@@ -197,7 +197,7 @@ export const SAMPLE_TEMPLATES = [
     metadata: {
       animated: false,
     },
-    preview: "https://ik.imagekit.io/scenify/OnktZ7CLGntNeirIYZ_eN8Cm.png",
+    preview: "https://ik.imagekit.io/cezllypgi/templ1.jpg?updatedAt=1743773050099",
   },
   {
     id: "sRQQYw0OOnctiJUBsMg6S",
@@ -367,7 +367,7 @@ export const SAMPLE_TEMPLATES = [
     metadata: {
       animated: false,
     },
-    preview: "https://ik.imagekit.io/scenify/2ZdeFFC6gdlw_LkzDN2J5cHs.png",
+    preview: "https://ik.imagekit.io/cezllypgi/templ2.jpg?updatedAt=1743773049816",
   },
   {
     id: "x2shx-AJICr0dZo32dq9y",
@@ -537,7 +537,7 @@ export const SAMPLE_TEMPLATES = [
     metadata: {
       animated: false,
     },
-    preview: "https://ik.imagekit.io/scenify/hkHXvT7iOVnyZwLIkniU8WpA.png",
+    preview: "https://ik.imagekit.io/cezllypgi/templ3.jpg?updatedAt=1743773049942",
   },
 ]
 

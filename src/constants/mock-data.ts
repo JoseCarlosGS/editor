@@ -12,7 +12,7 @@ export const graphics = [
     path: [["M", 60, 0], ["L", 0, 0], ["L", 0, 60], ["L", 60, 60], ["L", 60, 0], ["Z"]],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635011325399_603749.png",
+    preview: "https://ik.imagekit.io/cezllypgi/cuadrado.png?updatedAt=1743785126040",
     id: "E2mcHFkwGA-MTJcfl3Abs",
   },
   {
@@ -67,7 +67,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014101144_519480.png",
+    preview: "https://ik.imagekit.io/cezllypgi/hexagono.png?updatedAt=1743785126251",
     id: "9VWsxoB_O8LSAkCIRjNFY",
   },
   {
@@ -134,7 +134,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014130664_615881.png",
+    preview: "https://ik.imagekit.io/cezllypgi/estrella-de-david.png?updatedAt=1743785126163",
     id: "fRmRlanl-hydswssHKhn6",
   },
   {

@@ -3,12 +3,16 @@ import { Block } from "baseui/block"
 import Common from "./Common"
 import useAppContext from "~/hooks/useAppContext"
 import { useActiveObject, useEditor } from "@layerhub-io/react"
+import { set } from "lodash"
+import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 
 const Canvas = () => {
   const [state, setState] = React.useState({ fill: "#000000" })
   const { setActiveSubMenu } = useAppContext()
+  const { setActivePanel } = useAppContext()
   const editor = useEditor()
   const activeObject = useActiveObject() as any
+  const setIsSidebarOpen = useSetIsSidebarOpen()
 
   React.useEffect(() => {
     if (editor) {
@@ -30,6 +34,11 @@ const Canvas = () => {
     }
   }, [editor, activeObject])
 
+  const handleOnClick = () => {
+    setIsSidebarOpen(true)
+    setActiveSubMenu("CanvasFill")  
+  }
+
   return (
     <Block
       $style={{
@@ -47,7 +56,7 @@ const Canvas = () => {
           alignItems: "center",
         }}
       >
-        <Block onClick={() => setActiveSubMenu("CanvasFill")}>
+        <Block onClick={handleOnClick}>
           <Block
             $style={{
               height: "24px",
