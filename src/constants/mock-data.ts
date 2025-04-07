@@ -29,7 +29,7 @@ export const graphics = [
     fill: "#CBCBCB",
     metadata: {},
     id: "SY15tkntkk8S1PudoMfRI",
-    preview: "https://ik.imagekit.io/scenify/1635011631415_820612.png",
+    preview: "https://ik.imagekit.io/cezllypgi/flecha-hacia-arriba.png?updatedAt=1743785126165",
   },
   {
     left: 0,
@@ -217,7 +217,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014150489_628269.png",
+    preview: "https://ik.imagekit.io/cezllypgi/flores.png?updatedAt=1743785126408",
     id: "A8WLbfJFV1D58X1RUZADd",
   },
   {
@@ -304,7 +304,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014314495_390592.png",
+    preview: "https://ik.imagekit.io/cezllypgi/twitter.png?updatedAt=1743785126387",
     id: "0dwJMLuw8DK9jddPSapOV",
   },
   {
@@ -348,7 +348,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014323800_275038.png",
+    preview: "https://ik.imagekit.io/cezllypgi/corazon.png?updatedAt=1743785126454",
     id: "3w9KPQbyeUe3kgtwpMZx4",
   },
   {
@@ -481,7 +481,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014340531_452464.png",
+    preview: "https://ik.imagekit.io/cezllypgi/pulgar-arriba.png?updatedAt=1743785126170",
     id: "vAE3f8-4M0-2j5PF04cVY",
   },
 ]

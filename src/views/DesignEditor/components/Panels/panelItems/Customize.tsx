@@ -251,7 +251,8 @@ const ResizeTemplate = () => {
             $style={{
               padding: "2rem 1rem 1rem",
               textAlign: "center",
-              fontWeight: 500,
+              fontWeight: 600,
+              fontFamily: "Roboto, sans-serif",
             }}
           >
             Choose a format and resize your template.
@@ -320,7 +321,11 @@ const ResizeTemplate = () => {
             <Tab title="Custom size">
               <Block $style={{ padding: "2rem 2rem" }}>
                 <Block
-                  $style={{ display: "grid", gridTemplateColumns: "1fr 50px 1fr", alignItems: "end", fontSize: "14px" }}
+                  $style={{ display: "grid", 
+                    gridTemplateColumns: "1fr 50px 1fr", 
+                    alignItems: "end", 
+                    fontSize: "14px" 
+                  }}
                 >
                   <Input
                     onChange={(e: any) => setDesiredFrame({ ...desiredFrame, width: e.target.value })}
@@ -352,7 +357,11 @@ const ResizeTemplate = () => {
             </Tab>
           </Tabs>
         </Block>
-        <Block $style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "2rem" }}>
+        <Block $style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          paddingBottom: "2rem" }}>
           <Button disabled={!isEnabled} onClick={applyResize} style={{ width: "190px" }}>
             Resize template
           </Button>
