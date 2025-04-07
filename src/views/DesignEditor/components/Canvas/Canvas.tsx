@@ -1,4 +1,5 @@
-import React from "react"
+import React, { useState, useRef, useEffect } from "react";
+import { fabric } from "fabric"
 import { Canvas as LayerhubCanvas } from "@layerhub-io/react"
 import Playback from "../Playback"
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
