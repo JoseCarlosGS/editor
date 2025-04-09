@@ -15,22 +15,12 @@ const Canvas = () => {
 
   const updateCanvasSize = () => {
     if (!editor || !editor.frame || !editor.frame.frame) return;
-    
-    console.log("Current zoom ratio:", zoomRatio);
-    
 
     const scrollContainer = document.getElementById("layerhub-scroll-container");
     if (!scrollContainer) return;
-    
     try {
-      // Obtener el frame y sus dimensiones
       const frame = editor.frame.frame;
-
-      const canvas = editor.canvas.canvas;
-      
-
-      console.log("Frame dimensions:", frame.width, frame.height);
-      
+      const canvas = editor.canvas.canvas;  
       // Calcular dimensiones con zoom
       const frameWidth = frame.width || 800; 
       const frameHeight = frame.height || 600;
@@ -61,29 +51,28 @@ const Canvas = () => {
         fabricContainer.style.width = `${zoomedWidth}px`;
         fabricContainer.style.height = `${zoomedHeight}px`;
 
-        if(zoomRatio > 0.4 && zoomRatio < 0.7) {
-          canvas.setDimensions({ width: canvasWidth, height: canvasHeight+ (zoomedCanvasHeight * 0.1) });
-          console.log(`Canvas height increased to: ${canvas.height}`);
-        }
-        if(zoomRatio >= 0.7) { 
-          canvas.setDimensions({ width: canvasWidth + (zoomedCanvasWidth * 0.1), height: canvasHeight + (zoomedCanvasHeight * 0.1) });
-        }
+        // if(zoomRatio > 0.4 && zoomRatio < 0.7) {
+        //   canvas.setDimensions({ width: canvasWidth, height: canvasHeight+ (zoomedCanvasHeight * 0.1) });
+        //   console.log(`Canvas height increased to: ${canvas.height}`);
+        // }
+        // if(zoomRatio >= 0.7) { 
+        //   canvas.setDimensions({ width: canvasWidth + (zoomedCanvasWidth * 0.1), height: canvasHeight + (zoomedCanvasHeight * 0.1) });
+        // }
 
-        
         // Centrar el contenido en el área de visualización
-        if (scrollContainer.clientWidth > zoomedWidth + margin) {
-          const leftMargin = (scrollContainer.clientWidth - (zoomedWidth + margin)) / 2;
-          fabricContainer.style.marginLeft = '0px';
-        } else {
-          fabricContainer.style.marginLeft = '0px';
-        }
+        // if (scrollContainer.clientWidth > zoomedWidth + margin) {
+        //   const leftMargin = (scrollContainer.clientWidth - (zoomedWidth + margin)) / 2;
+        //   fabricContainer.style.marginLeft = '0px';
+        // } else {
+        //   fabricContainer.style.marginLeft = '0px';
+        // }
         
-        if (scrollContainer.clientHeight > zoomedHeight + margin) {
-          const topMargin = (scrollContainer.clientHeight - (zoomedHeight + margin)) / 2;
-          fabricContainer.style.marginTop = '0px';
-        } else {
-          fabricContainer.style.marginTop = '0px';
-        }
+        // if (scrollContainer.clientHeight > zoomedHeight + margin) {
+        //   const topMargin = (scrollContainer.clientHeight - (zoomedHeight + margin)) / 2;
+        //   fabricContainer.style.marginTop = '0px';
+        // } else {
+        //   fabricContainer.style.marginTop = '0px';
+        // }
       }
     } catch (error) {
       console.error("Error updating canvas size:", error);
@@ -94,13 +83,8 @@ const Canvas = () => {
     if (!containerRef.current) return;
     
     const container = containerRef.current;
-    
-    // IMPORTANTE: No configuramos overflow:auto aquí todavía
-    // para no afectar a toda la pantalla
     container.style.position = "relative";
     container.style.overflow = "hidden";
-    
-    console.log("Canvas container initialized");
   }, []);
 
   useEffect(() => {
@@ -192,10 +176,7 @@ const Canvas = () => {
       updateCanvasSize();
     };
     updateCanvasSize();
-
     editor.on("zoom:change", handleZoomChange);
-    
-    // También manejar cambios en el frame (cuando se cambia el tamaño del diseño)
     editor.on("frame:updated", handleZoomChange);
     
     return () => {
