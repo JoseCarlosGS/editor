@@ -166,12 +166,19 @@ const Navbar = () => {
         layers: scn.layers,
         metadata: {},
       }
+      //const obj = editor.objects.findById("imgbck")
       const loadedScene = await loadVideoEditorAssets(scene)
       await loadTemplateFonts(loadedScene)
 
       const preview = (await editor.renderer.render(loadedScene)) as string
       scenes.push({ ...loadedScene, preview })
     }
+    setTimeout(() => {
+      const objectToLock = editor.objects.findById("imgbck");
+      if (objectToLock) {
+        editor.objects.lock("imgbck");
+      }
+    }, 500); 
 
     return { scenes, design }
   }
