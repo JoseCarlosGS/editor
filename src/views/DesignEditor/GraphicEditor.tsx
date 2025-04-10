@@ -6,7 +6,7 @@ import Toolbox from "./components/Toolbox"
 import EditorContainer from "./components/EditorContainer"
 import React, { useState, useRef, useEffect } from "react";
 
-export const CanvasContext = React.createContext(null);
+//export const CanvasContext = React.createContext(null);
 
 const GraphicEditor = () => {
   const canvasRef = useRef(null);
