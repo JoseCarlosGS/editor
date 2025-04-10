@@ -30,12 +30,12 @@ const CanvasFill = () => {
     editor.canvas.setBackgroundColor(color)
   }, 100)
 
-  const [isVisible, setIsVisible] = useState(true);
+  // const [isVisible, setIsVisible] = useState(true);
 
-  const handleClose = () => {
-    setIsVisible(false); // Ocultar el CanvasFill
-    setActiveSubMenu(activePanel); // Restaurar el panel activo anterior
-  };
+   const handleClose = () => {
+  //   setIsVisible(false); // Ocultar el CanvasFill
+  //   setActiveSubMenu(activePanel); // Restaurar el panel activo anterior
+ };
 
   return (
     <Block $style={{ flex: 1, display: "flex", flexDirection: "column" }}>
