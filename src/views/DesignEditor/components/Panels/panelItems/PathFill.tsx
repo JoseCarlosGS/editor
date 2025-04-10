@@ -1,10 +1,11 @@
-import React from "react"
+import React, {useState} from "react"
 import { Block } from "baseui/block"
 import Scrollable from "~/components/Scrollable"
 import { HexColorPicker } from "react-colorful"
 import { Delete } from "baseui/icon"
 import { throttle } from "lodash"
 import { useActiveObject, useEditor } from "@layerhub-io/react"
+import useAppContext from "~/hooks/useAppContext"
 
 const PRESET_COLORS = [
   "#f44336",
@@ -25,6 +26,7 @@ const PathFill = () => {
   const [color, setColor] = React.useState("#b32aa9")
   const activeObject = useActiveObject()
   const editor = useEditor()
+  const { activePanel, setActivePanel, activeSubMenu, setActiveSubMenu } = useAppContext();
 
   const updateObjectFill = throttle((color: string) => {
     if (activeObject) {
@@ -33,6 +35,13 @@ const PathFill = () => {
 
     setColor(color)
   }, 100)
+
+  const [isVisible, setIsVisible] = useState(true);
+
+  const handleClose = () => {
+      setIsVisible(false); // Ocultar el CanvasFill
+      setActiveSubMenu(activePanel); // Restaurar el panel activo anterior
+  };
 
   return (
     <Block $style={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -47,8 +56,12 @@ const PathFill = () => {
       >
         <Block>Path Fill</Block>
 
-        <Block $style={{ cursor: "pointer", display: "flex" }}>
-          <Delete size={24} />
+        <Block
+            $style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}
+            onClick={handleClose}// Ocultar el componente
+            aria-label="Close Canvas Fill"
+          >
+            <Delete size={24} />
         </Block>
       </Block>
       <Scrollable>
