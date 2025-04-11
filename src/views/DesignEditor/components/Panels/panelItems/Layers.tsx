@@ -73,7 +73,7 @@ const Layers = () => {
               key={object.id}
             >
               <Block $style={{ cursor: "pointer" }} onClick={() => editor.objects.select(object.id)}>
-                {object.name}
+              {object.type === "staticText" ? object.text : object.name}
               </Block>
               <Block $style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
                 {object.locked ? (
