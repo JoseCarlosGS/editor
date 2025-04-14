@@ -6,6 +6,10 @@ import { Button, KIND, SIZE } from "baseui/button"
 import { Slider } from "baseui/slider"
 import { Input } from "baseui/input"
 import { useEditor, useZoomRatio } from "@layerhub-io/react"
+import useAppContext from "~/hooks/useAppContext"
+import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
+import useIsSidebarOpen from "~/hooks/useIsSidebarOpen"
+import panelItems from "../../Panels/panelItems"
 
 const Container = styled<"div", {}, Theme>("div", ({ $theme }) => ({
   height: "50px",
@@ -28,6 +32,9 @@ const Common = () => {
   const editor = useEditor()
   const zoomRatio: number = useZoomRatio()
   const previousZoomRef = React.useRef(zoomRatio);
+  const { activePanel, setActivePanel, activeSubMenu, setActiveSubMenu } = useAppContext();
+  const setIsSidebarOpen = useSetIsSidebarOpen()
+  const isSidebarOpen = useIsSidebarOpen()
 
   React.useEffect(() => {
     setOptions({ ...options, zoomRatio: Math.round(zoomRatio * 100) })
@@ -73,10 +80,17 @@ const Common = () => {
     }
   }
 
+  const handleLayersMenu = () => {
+    if (!isSidebarOpen) {
+      setIsSidebarOpen(true)
+    }
+    setActiveSubMenu("Layers");
+  }
+
   return (
     <Container>
       <div>
-        <Button kind={KIND.tertiary} size={SIZE.compact}>
+        <Button kind={KIND.tertiary} size={SIZE.compact} onClick={() => handleLayersMenu()}>
           <Icons.Layers size={20} />
         </Button>
       </div>

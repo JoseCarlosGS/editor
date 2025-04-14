@@ -27,6 +27,7 @@ import { IStaticText } from "@layerhub-io/types"
 import { getTextProperties } from "../../utils/text"
 import { loadFonts } from "~/utils/fonts"
 import Scrollbar from "@layerhub-io/react-custom-scrollbar"
+import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 
 interface TextState {
   color: string
@@ -60,6 +61,13 @@ const Text = () => {
   const activeObject = useActiveObject() as Required<IStaticText>
   const { setActiveSubMenu } = useAppContext()
   const editor = useEditor()
+  const setIsSidebarOpen = useSetIsSidebarOpen()
+
+  const handleOnClick = (submenu: string) => {
+    console.log("submenu", submenu)
+    setIsSidebarOpen(true)
+    setActiveSubMenu(submenu)  
+  }
 
   React.useEffect(() => {
     if (activeObject && activeObject.type === "StaticText") {
@@ -84,6 +92,8 @@ const Text = () => {
       }
     }
   }, [editor, activeObject])
+
+ 
 
   const makeBold = React.useCallback(async () => {
     if (state.bold) {
@@ -215,7 +225,7 @@ const Text = () => {
     >
       <Block display="flex" gridGap="0.5rem" alignItems="center">
         <Block
-          onClick={() => setActiveSubMenu("FontSelector")}
+          onClick={() => handleOnClick("FontSelector")}
           $style={{
             border: "1px solid rgb(185,185,185)",
             borderRadius: "4px",
@@ -243,7 +253,7 @@ const Text = () => {
             accessibilityType="tooltip"
             content="Text color"
           >
-            <Button onClick={() => setActiveSubMenu("TextFill")} size={SIZE.mini} kind={KIND.tertiary}>
+            <Button onClick={() => handleOnClick("TextFill")} size={SIZE.mini} kind={KIND.tertiary}>
               <TextColor color={state.color} size={22} />
             </Button>
           </StatefulTooltip>
