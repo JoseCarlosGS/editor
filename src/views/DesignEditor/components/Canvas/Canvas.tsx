@@ -17,14 +17,14 @@ const Canvas = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Space") {
+      if (e.code === "ControlLeft") {
         setIsSpacePressed(true)
         e.preventDefault()
       }
     }
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === "Space") {
+      if (e.code === "ControlLeft") {
         setIsSpacePressed(false)
       }
     }
