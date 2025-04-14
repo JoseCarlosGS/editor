@@ -1,7 +1,7 @@
 import { Button, SIZE } from "baseui/button"
 import { textComponents } from "~/constants/editor"
 import { useStyletron } from "styletron-react"
-import { useEditor, useObjects } from "@layerhub-io/react"
+import { useActiveObject, useEditor, useObjects } from "@layerhub-io/react"
 import { FontItem } from "~/interfaces/common"
 import { loadFonts } from "~/utils/fonts"
 import { ILayer, IStaticText } from "@layerhub-io/types"
@@ -10,22 +10,19 @@ import { Block } from "baseui/block"
 import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
 import Scrollable from "~/components/Scrollable"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
-import Delete from "baseui/icon/delete"
-import FlipVertical from "~/components/Icons/FlipVertical"
+import Delete from "~/components/Icons/Delete"
+import { ChevronDown } from "baseui/icon"
+import { ChevronUp } from "baseui/icon"
 import { useState } from "react"
-import { Select } from 'baseui/select';
 import { Input } from 'baseui/input';
-import Customize from "~/components/Icons/Customize"
+import { Textarea } from 'baseui/textarea';
 
 const Text = () => {
   const editor = useEditor()
+  const activeObject = useActiveObject()
   const setIsSidebarOpen = useSetIsSidebarOpen()
   const objects = useObjects() as ILayer[]
   const textObjects = objects.filter(obj => obj.type === 'StaticText');
-
-   // Estado para el modal
-   const [isOpen, setIsOpen] = useState(false);
-   const [currentObject, setCurrentObject] = useState(null);
 
    const [editingId, setEditingId] = useState(null);
    const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
@@ -104,22 +101,27 @@ const Text = () => {
   };
   
   const handleDelete = (id: string) => {
-    // Función para eliminar el objeto
+    if (activeObject) {
+      editor.objects.remove(id);
+    }
     console.log('Eliminando objeto:', id);
   };
 
-  const handleSave = (object:any) => {
-    console.log('Guardando objeto:', object);
-    editor.objects.update(object.tex, object.id)
-    console.log('Guardando cambios:');
-    
-    // Cerrar el modal
-    setIsOpen(false);
+  const handleSave = (text:string) => {
+    if (activeObject) {
+      editor.objects.update({ text: text })
+    }
   };
-  
-  const handleCancel = () => {
-    setIsOpen(false);
-  };
+
+  const isSelected = (id: string) => {
+    const currentObject = activeObject as IStaticText
+    const selectedObjects = editor.objects.findById(id);
+    const selectedObject = Array.isArray(selectedObjects) && selectedObjects.length > 0 ? selectedObjects[0] as IStaticText : null;
+    if (activeObject) {
+      return selectedObject === currentObject
+    }
+    return false
+  }
 
   return (
     <Block $style={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -172,34 +174,42 @@ const Text = () => {
               key={textObj.id}
               marginBottom="0.5rem"
               onClick={() => editor.objects.select(textObj.id)}
+              $style={{
+              borderRadius: "4px",
+              }}
             >
               {/* Elemento principal */}
               <Block $style={{
-                cursor: "pointer",
-                marginTop:"0.5rem",
-                display:"flex", 
-                alignItems:"center", 
-                justifyContent:"space-between",
-                padding:"0.5rem",
-                backgroundColor:"#f6f6f6",
-                borderRadius: editingId === textObj.id ? "4px 4px 0 0" : "4px"
+              cursor: "pointer",
+              marginTop:"0.5rem",
+              display:"flex", 
+              alignItems:"center", 
+              justifyContent:"space-between",
+              padding:"0.5rem",
+              backgroundColor:"#f6f6f6",
+              borderRadius: editingId === textObj.id ? "4px 4px 0 0" : "4px",
+              boxShadow: isSelected(textObj.id) ? "0 0 8px rgba(0, 112, 243, 0.5)" : "none", // Sombra si está seleccionado
               }}
               >
-                <Block>{textObj.name || 'Text sin nombre'}</Block>
-                <Block  $style={{display:"flex", gap:"0.5rem"}}>
-                  <Button 
-                    onClick={() => handleEdit(textObj)}
-                    size={SIZE.mini}
-                    kind={editingId === textObj.id ? "primary" : "secondary"}
-                  >
-                    <FlipVertical size={16} />
-                  </Button>
+              <Block>{textObj.name || 'Text sin nombre'}</Block>
+              <Block  $style={{
+                display:"flex", 
+                gap:"0.5rem", 
+                
+              }}>
+                <Button 
+                onClick={() => handleEdit(textObj)}
+                size={SIZE.mini}
+                kind={editingId === textObj.id ? "primary" : "secondary"}
+                >
+                    {editingId === textObj.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}        
+                    </Button>
                   <Button 
                     onClick={() => handleDelete(textObj.id)}
                     size={SIZE.mini}
                     kind="tertiary"
                   >
-                    <Delete size={16} color="red" />
+                    <Delete size={20}/>
                   </Button>
                 </Block>
               </Block>
@@ -212,7 +222,7 @@ const Text = () => {
                   borderTop:"1px solid #e0e0e0",
                   borderRadius:"0 0 4px 4px"}}
                 >
-                  <Block marginBottom="0.75rem">
+                    {/* <Block marginBottom="0.75rem">
                     <Block $style={{marginBottom:"0.25rem", fontSize:"12px"}}>Tipo</Block>
                     <Select
                       options={typeOptions}
@@ -221,26 +231,52 @@ const Text = () => {
                       onChange={({value}) => setEditType(value as { label: string; id: string }[])}
                       clearable={false}
                       size="compact"
+                      searchable={false} // Deshabilitar la edición
                     />
-                  </Block>
+                    </Block> */}
                   <Block marginBottom="0.75rem">
-                    <Block $style={{marginBottom:"0.25rem", fontSize:"12px"}}>Valor</Block>
-                    <Input
+                    <Block $style={{
+                      marginBottom:"0.25rem", 
+                      fontSize:"12px"
+                      }}>Valor</Block>
+                    <Textarea
                       value={editValue}
-                      onChange={e => setEditValue(e.target.value)}
+                      onChange={e => {
+                        const newValue = e.target.value;
+                        setEditValue(newValue);
+                        
+                        // Actualiza el texto en el canvas inmediatamente
+                        if (activeObject) {
+                          editor.objects.update({ text: newValue });
+                        }
+                      }}
                       placeholder="Ingrese el valor"
                       size="compact"
+                      rows={3} // Número de filas visibles inicialmente
+                      maxLength={500} // Opcional: limitar caracteres si es necesario
+                      overrides={{
+                        Input: {
+                          style: {
+                            backgroundColor: '#FFFFFF', // Fondo blanco para contrastar con el fondo del panel
+                            border: '1px solid #CCCCCC',
+                            borderRadius: '4px',
+                            padding: '8px',
+                            fontSize: '14px',
+                            lineHeight: '1.4',
+                            resize: 'vertical', // Permite al usuario ajustar la altura
+                            minHeight: '60px',
+                            '::placeholder': {
+                              color: '#AAAAAA'
+                            },
+                            ':focus': {
+                              border: '1px solid #276EF1',
+                              boxShadow: '0 0 0 3px rgba(39, 110, 241, 0.2)'
+                            }
+                          }
+                        }
+                      }}
                     />
                   </Block>
-                  <Block $style={{display:"flex", justifyContent:"flex-end", gap:"0.5rem"}}>
-                  <Button 
-                    onClick={() => handleSave(textObj)}
-                    size={SIZE.mini}
-                    kind="primary"
-                  >
-                    <Customize size={16} />
-                  </Button>
-                </Block>
                 </Block>
                 
               )}
