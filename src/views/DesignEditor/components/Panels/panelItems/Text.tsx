@@ -188,7 +188,7 @@ const Text = () => {
               padding:"0.5rem",
               backgroundColor:"#f6f6f6",
               borderRadius: editingId === textObj.id ? "4px 4px 0 0" : "4px",
-              boxShadow: isSelected(textObj.id) ? "0 0 8px rgba(0, 112, 243, 0.5)" : "none", // Sombra si está seleccionado
+              boxShadow: isSelected(textObj.id) ? "0 0 8px rgba(0, 112, 243, 0.5)" : "none", 
               }}
               >
               <Block>{textObj.name || 'Text sin nombre'}</Block>
@@ -202,14 +202,14 @@ const Text = () => {
                 size={SIZE.mini}
                 kind={editingId === textObj.id ? "primary" : "secondary"}
                 >
-                    {editingId === textObj.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}        
+                    {editingId === textObj.id ? <ChevronUp size={22} /> : <ChevronDown size={22} />}        
                     </Button>
                   <Button 
                     onClick={() => handleDelete(textObj.id)}
                     size={SIZE.mini}
                     kind="tertiary"
                   >
-                    <Delete size={20}/>
+                    <Delete size={22}/>
                   </Button>
                 </Block>
               </Block>
@@ -235,10 +235,6 @@ const Text = () => {
                     />
                     </Block> */}
                   <Block marginBottom="0.75rem">
-                    <Block $style={{
-                      marginBottom:"0.25rem", 
-                      fontSize:"12px"
-                      }}>Valor</Block>
                     <Textarea
                       value={editValue}
                       onChange={e => {

@@ -1,5 +1,7 @@
 import axios, { AxiosInstance } from "axios"
 import { Resource } from "~/interfaces/editor"
+// Removed "fs" import as it is not compatible with browser environments.
+import path from "path";
 
 type IElement = any
 type IFontFamily = any
@@ -10,8 +12,8 @@ class ApiService {
   base: AxiosInstance
   constructor() {
     this.base = axios.create({
-      // baseURL: "http://localhost:8080",
-      baseURL: "https://burly-note-production.up.railway.app",
+      baseURL: "http://localhost:8000/api",
+      //baseURL: "https://burly-note-production.up.railway.app",
       headers: {
         Authorization: "Bearer QYT8s1NavSTpTAxURji98Fpg",
       },
@@ -157,6 +159,17 @@ class ApiService {
     return new Promise(async (resolve, reject) => {
       try {
         const { data } = await this.base.get(`/templates/${id}`)
+        resolve(data)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  loadTemplateByFilename(filename: string): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await this.base.get(`/templates/load/${filename}`)
         resolve(data)
       } catch (err) {
         reject(err)
