@@ -13,21 +13,32 @@ import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 import Delete from "~/components/Icons/Delete"
 import { ChevronDown } from "baseui/icon"
 import { ChevronUp } from "baseui/icon"
-import { useState } from "react"
-import { Input } from 'baseui/input';
+import { useEffect, useReducer, useState } from "react"
 import { Textarea } from 'baseui/textarea';
+import useEditorHistoryListener from "~/hooks/useEditorHistoryListener"
 
 const Text = () => {
   const editor = useEditor()
   const activeObject = useActiveObject()
   const setIsSidebarOpen = useSetIsSidebarOpen()
   const objects = useObjects() as ILayer[]
-  const textObjects = objects.filter(obj => obj.type === 'StaticText');
-
+  //const textObjects = objects.filter(obj => obj.type === 'StaticText');
    const [editingId, setEditingId] = useState(null);
    const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
    const [editValue, setEditValue] = useState('');
-   
+
+   const [localObjects, setLocalObjects] = useState<ILayer[]>([])
+
+   useEffect(() => {
+    setLocalObjects(objects)
+  }, [objects])
+    
+  useEditorHistoryListener(() => {
+      console.log('Editor history changed')
+      const currentObjects = editor.objects.list() as ILayer[]
+      setLocalObjects(currentObjects)
+  })
+   const localTextObjects = localObjects.filter(obj => obj.type === 'StaticText')
    // Opciones para el combobox
    const typeOptions = [
      { label: 'Nombre', id: 'name' },
@@ -169,7 +180,7 @@ const Text = () => {
             ))}
           </Block> */}
 
-          {textObjects.map((textObj) => (
+          {localTextObjects.map((textObj) => (
             <Block 
               key={textObj.id}
               marginBottom="0.5rem"
