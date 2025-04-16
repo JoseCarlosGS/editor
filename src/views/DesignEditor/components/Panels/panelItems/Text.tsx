@@ -217,7 +217,7 @@ const Text = () => {
               {/* Panel de edición desplegable */}
               {editingId === textObj.id && (
                 <Block 
-                  $style={{padding:"0.75rem",
+                  $style={{padding:"0.25rem",
                   backgroundColor:"#f0f0f0",
                   borderTop:"1px solid #e0e0e0",
                   borderRadius:"0 0 4px 4px"}}
@@ -253,20 +253,20 @@ const Text = () => {
                       overrides={{
                         Input: {
                           style: {
-                            backgroundColor: '#FFFFFF', // Fondo blanco para contrastar con el fondo del panel
+                            backgroundColor: '#FFFFFF', 
                             border: '1px solid #CCCCCC',
                             borderRadius: '4px',
                             padding: '8px',
                             fontSize: '14px',
                             lineHeight: '1.4',
-                            resize: 'vertical', // Permite al usuario ajustar la altura
+                            //resize: 'vertical',
                             minHeight: '60px',
                             '::placeholder': {
                               color: '#AAAAAA'
                             },
                             ':focus': {
-                              border: '1px solid #276EF1',
-                              boxShadow: '0 0 0 3px rgba(39, 110, 241, 0.2)'
+                              //border: '1px solid #276EF1',
+                              //boxShadow: '0 0 0 3px rgba(196, 215, 250, 0.2)'
                             }
                           }
                         }
