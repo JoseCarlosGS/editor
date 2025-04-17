@@ -10,7 +10,8 @@
             "text": "Texto",
             "graphics": "Graficos",
             "pixabay": "Pixabay",
-            "layers": "Capas"
+            "layers": "Capas",
+            "documentFields": "Campos"
         }
     }
 }

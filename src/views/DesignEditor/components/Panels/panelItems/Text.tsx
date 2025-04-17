@@ -65,7 +65,9 @@ const Text = () => {
         fontStyle: "normal",
         fontURL: font.url,
         fill: "#333333",
-        metadata: {},
+        metadata: {
+          type: "field", 
+        },
       }
       editor.objects.add(options)
     }
@@ -167,7 +169,7 @@ const Text = () => {
             Add text
           </Button>
 
-          {/* <Block
+          <Block
             $style={{
               paddingTop: "0.5rem",
               display: "grid",
@@ -178,121 +180,11 @@ const Text = () => {
             {[...textComponents].map((tc) => (
               <TextComponentItem onClick={addComponent} key={tc.id} component={tc} />
             ))}
-          </Block> */}
+          </Block>
 
-          {localTextObjects.map((textObj) => (
-            <Block 
-              key={textObj.id}
-              marginBottom="0.5rem"
-              onClick={() => editor.objects.select(textObj.id)}
-              $style={{
-              borderRadius: "4px",
-              }}
-            >
-              {/* Elemento principal */}
-              <Block $style={{
-              cursor: "pointer",
-              marginTop:"0.5rem",
-              display:"flex", 
-              alignItems:"center", 
-              justifyContent:"space-between",
-              padding:"0.5rem",
-              backgroundColor:"#f6f6f6",
-              borderRadius: editingId === textObj.id ? "4px 4px 0 0" : "4px",
-              boxShadow: isSelected(textObj.id) ? "0 0 8px rgba(0, 112, 243, 0.5)" : "none", 
-              }}
-              >
-              <Block>{textObj.name || 'Text sin nombre'}</Block>
-              <Block  $style={{
-                display:"flex", 
-                gap:"0.5rem", 
-                
-              }}>
-                <Button 
-                onClick={() => handleEdit(textObj)}
-                size={SIZE.mini}
-                kind={editingId === textObj.id ? "primary" : "secondary"}
-                >
-                    {editingId === textObj.id ? <ChevronUp size={22} /> : <ChevronDown size={22} />}        
-                    </Button>
-                  <Button 
-                    onClick={() => handleDelete(textObj.id)}
-                    size={SIZE.mini}
-                    kind="tertiary"
-                  >
-                    <Delete size={22}/>
-                  </Button>
-                </Block>
-              </Block>
-              
-              {/* Panel de edición desplegable */}
-              {editingId === textObj.id && (
-                <Block 
-                  $style={{padding:"0.25rem",
-                  backgroundColor:"#f0f0f0",
-                  borderTop:"1px solid #e0e0e0",
-                  borderRadius:"0 0 4px 4px"}}
-                >
-                    {/* <Block marginBottom="0.75rem">
-                    <Block $style={{marginBottom:"0.25rem", fontSize:"12px"}}>Tipo</Block>
-                    <Select
-                      options={typeOptions}
-                      value={editType}
-                      placeholder="Seleccionar tipo"
-                      onChange={({value}) => setEditType(value as { label: string; id: string }[])}
-                      clearable={false}
-                      size="compact"
-                      searchable={false} // Deshabilitar la edición
-                    />
-                    </Block> */}
-                  <Block marginBottom="0.75rem">
-                    <Textarea
-                      value={editValue}
-                      onChange={e => {
-                        const newValue = e.target.value;
-                        setEditValue(newValue);
-                        
-                        // Actualiza el texto en el canvas inmediatamente
-                        if (activeObject) {
-                          editor.objects.update({ text: newValue });
-                        }
-                      }}
-                      placeholder="Ingrese el valor"
-                      size="compact"
-                      rows={3} // Número de filas visibles inicialmente
-                      maxLength={500} // Opcional: limitar caracteres si es necesario
-                      overrides={{
-                        Input: {
-                          style: {
-                            backgroundColor: '#FFFFFF', 
-                            border: '1px solid #CCCCCC',
-                            borderRadius: '4px',
-                            padding: '8px',
-                            fontSize: '14px',
-                            lineHeight: '1.4',
-                            //resize: 'vertical',
-                            minHeight: '60px',
-                            '::placeholder': {
-                              color: '#AAAAAA'
-                            },
-                            ':focus': {
-                              //border: '1px solid #276EF1',
-                              //boxShadow: '0 0 0 3px rgba(196, 215, 250, 0.2)'
-                            }
-                          }
-                        }
-                      }}
-                    />
-                  </Block>
-                </Block>
-                
-              )}
-            </Block>
-          ))}
+          
         </Block>
       </Scrollable>
-
-      
     </Block>
   )
 }
