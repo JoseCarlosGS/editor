@@ -21,8 +21,7 @@ import { Checkbox } from "baseui/checkbox";
 import { FormControl } from "baseui/form-control";
 import { DatePicker } from "baseui/datepicker";
 import { TimePicker } from "baseui/datepicker";
-
-
+import EditableName from "~/components/EditableName"
 
 const DocumentFields = () => {
   const editor = useEditor()
@@ -57,12 +56,12 @@ const DocumentFields = () => {
       const currentObjects = editor.objects.list() as ILayer[]
       setLocalObjects(currentObjects)
   })
-   const localTextObjects = localObjects.filter(obj => obj.type === 'StaticText')
+  const localTextObjects = localObjects.filter(obj => obj.metadata?.type === 'field')
    // Opciones para el combobox
-   const typeOptions = [
+  const typeOptions = [
     { id: "text", label: "Texto" },
-    { id: "time", label: "Tiempo" },
-    { id: "image", label: "Imagen (próximamente)" }
+    { id: "signature", label: "Firma" },
+    { id: "image", label: "Imagen" }
   ];
   const dateFormatOptions = [
     { id: "yyyy-MM-dd", label: "AAAA-MM-DD" },
@@ -117,7 +116,7 @@ const DocumentFields = () => {
             id: nanoid(),
             type: "StaticText",
             width: 420,
-            text: newFieldContent,
+            text: newFieldName,
             fontSize: 40,
             fontFamily: font.name,
             textAlign: "center",
@@ -132,35 +131,87 @@ const DocumentFields = () => {
           editor.objects.add(options)
         }
         // Añadir información adicional si es un campo de tiempo
-        if (fieldType[0].id === "time") {
-
-          const text = formatDateTimePreview(selectedDate, selectedTime, includeDate, includeTime, dateFormat[0].id, timeFormat[0].id)
-
-            const options = {
+        if (fieldType[0].id === "signature") {
+          const firma = {
             id: nanoid(),
             type: "StaticText",
             width: 420,
-            text: text.toString(),
+            text: newFieldContent,
             fontSize: 40,
             fontFamily: font.name,
             textAlign: "center",
             fontStyle: "normal",
             fontURL: font.url,
+            top: 607,
             fill: "#333333",
             name: newFieldName,
             metadata: {
               type: "field",
-              dateFormat: includeDate ? dateFormat[0].id : "",
-              timeFormat: includeTime ? timeFormat[0].id : "",
             },
-            }
-          editor.objects.add(options)
+          }
+          const line = {
+            id: nanoid(),
+            type: "StaticPath",
+            width: 60,
+            height: 60,
+            strokeWidth: 2,
+            stroke: "#333333",
+            name: newFieldName,
+            scaleX: 4.92,
+            scaleY: 0.03,
+            path: [
+              [
+                  "M",
+                  60,
+                  0
+              ],
+              [
+                  "L",
+                  0,
+                  0
+              ],
+              [
+                  "L",
+                  0,
+                  60
+              ],
+              [
+                  "L",
+                  60,
+                  60
+              ],
+              [
+                  "L",
+                  60,
+                  0
+              ],
+              [
+                  "Z"
+              ]
+            ],
+            fill: "#000000",
+            metadata: {
+            },
+          }
+          editor.objects.add(line)
+          editor.objects.add(firma)
         }
       
       //addObject(fieldData);
       }else
       {
-        console.log("Procesando imagen")
+        const options = {
+          id: nanoid(),
+          type: "StaticImage",
+          name: newFieldName,
+          src: "https://ik.imagekit.io/cezllypgi/M2Pflt01.svg?updatedAt=1745242241126",
+          scaleX: 0.5,
+          scaleY: 0.5,
+          metadata: {
+            type: "field",
+          },
+        }
+        editor.objects.add(options)
       }
       // Reset form
       resetForm();
@@ -237,9 +288,9 @@ const DocumentFields = () => {
     console.log('Eliminando objeto:', id);
   };
 
-  const handleSave = (text:string) => {
+  const handleSave = (name:string) => {
     if (activeObject) {
-      editor.objects.update({ text: text })
+      editor.objects.update({ name: name })
     }
   };
 
@@ -251,6 +302,13 @@ const DocumentFields = () => {
       return selectedObject === currentObject
     }
     return false
+  }
+
+  const handleUpdateImage = (image:string) =>{
+    if (activeObject) {
+      editor.objects.update({ src: image })
+    }
+    console.log('Actualizando imagen:', image);
   }
 
   return (
@@ -307,18 +365,19 @@ const DocumentFields = () => {
                 boxShadow: isSelected(textObj.id) ? "0 0 8px rgba(0, 112, 243, 0.5)" : "none",
               }}
               >
-                <Block>{textObj.name || 'Text sin nombre'}</Block>
+                <Block>{textObj.name || 'Texto sin nombre'}</Block>
                 <Block $style={{
                   display: "flex",
                   gap: "0.5rem",
                 }}>
-                  <Button
+                  {textObj.type === "StaticText" && <Button
                     onClick={() => handleEdit(textObj)}
                     size={SIZE.mini}
-                    kind={editingId === textObj.id ? "primary" : "secondary"}
-                  >
+                    kind={"tertiary"}
+                    disabled={textObj.type !== "StaticText"}                 
+                    > 
                     {editingId === textObj.id ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
-                  </Button>
+                  </Button>}
                   <Button
                     onClick={() => handleDelete(textObj.id)}
                     size={SIZE.mini}
@@ -338,19 +397,11 @@ const DocumentFields = () => {
                     borderRadius: "0 0 4px 4px"
                   }}
                 >
-                  {/* <Block marginBottom="0.75rem">
-                    <Block $style={{marginBottom:"0.25rem", fontSize:"12px"}}>Tipo</Block>
-                    <Select
-                      options={typeOptions}
-                      value={editType}
-                      placeholder="Seleccionar tipo"
-                      onChange={({value}) => setEditType(value as { label: string; id: string }[])}
-                      clearable={false}
-                      size="compact"
-                      searchable={false} // Deshabilitar la edición
+                  <Block >
+                    <EditableName 
+                      textObj={textObj} 
+                      handleSave={handleSave} 
                     />
-                    </Block> */}
-                  <Block marginBottom="0.75rem">
                     <Textarea
                       value={editValue}
                       onChange={e => {
@@ -364,7 +415,7 @@ const DocumentFields = () => {
                       } }
                       placeholder="Ingrese el valor"
                       size="compact"
-                      rows={3} // Número de filas visibles inicialmente
+                      rows={2} // Número de filas visibles inicialmente
                       maxLength={500} // Opcional: limitar caracteres si es necesario
                       overrides={{
                         Input: {
@@ -375,15 +426,11 @@ const DocumentFields = () => {
                             padding: '8px',
                             fontSize: '14px',
                             lineHeight: '1.4',
-                            //resize: 'vertical',
                             minHeight: '60px',
                             '::placeholder': {
                               color: '#AAAAAA'
                             },
-                            ':focus': {
-                              //border: '1px solid #276EF1',
-                              //boxShadow: '0 0 0 3px rgba(196, 215, 250, 0.2)'
-                            }
+
                           }
                         }
                       }} />
@@ -418,20 +465,22 @@ const DocumentFields = () => {
             <Input
               value={newFieldName}
               onChange={e => setNewFieldName(e.target.value)}
-              placeholder="Ej: Título, Fecha, Autor..."
+              placeholder="Ej: Título, Fecha, Nombre..."
               clearOnEscape />
           </FormControl>
 
-          {fieldType[0].id === "text" && (
+          {/* {fieldType[0].id === "text" && (
             <FormControl label="Contenido del campo">
               <Textarea
                 value={newFieldContent}
                 onChange={e => setNewFieldContent(e.target.value)}
                 placeholder="Escribe aquí el contenido..."
                 size="compact"
-                rows={3} />
+                rows={3}
+                 
+              />
             </FormControl>
-          )}
+          )} */}
 
           {fieldType[0].id === "time" && (
             <>
@@ -519,10 +568,7 @@ const DocumentFields = () => {
           )}
 
           {fieldType[0].id === "image" && (
-            <Block padding="1rem" display="flex" justifyContent="center">
-              <Block color="gray">
-                La funcionalidad de imágenes estará disponible próximamente
-              </Block>
+            <Block padding="1rem" display="none" justifyContent="center">
             </Block>
           )}
         </ModalBody>
@@ -530,7 +576,7 @@ const DocumentFields = () => {
           <ModalButton kind="tertiary" onClick={() => setIsModalOpen(false)}>
             Cancelar
           </ModalButton>
-          <ModalButton onClick={handleAddNewField} disabled={fieldType[0].id === "image"}>
+          <ModalButton onClick={handleAddNewField} >
             Crear campo
           </ModalButton>
         </ModalFooter>
