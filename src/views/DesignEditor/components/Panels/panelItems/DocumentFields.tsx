@@ -2,7 +2,7 @@ import { Button, SIZE } from "baseui/button"
 import { useActiveObject, useEditor, useObjects } from "@layerhub-io/react"
 import { FontItem } from "~/interfaces/common"
 import { loadFonts } from "~/utils/fonts"
-import { ILayer, IStaticText } from "@layerhub-io/types"
+import { ILayer, IStaticImage, IStaticText } from "@layerhub-io/types"
 import { nanoid } from "nanoid"
 import { Block } from "baseui/block"
 import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
@@ -17,15 +17,14 @@ import useEditorHistoryListener from "~/hooks/useEditorHistoryListener"
 import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton, ROLE } from "baseui/modal";
 import { Input } from "baseui/input";
 import { Select } from "baseui/select";
-import { Checkbox } from "baseui/checkbox";
 import { FormControl } from "baseui/form-control";
-import { DatePicker } from "baseui/datepicker";
-import { TimePicker } from "baseui/datepicker";
 import EditableName from "~/components/EditableName"
+import ImagePreview from "~/views/DesignEditor/utils/common/ImagePreview"
+import { toBase64 } from "~/utils/data"
 
 const DocumentFields = () => {
   const editor = useEditor()
-  const activeObject = useActiveObject()
+  const activeObject = useActiveObject() as ILayer
   const setIsSidebarOpen = useSetIsSidebarOpen()
   const objects = useObjects() as ILayer[]
   //const textObjects = objects.filter(obj => obj.type === 'StaticText');
@@ -39,13 +38,6 @@ const DocumentFields = () => {
   const [newFieldName, setNewFieldName] = useState("");
   const [newFieldContent, setNewFieldContent] = useState("");
   const [fieldType, setFieldType] = useState([{ id: "text", label: "Texto" }]);
-  const [includeDate, setIncludeDate] = useState(true);
-  const [includeTime, setIncludeTime] = useState(true);
-  const [dateFormat, setDateFormat] = useState([{ id: "yyyy-MM-dd", label: "AAAA-MM-DD" }]);
-  const [timeFormat, setTimeFormat] = useState([{ id: "HH:mm", label: "24 horas" }]);
-
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState(new Date());
 
    useEffect(() => {
     setLocalObjects(objects)
@@ -56,22 +48,15 @@ const DocumentFields = () => {
       const currentObjects = editor.objects.list() as ILayer[]
       setLocalObjects(currentObjects)
   })
-  const localTextObjects = localObjects.filter(obj => obj.metadata?.type === 'field')
+  const localTextObjects = localObjects.filter(obj => {
+    console.log("Objeto:", obj.id, obj.type, obj);
+    return obj.metadata?.type === 'field';
+  })
    // Opciones para el combobox
   const typeOptions = [
     { id: "text", label: "Texto" },
     { id: "signature", label: "Firma" },
     { id: "image", label: "Imagen" }
-  ];
-  const dateFormatOptions = [
-    { id: "yyyy-MM-dd", label: "AAAA-MM-DD" },
-    { id: "dd/MM/yyyy", label: "DD/MM/AAAA" },
-    { id: "MM/dd/yyyy", label: "MM/DD/AAAA" }
-  ];
-  
-  const timeFormatOptions = [
-    { id: "HH:mm", label: "24 horas (14:30)" },
-    { id: "hh:mm a", label: "12 horas (02:30 PM)" }
   ];
 
   const addObject = async () => {
@@ -102,7 +87,7 @@ const DocumentFields = () => {
   const handleAddNewField = async () => {
 
     if (newFieldName.trim()) {
-      console.log('Creando nuevo campo:', newFieldName, fieldType[0].id, newFieldContent, includeDate, includeTime, dateFormat[0].id, timeFormat[0].id)
+      console.log('Creando nuevo campo:', newFieldName, fieldType[0].id, newFieldContent)
 
       if (fieldType[0].id !== "image") {
         const font: FontItem = {
@@ -117,7 +102,7 @@ const DocumentFields = () => {
             type: "StaticText",
             width: 420,
             text: newFieldName,
-            fontSize: 40,
+            fontSize: 36,
             fontFamily: font.name,
             textAlign: "center",
             fontStyle: "normal",
@@ -136,8 +121,8 @@ const DocumentFields = () => {
             id: nanoid(),
             type: "StaticText",
             width: 420,
-            text: newFieldContent,
-            fontSize: 40,
+            text: newFieldName,
+            fontSize: 36,
             fontFamily: font.name,
             textAlign: "center",
             fontStyle: "normal",
@@ -161,29 +146,19 @@ const DocumentFields = () => {
             scaleY: 0.03,
             path: [
               [
-                  "M",
-                  60,
-                  0
+                  "M",60,0
               ],
               [
-                  "L",
-                  0,
-                  0
+                  "L",0,0
               ],
               [
-                  "L",
-                  0,
-                  60
+                  "L",0,60
               ],
               [
-                  "L",
-                  60,
-                  60
+                  "L",60,60
               ],
               [
-                  "L",
-                  60,
-                  0
+                  "L",60,0
               ],
               [
                   "Z"
@@ -199,12 +174,16 @@ const DocumentFields = () => {
       
       //addObject(fieldData);
       }else
-      {
+      { const response = await fetch("https://ik.imagekit.io/cezllypgi/M2Pflt01.svg?updatedAt=1745242241126");
+        const blob = await response.blob()
+        const file = new File([blob], "image.jpg", { type: blob.type });
+        const base64 = await toBase64(file) as unknown as string
         const options = {
           id: nanoid(),
           type: "StaticImage",
           name: newFieldName,
-          src: "https://ik.imagekit.io/cezllypgi/M2Pflt01.svg?updatedAt=1745242241126",
+          src: base64,
+          preview: base64,
           scaleX: 0.5,
           scaleY: 0.5,
           metadata: {
@@ -219,60 +198,17 @@ const DocumentFields = () => {
     }
   };
 
-  const formatDateTimePreview = (date:any, time:any, showDate:any, showTime:any, dateFormatStr:any, timeFormatStr:any) => {
-    let preview = '';
-    
-    if (showDate) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      
-      if (dateFormatStr === "yyyy-MM-dd") {
-        preview += `${year}-${month}-${day}`;
-      } else if (dateFormatStr === "dd/MM/yyyy") {
-        preview += `${day}/${month}/${year}`;
-      } else if (dateFormatStr === "MM/dd/yyyy") {
-        preview += `${month}/${day}/${year}`;
-      }
-    }
-    
-    if (showDate && showTime) {
-      preview += ' ';
-    }
-    
-    if (showTime) {
-      const hours24 = time.getHours();
-      const minutes = String(time.getMinutes()).padStart(2, '0');
-      
-      if (timeFormatStr === "HH:mm") {
-        preview += `${String(hours24).padStart(2, '0')}:${minutes}`;
-      } else {
-        const hours12 = hours24 % 12 || 12;
-        const ampm = hours24 >= 12 ? 'PM' : 'AM';
-        preview += `${String(hours12).padStart(2, '0')}:${minutes} ${ampm}`;
-      }
-    }
-    
-    return preview || 'Sin formato seleccionado';
-  };
-
   const resetForm = () => {
     setNewFieldName("");
     setNewFieldContent("");
     setFieldType([typeOptions[0]]);
-    setIncludeDate(true);
-    setIncludeTime(true);
-    setDateFormat([dateFormatOptions[0]]);
-    setTimeFormat([timeFormatOptions[0]]);
   };
 
   const handleEdit = (textObj:any) => {
     console.log('Editando objeto:', textObj)
     if (editingId === textObj.id) {
-      // Si ya estamos editando este objeto, cerramos el panel de edición
       setEditingId(null);
     } else {
-      // Configuramos el objeto para edición
       setEditingId(textObj.id);
       setEditType(textObj.fieldType ? 
         [typeOptions.find(option => option.id === textObj.fieldType) || typeOptions[0]] : 
@@ -370,14 +306,13 @@ const DocumentFields = () => {
                   display: "flex",
                   gap: "0.5rem",
                 }}>
-                  {textObj.type === "StaticText" && <Button
+                  <Button
                     onClick={() => handleEdit(textObj)}
                     size={SIZE.mini}
-                    kind={"tertiary"}
-                    disabled={textObj.type !== "StaticText"}                 
+                    kind={"tertiary"}                
                     > 
                     {editingId === textObj.id ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
-                  </Button>}
+                  </Button>
                   <Button
                     onClick={() => handleDelete(textObj.id)}
                     size={SIZE.mini}
@@ -402,7 +337,7 @@ const DocumentFields = () => {
                       textObj={textObj} 
                       handleSave={handleSave} 
                     />
-                    <Textarea
+                    {textObj.type == "StaticText" ? (<Textarea
                       value={editValue}
                       onChange={e => {
                         const newValue = e.target.value
@@ -433,7 +368,27 @@ const DocumentFields = () => {
 
                           }
                         }
-                      }} />
+                      }} />):(<ImagePreview
+                        textObj={textObj as IStaticImage}
+                        handleUpdateImage={(src) => {
+                          // Actualiza la imagen en el canvas
+                          if (activeObject) {
+                            // Encuentra el objeto en el editor
+                            const obj = editor.objects.findById(textObj.id)[0];
+                            if (obj && typeof obj.setSrc === "function") {
+                              // Usa setSrc para actualizar el src de manera persistente
+                              obj.setSrc(src, () => {
+                                console.log('src actualizado correctamente:', obj.getSrc());
+                              });
+                              // Opcional: Actualiza el preview si es necesario
+                              editor.objects.update({ id: textObj.id, preview: src });
+                      
+                            } else {
+                              console.error('El objeto no tiene el método setSrc');
+                            }
+                          }
+                        }}
+                      />)}
                   </Block>
                 </Block>
 
@@ -481,91 +436,6 @@ const DocumentFields = () => {
               />
             </FormControl>
           )} */}
-
-          {fieldType[0].id === "time" && (
-            <>
-              <FormControl label="Opciones de tiempo">
-                <Block 
-                $style = {{display:"flex", flexDirection:"column", gap:"0.5rem"}}
-                >
-                  <Checkbox
-                    checked={includeDate}
-                    onChange={e => setIncludeDate(e.target.checked)}
-                  >
-                    Incluir fecha
-                  </Checkbox>
-                  
-                  {includeDate && (
-                    <>
-                      <FormControl label="Formato de fecha">
-                        <Select
-                          options={dateFormatOptions}
-                          value={dateFormat}
-                          onChange={({value}) => setDateFormat(value.map(v => ({ id: v.id as string, label: v.label as string })))}
-                          clearable={false}
-                          searchable={false}
-                        />
-                      </FormControl>
-                      
-                      <FormControl label="Valor de fecha">
-                        <DatePicker
-                          value={selectedDate}
-                          onChange={({date}) => setSelectedDate(Array.isArray(date) ? date[0] || new Date() : date || new Date())}
-                          formatString={dateFormat[0].id}
-                          placeholder="Seleccionar fecha"
-                          clearable={false}
-                        />
-                      </FormControl>
-                    </>
-                  )}
-                  
-                  <Checkbox
-                    checked={includeTime}
-                    onChange={e => setIncludeTime(e.target.checked)}
-                  >
-                    Incluir hora
-                  </Checkbox>
-                  
-                  {includeTime && (
-                    <>
-                      <FormControl label="Formato de hora">
-                        <Select
-                          options={timeFormatOptions}
-                          value={timeFormat}
-                          onChange={({value}) => setTimeFormat(value.map(v => ({ id: v.id as string, label: v.label as string })))}
-                          clearable={false}
-                          searchable={false}
-                        />
-                      </FormControl>
-                      
-                      <FormControl label="Valor de hora">
-                        <TimePicker
-                          onChange={(value) => setSelectedTime(typeof value === 'string' ? new Date(`1970-01-01T${value}`) : value || new Date())}
-                          format={timeFormat[0].id === "HH:mm" ? "24" : "12"}
-                          value={selectedTime}
-                          step={900}
-                          creatable={true}
-                        />
-                      </FormControl>
-                    </>
-                  )}
-                </Block>
-              </FormControl>
-              
-              {/* Previsualización del formato de fecha/hora */}
-              <Block 
-              $style = {{marginTop:"1rem", 
-                padding:"0.5rem", 
-                backgroundColor:"rgba(0,0,0,0.05)", 
-                borderRadius:"4px"}}
-              >
-                <Block $style = {{marginBottom:"0.25rem", fontSize:"12px"}}>Vista previa:</Block>
-                <Block>
-                  {formatDateTimePreview(selectedDate, selectedTime, includeDate, includeTime, dateFormat[0].id, timeFormat[0].id)}
-                </Block>
-              </Block>
-            </>
-          )}
 
           {fieldType[0].id === "image" && (
             <Block padding="1rem" display="none" justifyContent="center">
