@@ -16,6 +16,8 @@ const Image = () => {
     >
       <Block>
         <Flip />
+      </Block>
+      <Block>
         <CropControls />
       </Block>
       <Common />
