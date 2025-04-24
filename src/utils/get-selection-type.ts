@@ -7,6 +7,10 @@ export default function (selection: any): string[] | null {
     return ["Locked"]
   }
 
+  if (selection.name == "croparea"){
+    return ["Crop"]
+  }
+
   if (selection.type === "group" || selection.type === "activeSelection") {
     return ["Multiple"]
   }

@@ -1,7 +1,7 @@
 import { Block } from "baseui/block"
 import Common from "./Common"
 import Flip from "./Shared/Flip"
-import CropControls from "./Shared/Crop"
+import CropControls from "./Shared/CropControls"
 
 const Image = () => {
   return (
@@ -16,6 +16,8 @@ const Image = () => {
     >
       <Block>
         <Flip />
+      </Block>
+      <Block>
         <CropControls />
       </Block>
       <Common />
