@@ -39,15 +39,6 @@ const CropControls = () => {
         };
     }, [canvas, isCropping, originalObject]);
 
-    const toggle = () => {
-        setIsOpen(!isOpen)
-        if (!isOpen) {
-            createCropArea()
-        } else {
-            removeCropArea()
-        }
-    }
-
     const createCropArea = async () => {
 
         console.log("creando area de corte")

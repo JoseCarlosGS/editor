@@ -22,8 +22,8 @@ const GraphicEditor = () => {
   const queryParams = new URLSearchParams(location.search);
   const idProject = queryParams.get("id");
   const { load, loading, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
-  
-  console.log("Id from URL:", idProject);
+
+  //console.log("Id from URL:", idProject);
 
   useEffect(() => {
     // Establecer el tipo de editor manualmente
@@ -32,7 +32,7 @@ const GraphicEditor = () => {
 
   useEffect(() => {
     if (!editor) return
-  
+
     if (idProject) {
       loadProject()
     }
@@ -81,7 +81,7 @@ const GraphicEditor = () => {
       </style>
     </div>
   )
-  
+
 
   return (
     <EditorContainer>

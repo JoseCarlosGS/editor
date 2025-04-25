@@ -9,13 +9,13 @@ import { fabric } from "fabric"
 
 const Crop = () => {
     const editor = useEditor()
-    const objects = useObjects() as fabric.Rect[]
+    const objects = useObjects() as fabric.Image[]
     const canvas = editor.canvas.canvas;
-    const [originalObject, setOriginalObject] = useState<fabric.Rect | null>(null);
+    const [originalObject, setOriginalObject] = useState<fabric.Image | null>(null);
     const [cropRect, setCropRect] = useState<fabric.Rect | null>(null);
 
-    const original = objects.filter(obj => {
-        console.log("Objeto:", obj.id, obj.type, obj);
+    let original = objects.filter(obj => {
+        //console.log("Objeto:", obj.id, obj.type, obj);
         return obj.metadata?.type === 'isCut';
     })[0]
 
@@ -24,7 +24,7 @@ const Crop = () => {
         const detectCropRect = () => {
             if (canvas) {
                 const activeObject = canvas.getActiveObject()
-                console.log(activeObject)
+                //console.log(activeObject)
                 setCropRect(activeObject);
             }
         };
@@ -40,7 +40,7 @@ const Crop = () => {
                 const objects = canvas.getObjects();
                 const original = objects.find(obj => obj !== e.selected[0] && obj.visible);
                 if (original) {
-                    setOriginalObject(original);
+                    setOriginalObject(original as fabric.Image);
                 }
             }
         };
@@ -56,57 +56,132 @@ const Crop = () => {
 
     }, [canvas]);
 
+    function applyCrop3() {
+        const rect = cropRect!.getBoundingRect(true); // Coordenadas absolutas del recorte
+        const img = original.getBoundingRect(true);   // Coordenadas absolutas de la imagen original
 
-    const applyCrop = async () => {
-        if (!canvas || !cropRect) return;
+        // if (rect.top != img.top) {
+        //     if (rect.height != img.height + 2)
+        //         console.log("arrastre vertical de arriba hacia abajo")
+        // }
+        // else {
+        //     if (rect.height != img.height + 2)
+        //         console.log("arrastre vertical de abajo hacia arriba")
+        // }
+        // if (Math.floor(rect.left) != Math.floor(img.left)) {
+        //     if (rect.width != img.width + 2)
+        //         console.log("arrastre horizontal de izquierda a derecha")
+        // }
+        // else {
+        //     if (rect.width != img.width + 2)
+        //         console.log("arrastre horizontal de derecha a izquierda")
+        // }
 
-        const active = original;
-        if (!active) return;
+        // Normalizar el rectángulo para que siempre sea desde top-left
+        const normalizedRect = {
+            left: Math.min(rect.left, rect.left + rect.width),
+            top: Math.min(rect.top, rect.top + rect.height),
+            width: Math.abs(rect.width),
+            height: Math.abs(rect.height),
+        };
 
-        const rectBounds = cropRect.getBoundingRect(true);
-        const imageBounds = active.getBoundingRect(true);
+        const scaleX = original.scaleX || 1;
+        const scaleY = original.scaleY || 1;
 
-        const scaleX = active.scaleX || 1;
-        const scaleY = active.scaleY || 1;
+        const cropX = (normalizedRect.left - img.left) / scaleX;
+        const cropY = (normalizedRect.top - img.top) / scaleY;
+        const cropWidth = normalizedRect.width / scaleX;
+        const cropHeight = normalizedRect.height / scaleY;
 
-        // Determinar extremos del rectángulo
-        const x1 = rectBounds.left;
-        const x2 = rectBounds.left + rectBounds.width;
-        const y1 = rectBounds.top;
-        const y2 = rectBounds.top + rectBounds.height;
-
-        // Normalizar coordenadas: asegurarse de que left < right, top < bottom
-        const left = Math.min(x1, x2);
-        const right = Math.max(x1, x2);
-        const top = Math.min(y1, y2);
-        const bottom = Math.max(y1, y2);
-
-        // Desplazamiento del rect relativo a la imagen
-        const offsetX = rectBounds.left - imageBounds.left;
-        const offsetY = rectBounds.top - imageBounds.top;
-
-        // Ahora calcular el crop con las coordenadas normalizadas
-        const cropX = (left - imageBounds.left) / scaleX;
-        const cropY = (top - imageBounds.top) / scaleY;
-        const cropWidth = (right - left) / scaleX;
-        const cropHeight = (bottom - top) / scaleY;
-
-        await active.set({
+        original.set({
+            cropX: cropX,
+            cropY: cropY,
+            originX: 'left',
+            originY: 'top',
             width: cropWidth,
             height: cropHeight,
             scaleX: 1,
             scaleY: 1,
-            left: rectBounds.left,
-            top: rectBounds.top,
+            left: normalizedRect.left,
+            top: normalizedRect.top,
         });
 
-        // Store custom crop properties in metadata or data field
-        await active.set('metadata', {
-            ...active.metadata,
-            cropX,
-            cropY,
-        });
-        canvas.remove(cropRect);
+        canvas.remove(cropRect!);
+        canvas.requestRenderAll();
+    }
+
+
+    function applyCrop() {
+        if (!canvas || !cropRect || !original) return;
+
+        console.log("original", original)
+
+        const rect = cropRect.getBoundingRect(true); // Coordenadas absolutas del recorte
+        const img = original.getBoundingRect(true);   // Coordenadas absolutas de la imagen original
+
+        // Normalizar el rectángulo para que siempre sea desde top-left
+        const normalizedRect = {
+            left: Math.min(rect.left, rect.left + rect.width),
+            top: Math.min(rect.top, rect.top + rect.height),
+            width: Math.abs(rect.width),
+            height: Math.abs(rect.height),
+        };
+
+        const scaleX = original.scaleX || 1;
+        const scaleY = original.scaleY || 1;
+
+        const cropX = (normalizedRect.left - img.left) / scaleX;
+        const cropY = (normalizedRect.top - img.top) / scaleY;
+        const cropWidth = normalizedRect.width / scaleX;
+        const cropHeight = normalizedRect.height / scaleY;
+
+        // Crear un canvas temporal para hacer el recorte real
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+
+        // Si original es de tipo fabric.Image
+        if (original.getElement && typeof original.getElement === 'function') {
+            const imgElement = original.getElement();
+
+            // Establecer dimensiones del canvas temporal
+            tempCanvas.width = cropWidth;
+            tempCanvas.height = cropHeight;
+
+            // Dibujar solo la porción recortada en el canvas temporal
+            tempCtx!.drawImage(
+                imgElement,
+                cropX, cropY, cropWidth, cropHeight,
+                0, 0, cropWidth, cropHeight
+            );
+
+            // Crear una nueva imagen con el contenido recortado
+            fabric.Image.fromURL(tempCanvas.toDataURL(), function (newImage) {
+                // Configurar la nueva imagen con las propiedades correctas
+                newImage.set({
+                    left: normalizedRect.left,
+                    top: normalizedRect.top,
+                    originX: 'left',
+                    originY: 'top',
+                    type: 'StaticImage'
+                });
+
+                // Reemplazar la imagen original con la nueva en el canvas
+                canvas.remove(original);
+                canvas.add(newImage);
+                canvas.setActiveObject(newImage);
+
+                console.log('nueva', newImage)
+
+                // Actualizar la referencia a la imagen original para futuros recortes
+                original = newImage;
+                original.set({
+                    metadata: {
+                        type: ""
+                    }
+                })
+                canvas.remove(cropRect);
+            });
+        }
     }
 
     const applyCrop1 = () => {
