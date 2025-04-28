@@ -1,26 +1,26 @@
-import { Button, SIZE } from "baseui/button"
+import { useEffect, useReducer, useState } from "react"
 import { useActiveObject, useEditor, useObjects } from "@layerhub-io/react"
+import { ILayer, IStaticImage, IStaticText } from "@layerhub-io/types"
+import useEditorHistoryListener from "~/hooks/useEditorHistoryListener"
+import Scrollable from "~/components/Scrollable"
+import { Button, SIZE } from "baseui/button"
 import { FontItem } from "~/interfaces/common"
 import { loadFonts } from "~/utils/fonts"
-import { ILayer, IStaticImage, IStaticText } from "@layerhub-io/types"
 import { nanoid } from "nanoid"
+import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton, ROLE } from "baseui/modal";
 import { Block } from "baseui/block"
 import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
-import Scrollable from "~/components/Scrollable"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 import Delete from "~/components/Icons/Delete"
 import { ChevronDown } from "baseui/icon"
 import { ChevronUp } from "baseui/icon"
-import { useEffect, useReducer, useState } from "react"
 import { Textarea } from 'baseui/textarea';
-import useEditorHistoryListener from "~/hooks/useEditorHistoryListener"
-import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton, ROLE } from "baseui/modal";
 import { Input } from "baseui/input";
 import { Select } from "baseui/select";
 import { FormControl } from "baseui/form-control";
 import EditableName from "~/components/EditableName"
-import ImagePreview from "~/views/DesignEditor/utils/common/ImagePreview"
 import { toBase64 } from "~/utils/data"
+import ImagePreview from "~/views/DesignEditor/utils/common/ImagePreview"
 
 const DocumentFields = () => {
   const editor = useEditor()
@@ -28,31 +28,31 @@ const DocumentFields = () => {
   const setIsSidebarOpen = useSetIsSidebarOpen()
   const objects = useObjects() as ILayer[]
   //const textObjects = objects.filter(obj => obj.type === 'StaticText');
-   const [editingId, setEditingId] = useState(null);
-   const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
-   const [editValue, setEditValue] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
+  const [editValue, setEditValue] = useState('');
 
-   const [localObjects, setLocalObjects] = useState<ILayer[]>([])
+  const [localObjects, setLocalObjects] = useState<ILayer[]>([])
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newFieldName, setNewFieldName] = useState("");
   const [newFieldContent, setNewFieldContent] = useState("");
   const [fieldType, setFieldType] = useState([{ id: "text", label: "Texto" }]);
 
-   useEffect(() => {
+  useEffect(() => {
     setLocalObjects(objects)
   }, [objects])
-    
+
   useEditorHistoryListener(() => {
-      console.log('Editor history changed')
-      const currentObjects = editor.objects.list() as ILayer[]
-      setLocalObjects(currentObjects)
+    console.log('Editor history changed')
+    const currentObjects = editor.objects.list() as ILayer[]
+    setLocalObjects(currentObjects)
   })
   const localTextObjects = localObjects.filter(obj => {
     console.log("Objeto:", obj.id, obj.type, obj);
     return obj.metadata?.type === 'field';
   })
-   // Opciones para el combobox
+  // Opciones para el combobox
   const typeOptions = [
     { id: "text", label: "Texto" },
     { id: "signature", label: "Firma" },
@@ -96,7 +96,7 @@ const DocumentFields = () => {
         }
         await loadFonts([font])
         // Crear objeto con los datos según el tipo
-        if(fieldType[0].id === "text") {
+        if (fieldType[0].id === "text") {
           const options = {
             id: nanoid(),
             type: "StaticText",
@@ -146,22 +146,22 @@ const DocumentFields = () => {
             scaleY: 0.03,
             path: [
               [
-                  "M",60,0
+                "M", 60, 0
               ],
               [
-                  "L",0,0
+                "L", 0, 0
               ],
               [
-                  "L",0,60
+                "L", 0, 60
               ],
               [
-                  "L",60,60
+                "L", 60, 60
               ],
               [
-                  "L",60,0
+                "L", 60, 0
               ],
               [
-                  "Z"
+                "Z"
               ]
             ],
             fill: "#000000",
@@ -171,10 +171,10 @@ const DocumentFields = () => {
           editor.objects.add(line)
           editor.objects.add(firma)
         }
-      
-      //addObject(fieldData);
-      }else
-      { const response = await fetch("https://ik.imagekit.io/cezllypgi/M2Pflt01.svg?updatedAt=1745242241126");
+
+        //addObject(fieldData);
+      } else {
+        const response = await fetch("https://ik.imagekit.io/cezllypgi/M2Pflt01.svg?updatedAt=1745242241126");
         const blob = await response.blob()
         const file = new File([blob], "image.jpg", { type: blob.type });
         const base64 = await toBase64(file) as unknown as string
@@ -204,19 +204,19 @@ const DocumentFields = () => {
     setFieldType([typeOptions[0]]);
   };
 
-  const handleEdit = (textObj:any) => {
+  const handleEdit = (textObj: any) => {
     console.log('Editando objeto:', textObj)
     if (editingId === textObj.id) {
       setEditingId(null);
     } else {
       setEditingId(textObj.id);
-      setEditType(textObj.fieldType ? 
-        [typeOptions.find(option => option.id === textObj.fieldType) || typeOptions[0]] : 
+      setEditType(textObj.fieldType ?
+        [typeOptions.find(option => option.id === textObj.fieldType) || typeOptions[0]] :
         [typeOptions[0]]);
       setEditValue(textObj.text || '');
     }
   };
-  
+
   const handleDelete = (id: string) => {
     if (activeObject) {
       editor.objects.remove(id);
@@ -224,7 +224,7 @@ const DocumentFields = () => {
     console.log('Eliminando objeto:', id);
   };
 
-  const handleSave = (name:string) => {
+  const handleSave = (name: string) => {
     if (activeObject) {
       editor.objects.update({ name: name })
     }
@@ -240,7 +240,7 @@ const DocumentFields = () => {
     return false
   }
 
-  const handleUpdateImage = (image:string) =>{
+  const handleUpdateImage = (image: string) => {
     if (activeObject) {
       editor.objects.update({ src: image })
     }
@@ -309,8 +309,8 @@ const DocumentFields = () => {
                   <Button
                     onClick={() => handleEdit(textObj)}
                     size={SIZE.mini}
-                    kind={"tertiary"}                
-                    > 
+                    kind={"tertiary"}
+                  >
                     {editingId === textObj.id ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
                   </Button>
                   <Button
@@ -333,9 +333,9 @@ const DocumentFields = () => {
                   }}
                 >
                   <Block >
-                    <EditableName 
-                      textObj={textObj} 
-                      handleSave={handleSave} 
+                    <EditableName
+                      textObj={textObj}
+                      handleSave={handleSave}
                     />
                     {textObj.type == "StaticText" ? (<Textarea
                       value={editValue}
@@ -347,7 +347,7 @@ const DocumentFields = () => {
                         if (activeObject) {
                           editor.objects.update({ text: newValue })
                         }
-                      } }
+                      }}
                       placeholder="Ingrese el valor"
                       size="compact"
                       rows={2} // Número de filas visibles inicialmente
@@ -368,7 +368,7 @@ const DocumentFields = () => {
 
                           }
                         }
-                      }} />):(<ImagePreview
+                      }} />) : (<ImagePreview
                         textObj={textObj as IStaticImage}
                         handleUpdateImage={(src) => {
                           // Actualiza la imagen en el canvas
@@ -382,7 +382,7 @@ const DocumentFields = () => {
                               });
                               // Opcional: Actualiza el preview si es necesario
                               editor.objects.update({ id: textObj.id, preview: src });
-                      
+
                             } else {
                               console.error('El objeto no tiene el método setSrc');
                             }
@@ -451,7 +451,7 @@ const DocumentFields = () => {
           </ModalButton>
         </ModalFooter>
       </Modal></>
-    
+
   )
 }
 
