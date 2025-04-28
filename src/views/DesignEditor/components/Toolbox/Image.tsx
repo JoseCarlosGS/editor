@@ -14,11 +14,18 @@ const Image = () => {
         justifyContent: "space-between",
       }}
     >
-      <Block>
+      <Block
+        $style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 12px",
+          justifyContent: "space-between",
+        }}>
         <Flip />
+        <CropControls />
       </Block>
       <Block>
-        <CropControls />
       </Block>
       <Common />
     </Block>

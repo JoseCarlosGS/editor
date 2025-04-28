@@ -41,24 +41,24 @@ const Common = () => {
 
     if (editor && Math.abs(previousZoomRef.current - zoomRatio) > 0.001) {
       const container = document.querySelector('.layerhub-canvas-container');
-      
+
       if (container) {
         // Calcular el centro actual del viewport
         const scrollLeft = container.scrollLeft;
         const scrollTop = container.scrollTop;
         const viewportWidth = container.clientWidth;
         const viewportHeight = container.clientHeight;
-        
+
         const centerX = scrollLeft + viewportWidth / 2;
         const centerY = scrollTop + viewportHeight / 2;
-        
+
         // Calcular el factor de escala entre el zoom anterior y el actual
         const scaleFactor = zoomRatio / previousZoomRef.current;
-        
+
         // Calcular la nueva posición de desplazamiento para mantener el centro
         const newScrollLeft = centerX * scaleFactor - viewportWidth / 2;
         const newScrollTop = centerY * scaleFactor - viewportHeight / 2;
-        
+
         // Aplicar el desplazamiento
         requestAnimationFrame(() => {
           container.scrollLeft = newScrollLeft;

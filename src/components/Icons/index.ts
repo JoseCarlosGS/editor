@@ -26,6 +26,7 @@ import Add from "./Add"
 import Video from "./Video"
 import DocumentFields from "./DocumentFields"
 import Edit from "./Edit"
+import CropIcon from "./CropIcon"
 class Icons {
   static Background = Background
   static Elements = Elements
@@ -55,6 +56,7 @@ class Icons {
   static Add = Add
   static DocumentFields = DocumentFields
   static Edit = Edit
+  static CropIcon = CropIcon
 }
 
 export default Icons

@@ -16,7 +16,7 @@ import { IDesign } from "~/interfaces/DesignEditor"
 import Github from "~/components/Icons/Github"
 
 const Container = styled<"div", {}, Theme>("div", ({ $theme }) => ({
-  height: "64px",
+  height: "50px",
   background: $theme.colors.black,
   display: "grid",
   padding: "0 1.25rem",
@@ -149,7 +149,7 @@ const Navbar = () => {
       } else if (editorType === "PRESENTATION") {
         return parsePresentationJSON()
       } else {
-      return parseVideoJSON()
+        return parseVideoJSON()
       }
     }
   }
@@ -178,7 +178,7 @@ const Navbar = () => {
       if (objectToLock) {
         editor.objects.lock("imgbck");
       }
-    }, 500); 
+    }, 500);
 
     return { scenes, design }
   }
@@ -270,10 +270,14 @@ const Navbar = () => {
     <ThemeProvider theme={DarkTheme}>
       <Container>
         <div style={{ color: "#ffffff" }}>
-          <Logo size={36} />
+          <Logo size={30} />
         </div>
         <DesignTitle />
-        <Block $style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <Block $style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        }}>
           <input
             multiple={false}
             onChange={handleFileInput}
