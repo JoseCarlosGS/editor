@@ -17,8 +17,6 @@ const Crop = () => {
 
     useEffect(() => {
         if (!canvas) return;
-
-        // Busca la imagen con type = 'isCut' entre todos los objetos
         const findImageToCrop = () => {
             const allObjects = canvas.getObjects();
             const imageToCrop = allObjects.find(obj =>
@@ -26,14 +24,10 @@ const Crop = () => {
             ) as fabric.Image;
 
             if (imageToCrop && (!originalObject || originalObject.id !== imageToCrop.id)) {
-                console.log('Nueva imagen para recortar detectada:', imageToCrop);
                 setOriginalObject(imageToCrop);
             }
         };
-
         findImageToCrop();
-
-        // También actualizar cuando cambie la selección activa
         const handleObjectModified = () => {
             findImageToCrop();
         };
@@ -45,26 +39,18 @@ const Crop = () => {
         };
     }, [canvas, objects, originalObject]);
 
-    console.log('initial original: ', originalObject)
-
     useEffect(() => {
-        // Buscar el rectángulo de recorte entre los objetos del canvas
         const detectCropRect = () => {
             if (canvas) {
                 const activeObject = canvas.getActiveObject()
-                console.log('nuevo rect: ', activeObject)
                 setCropRect(activeObject);
             }
         };
 
         detectCropRect();
-
-
-        // También podemos agregar un listener para cuando cambie la selección
         const handleSelectionCreated = (e: any) => {
             if (e.selected && e.selected[0] && e.selected[0].name === 'cropRect') {
                 setCropRect(e.selected[0]);
-                // SOLO si todavía no hay originalObject definido
                 if (!originalObject) {
                     const objects = canvas.getObjects();
                     const original = objects.find(obj => obj !== e.selected[0] && obj.visible);
@@ -92,8 +78,6 @@ const Crop = () => {
             console.error("No se pueden encontrar todos los elementos necesarios para recortar");
             return;
         }
-
-        console.log("Aplicando recorte a:", originalObject);
 
         const rect = cropRect.getBoundingRect(true);
         const img = originalObject.getBoundingRect(true);
@@ -137,18 +121,12 @@ const Crop = () => {
                     originY: 'top',
                     type: 'StaticImage'
                 });
-
-                // Eliminar metadata.type para evitar confusiones en futuros recortes
                 if (originalObject.metadata) {
                     delete originalObject.metadata.type;
                 }
-
-                // Añadir la nueva imagen
                 canvas.add(newImage);
                 canvas.setActiveObject(newImage);
-                console.log('Nueva imagen recortada creada:', newImage);
 
-                // Eliminamos la imagen original y el rectángulo de recorte
                 await canvas.remove(originalObject);
                 canvas.remove(cropRect);
 
@@ -162,52 +140,6 @@ const Crop = () => {
             console.error("No se puede obtener el elemento de la imagen");
         }
     }
-
-    const applyCrop1 = () => {
-        if (!canvas || !cropRect) return;
-
-        const active = originalObject;
-        if (!active) return;
-
-        const rectBounds = cropRect.getBoundingRect(true);
-        const imageBounds = active.getBoundingRect(true);
-
-        const tempCanvas = document.createElement('canvas');
-
-        // Obtener las coordenadas del área de recorte
-        const cropLeft = cropRect.left;
-        const cropTop = cropRect.top;
-        const cropWidth = cropRect.width;
-        const cropHeight = cropRect.height;
-
-        console.log('left: ', cropLeft, 'top: ', cropTop, 'width:: ', cropWidth, 'height: ', cropHeight)
-        console.log('left: ', active.left, 'top: ', active.top, 'width: ', active.width, 'height: ', active.height)
-
-        // Exportar el área de recorte como una imagen usando toDataURL
-        const croppedImage = active.toDataURL({
-            left: cropLeft,
-            top: cropTop,
-            width: cropWidth,
-            height: cropHeight,
-        });
-
-        // Crear una nueva imagen a partir de los datos recortados
-        fabric.Image.fromURL(croppedImage, (img) => {
-            img.set({
-                left: cropLeft,
-                top: cropTop,
-                scaleX: cropWidth! / img.width!,
-                scaleY: cropHeight! / img.height!,
-                type: "StaticImage"
-            });
-            // Reemplazar el objeto activo con la nueva imagen recortad
-            canvas.remove(active);
-            canvas.add(img);
-            canvas.remove(canvas.getActiveObject()!)
-            // Limpiar el área de recorte
-        });
-    };
-
     const cancelCropping = () => {
         canvas.remove(cropRect!);
         setCropRect(null);
