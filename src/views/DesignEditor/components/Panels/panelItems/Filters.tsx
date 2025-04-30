@@ -1,0 +1,304 @@
+import React, { useState } from 'react';
+import useAppContext from '~/hooks/useAppContext';
+import { useEditor } from '@layerhub-io/react';
+import { Block } from 'baseui/block';
+import ArrowBackOutline from '~/components/Icons/ArrowBackOutline';
+import Delete from 'baseui/icon/delete';
+import useSetIsSidebarOpen from '~/hooks/useSetIsSidebarOpen';
+import Scrollable from '~/components/Scrollable';
+import { Slider } from "baseui/slider"
+import { Button, KIND, SIZE } from 'baseui/button';
+import Icons from '~/components/Icons';
+import { Input } from 'baseui/input';
+import FilterAdjuster from './utils';
+import { Sun, Contrast, Palette, Droplet, Rainbow, Loader, Circle } from "lucide-react";
+import { useActiveObject } from '@layerhub-io/react';
+import { fabric } from 'fabric';
+
+interface Options {
+    ratio: number
+}
+const Filters = () => {
+    const editor = useEditor()
+    const canvas = editor.canvas.canvas
+    const activeObject = useActiveObject()
+    let frameRequest: number | null = null;
+    const ratioMin = -100
+    const ratioMax = 100
+    const [brightnessOptions, setBrightnessOptions] = React.useState<Options>({
+        ratio: 0,
+    })
+    const [contrastOptions, setContrastOptions] = React.useState<Options>({
+        ratio: 0,
+    })
+    const [grayScaleOptions, setGrayScaleOptions] = React.useState<Options>({
+        ratio: 0,
+    })
+    const [blurOptions, setBlurOptions] = React.useState<Options>({
+        ratio: 1,
+    })
+    const [saturationOptions, setSaturationOptions] = React.useState<Options>({
+        ratio: 0,
+    })
+    const { activePanel, setActiveSubMenu } = useAppContext();
+    const setIsSidebarOpen = useSetIsSidebarOpen()
+
+    type FilterOptions = {
+        value: number;
+        fabricFilter: any; // eg: fabric.Image.filters.Brightness
+        propName: string;  // eg: 'brightness', 'contrast'
+    };
+
+    const applyImageFilter = (
+        activeObject: fabric.Object,
+        options: FilterOptions
+    ) => {
+        const { value, fabricFilter, propName } = options;
+        const active = activeObject as fabric.Image;
+
+        if (!active.filters) {
+            active.filters = [];
+        }
+
+        const filterIndex = active.filters.findIndex(f => f instanceof fabricFilter);
+
+        const newFilter = new fabricFilter({
+            [propName]: value
+        });
+
+        if (filterIndex !== -1) {
+            active.filters[filterIndex] = newFilter;
+        } else {
+            active.filters.push(newFilter);
+        }
+
+        active.applyFilters();
+        editor.canvas?.requestRenderAll();
+    };
+
+    const filterValue = (value: number, max: number, min: number) => {
+        if (value > max) return max;
+        if (value < min) return min;
+        return value
+    }
+
+    const removeFilter = (filterType: any): boolean => {
+        if (editor && activeObject && activeObject instanceof fabric.Image) {
+            const active = activeObject as fabric.Image;
+            if (!active.filters || active.filters.length === 0) {
+                console.log("No hay filtros para eliminar");
+                return false;
+            }
+            const filterIndex = active.filters.findIndex(
+                filter => filter instanceof filterType
+            );
+
+            if (filterIndex !== -1) {
+                active.filters.splice(filterIndex, 1);
+                active.applyFilters();
+                editor.canvas?.requestRenderAll();
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    };
+
+    const removeAllFilters = (): boolean => {
+        if (editor && activeObject && activeObject instanceof fabric.Image) {
+            const active = activeObject as fabric.Image;
+            if (!active.filters || active.filters.length === 0) {
+                console.log("No hay filtros para eliminar");
+                return false;
+            }
+            active.filters = [];
+            active.applyFilters();
+            editor.canvas?.requestRenderAll();
+            return true;
+        }
+        return false;
+    };
+
+    const handleBrightnessChange = (value: number) => {
+        const newValue = filterValue(value, ratioMax, ratioMin)
+        setBrightnessOptions({ ratio: newValue });
+        const brightnessValue = newValue / 100;
+
+        if (editor) {
+            if (frameRequest) cancelAnimationFrame(frameRequest);
+
+            frameRequest = requestAnimationFrame(() => {
+                applyImageFilter(activeObject as fabric.Image, {
+                    value: brightnessValue,
+                    fabricFilter: fabric.Image.filters.Brightness,
+                    propName: "brightness"
+                });
+            });
+        }
+    };
+
+    const handleContrastChange = (value: number) => {
+        setContrastOptions({ ratio: value });
+        const contrastValue = value / 100;
+
+        if (editor) {
+            if (frameRequest) cancelAnimationFrame(frameRequest);
+
+            frameRequest = requestAnimationFrame(() => {
+                applyImageFilter(activeObject as fabric.Image, {
+                    value: contrastValue,
+                    fabricFilter: fabric.Image.filters.Contrast,
+                    propName: "contrast"
+                });
+            });
+        }
+    };
+
+    const handleSaturationChange = (value: number) => {
+        setSaturationOptions({ ratio: value })
+        const saturationVale = value / 100;
+        if (editor) {
+            if (frameRequest) cancelAnimationFrame(frameRequest);
+            frameRequest = requestAnimationFrame(() => {
+                applyImageFilter(activeObject as fabric.Image, {
+                    value: saturationVale,
+                    fabricFilter: fabric.Image.filters.Saturation,
+                    propName: "saturation"
+                });
+            })
+        }
+    };
+
+    const handleBlurChange = (value: number) => {
+        const newValue = filterValue(value, 100, 1)
+        setBlurOptions({ ratio: newValue })
+        const blurValue = newValue / 100
+        if (editor) {
+            if (frameRequest) cancelAnimationFrame(frameRequest);
+            frameRequest = requestAnimationFrame(() => {
+                applyImageFilter(activeObject as fabric.Image, {
+                    value: blurValue,
+                    fabricFilter: fabric.Image.filters.Blur,
+                    propName: "blur"
+                });
+            })
+        }
+    }
+
+    const handleGrayScale = (value: number) => {
+        const newValue = filterValue(value, 1, 0)
+        setGrayScaleOptions({ ratio: newValue })
+        if (newValue === 1) {
+            applyImageFilter(activeObject as fabric.Image, {
+                value: newValue,
+                fabricFilter: fabric.Image.filters.Grayscale,
+                propName: "grayscale"
+            })
+
+        }
+        else if (newValue === 0) {
+            removeFilter(fabric.Image.filters.Grayscale)
+        }
+
+    }
+
+
+
+    return (
+        <Block $style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+            <Block
+                $style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontWeight: 500,
+                    justifyContent: "space-between",
+                    padding: "1.5rem",
+                }}
+            >
+                <Block onClick={() => setActiveSubMenu(activePanel)} $style={{ cursor: "pointer", display: "flex" }}>
+                    <ArrowBackOutline size={24} />
+                </Block>
+                <Block>Filters</Block>
+                <Block
+                    $style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close Canvas Fill"
+                >
+                    <Delete size={24} />
+                </Block>
+
+
+            </Block>
+            <Scrollable>
+                <Block $style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontWeight: 500,
+                    justifyContent: "space-between",
+                    marginLeft: "10px"
+                }}>
+                    <Button kind={KIND.tertiary}>
+                        Restablecer
+                    </Button>
+                </Block>
+                <Block padding="0 1.5rem">
+                    <FilterAdjuster
+                        label="Brillo"
+                        icon={<Sun size={18} />}
+                        value={brightnessOptions.ratio}
+                        min={ratioMin}
+                        max={ratioMax}
+                        step={1}
+                        onChange={(val) => handleBrightnessChange(val)}
+                        defaultValue={0}
+                    />
+                    <FilterAdjuster
+                        label="Contraste"
+                        icon={<Contrast size={18} />}
+                        value={contrastOptions.ratio}
+                        min={ratioMin}
+                        max={ratioMax}
+                        step={1}
+                        onChange={(val) => handleContrastChange(val)}
+                        defaultValue={0}
+                    />
+                    <FilterAdjuster
+                        label="Saturacion"
+                        icon={<Loader size={18} />}
+                        value={saturationOptions.ratio}
+                        min={ratioMin}
+                        max={ratioMax}
+                        step={1}
+                        onChange={(val) => handleSaturationChange(val)}
+                        defaultValue={0}
+                    />
+                    <FilterAdjuster
+                        label="Desenfoque"
+                        icon={<Droplet size={18} />}
+                        value={blurOptions.ratio}
+                        min={1}
+                        max={100}
+                        step={1}
+                        onChange={(val) => handleBlurChange(val)}
+                        defaultValue={1}
+                    />
+                    <FilterAdjuster
+                        label="Escala de grises"
+                        icon={<Circle size={18} />}
+                        value={grayScaleOptions.ratio}
+                        min={0}
+                        max={1}
+                        step={1}
+                        onChange={(val) => handleGrayScale(val)}
+                        defaultValue={0}
+                    />
+
+
+                </Block>
+            </Scrollable>
+        </Block>
+    );
+};
+
+export default Filters;

@@ -33,7 +33,7 @@ const CanvasFill = () => {
     editor.canvas.setBackgroundColor(color)
   }, 100)
 
-   const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(true);
 
 
   return (
@@ -49,15 +49,15 @@ const CanvasFill = () => {
       >
         <Block onClick={() => setActiveSubMenu(activePanel)} $style={{ cursor: "pointer", display: "flex" }}>
           <ArrowBackOutline size={24} />
-          </Block>
+        </Block>
         <Block>Canvas Fill</Block>
 
         <Block
-            $style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}
-            onClick={() => setIsSidebarOpen(false)}// Ocultar el componente
-            aria-label="Close Canvas Fill"
-          >
-            <Delete size={24} />
+          $style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}
+          onClick={() => setIsSidebarOpen(false)}// Ocultar el componente
+          aria-label="Close Canvas Fill"
+        >
+          <Delete size={24} />
         </Block>
       </Block>
       <Scrollable>

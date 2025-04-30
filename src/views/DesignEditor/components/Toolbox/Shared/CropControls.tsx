@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Button, KIND, SIZE } from "baseui/button"
 import { Block } from "baseui/block"
-import { useActiveObject, useEditor } from "@layerhub-io/react"
+import { useEditor } from "@layerhub-io/react"
 import { fabric } from "fabric"
 import { useEffect } from "react"
 import CropIcon from "~/components/Icons/CropIcon"
@@ -33,8 +33,6 @@ const CropControls = () => {
     }, [canvas, isCropping, originalObject]);
 
     const createCropArea = async () => {
-
-        console.log("creando area de corte")
         const active = canvas.getActiveObject();
 
         setOriginalObject(active);
@@ -76,64 +74,9 @@ const CropControls = () => {
         });
         await canvas.add(cropRect);
         canvas.setActiveObject(cropRect);
-
-        console.log('Enviando nueva imagen a recortar', canvas.getActiveObject())
-        console.log(canvas.getActiveObject())
-
         setCropRect(cropRect);
         setIsCropping(true);
     }
-
-    const removeCropArea = () => {
-        if (!canvas || !cropRect) return;
-
-        canvas.remove(cropRect);
-        setCropRect(null);
-        setIsCropping(false);
-        setOriginalObject(null);
-    };
-
-    const cancelCropping = () => {
-        removeCropArea();
-    }
-
-    const applyCrop = () => {
-        if (!canvas || !cropRect) return;
-
-        const active = canvas.getActiveObject();
-        if (!active) return;
-
-        const tempCanvas = document.createElement('canvas');
-
-        // Obtener las coordenadas del área de recorte
-        const cropLeft = cropRect.left;
-        const cropTop = cropRect.top;
-        const cropWidth = cropRect.width;
-        const cropHeight = cropRect.height;
-
-        // Exportar el área de recorte como una imagen usando toDataURL
-        const croppedImage = active.toDataURL({
-            left: cropLeft,
-            top: cropTop,
-            width: cropWidth,
-            height: cropHeight,
-        });
-
-        fabric.Image.fromURL(croppedImage, (img) => {
-            img.set({
-                left: cropLeft,
-                top: cropTop,
-                scaleX: cropWidth! / img.width!,
-                scaleY: cropHeight! / img.height!,
-                type: "StaticImage"
-            });
-
-            canvas.remove(active);
-            canvas.add(img);
-
-            removeCropArea();
-        });
-    };
 
     return (
         <Block>

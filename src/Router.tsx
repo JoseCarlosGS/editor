@@ -8,8 +8,8 @@ const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/manage" element={<Dashboard />} />
-        <Route path="/" element={<DesignEditor />} />
-        <Route path="/project" element={<GraphicEditor />} />
+        <Route path="/deisgn" element={<DesignEditor />} />
+        <Route path="/" element={<GraphicEditor />} />
       </Routes>
     </BrowserRouter>
   )
