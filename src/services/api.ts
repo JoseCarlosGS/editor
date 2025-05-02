@@ -12,10 +12,10 @@ class ApiService {
   base: AxiosInstance
   constructor() {
     this.base = axios.create({
-      baseURL: "http://localhost:8000/api",
+      baseURL: "https://66sqhsvx-8080.brs.devtunnels.ms/api",
       //baseURL: "https://burly-note-production.up.railway.app",
       headers: {
-        Authorization: "Bearer QYT8s1NavSTpTAxURji98Fpg",
+        Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGJlcnRvQGxpdmUuY29tIiwiaWF0IjoxNzQ2MTg5MzM2LCJleHAiOjE3NDYyMjUzMzZ9.LH-W16hAn7K0aSnTveSnzQ_jIfas6-yzkDHU9DeSzqs",
       },
     })
   }
@@ -260,6 +260,17 @@ class ApiService {
       try {
         const { data } = await this.base.get("/resources/pixabay?query=flower")
         resolve(data.data)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  getTemplateByParams(personaId:string, eventoId:string, filename:string): Promise<any>{
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await this.base.get(`/archivos/leer?personaId=${personaId}&eventoId=${eventoId}&filename=${filename}`)
+        resolve(data)
       } catch (err) {
         reject(err)
       }

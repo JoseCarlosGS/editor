@@ -174,7 +174,7 @@ const Scenes = () => {
         id="TimelineItemsContainer"
         $style={{ padding: "0.25rem 0.75rem", background: "#ffffff", position: "relative" }}
       >
-        <div className={css({ display: "none", alignItems: "center" })}>   
+        <div className={css({ display: "none", alignItems: "center" })}>
           {contextMenuTimelineRequest.visible && <SceneContextMenu />}
 
           <SortableContext items={scenes} strategy={horizontalListSortingStrategy}>
