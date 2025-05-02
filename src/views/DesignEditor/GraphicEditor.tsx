@@ -20,27 +20,30 @@ const GraphicEditor = () => {
     originalSetCurrentDesign((prev) => ({ ...prev, ...design }));
   };
   const queryParams = new URLSearchParams(location.search);
-  const idProject = queryParams.get("id");
+  const filename = queryParams.get("filename");
+  const personaId = queryParams.get("personaId");
+  const eventoId = queryParams.get("eventoId");
+
   const { load, loading, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
 
   //console.log("Id from URL:", idProject);
 
   useEffect(() => {
-    // Establecer el tipo de editor manualmente
     setEditorType("GRAPHIC");
   }, []);
 
   useEffect(() => {
     if (!editor) return
 
-    if (idProject) {
+    if (filename) {
       loadProject()
     }
-  }, [editor, idProject])
+  }, [editor, filename, personaId, eventoId])
 
 
   const loadProject = async () => {
-    const project = await api.getTemplateById(idProject || "")
+    const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
+    //const project = await api.getTemplateById(filename || "")
     if (project) {
       await load(project)
     }

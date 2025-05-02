@@ -16,6 +16,8 @@ import CanvasFill from "./CanvasFill"
 import TextEffects from "./TextEffects"
 import DocumentFields from "./DocumentFields"
 import Filters from "./Filters"
+import ImageSettings from "./ImageSettings"
+
 export default {
   StaticText: TextProperties,
   Text: Text,
@@ -34,5 +36,6 @@ export default {
   CanvasFill: CanvasFill,
   TextEffects: TextEffects,
   DocumentFields: DocumentFields,
-  Filters: Filters
+  Filters: Filters,
+  ImageSettings: ImageSettings
 };

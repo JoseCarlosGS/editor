@@ -12,11 +12,12 @@ const Images = () => {
   const setIsSidebarOpen = useSetIsSidebarOpen()
 
   const addObject = React.useCallback(
-    (url: string) => {
+    (url: string, prev: string) => {
       if (editor) {
         const options = {
           type: "StaticImage",
           src: url,
+          preview: prev
         }
         editor.objects.add(options)
       }
@@ -45,7 +46,7 @@ const Images = () => {
         <Block padding="0 1.5rem">
           <div style={{ display: "grid", gap: "8px", gridTemplateColumns: "1fr 1fr" }}>
             {images.map((image, index) => {
-              return <ImageItem key={index} onClick={() => addObject(image.src.large)} preview={image.src.small} />
+              return <ImageItem key={index} onClick={() => addObject(image.src.large, image.src.small)} preview={image.src.small} />
             })}
           </div>
         </Block>

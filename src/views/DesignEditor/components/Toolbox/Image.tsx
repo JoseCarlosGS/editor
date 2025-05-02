@@ -4,9 +4,12 @@ import Flip from "./Shared/Flip"
 import CropControls from "./Shared/CropControls"
 import { Button, KIND, SIZE } from "baseui/button"
 import useAppContext from "~/hooks/useAppContext"
+import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
+import { SlidersHorizontal } from "lucide-react"
 
 const Image = () => {
   const { setActiveSubMenu } = useAppContext()
+  const setIsSideBarOpen = useSetIsSidebarOpen()
 
   return (
     <Block
@@ -28,9 +31,21 @@ const Image = () => {
         }}>
         <Flip />
         <CropControls />
-        <Button onClick={() => setActiveSubMenu('Filters')} kind={KIND.tertiary} size={SIZE.mini} >
+        <Button onClick={() => {
+          setIsSideBarOpen(true);
+          setActiveSubMenu('Filters');
+
+        }} kind={KIND.tertiary} size={SIZE.mini} >
           {/* <CropIcon size={20} /> */}
           Filtros
+        </Button>
+        <Button onClick={() => {
+          setIsSideBarOpen(true);
+          setActiveSubMenu('ImageSettings');
+
+        }} kind={KIND.tertiary} size={SIZE.mini} >
+          {/* <CropIcon size={20} /> */}
+          <SlidersHorizontal size={20} />
         </Button>
       </Block>
       <Block>
