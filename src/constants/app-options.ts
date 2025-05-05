@@ -4,6 +4,11 @@ export const BASE_ITEMS = [
     name: "Templates",
   },
   {
+    id: "documentFields",
+    name: "DocumentFields",
+  },
+  
+  {
     id: "customize",
     name: "Customize",
   },
@@ -36,10 +41,7 @@ export const BASE_ITEMS = [
     id: "layers",
     name: "Layers",
   },
-  {
-    id: "documentFields",
-    name: "DocumentFields",
-  }
+  
 ]
 
 export const VIDEO_PANEL_ITEMS = [

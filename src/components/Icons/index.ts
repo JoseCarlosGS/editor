@@ -27,6 +27,8 @@ import Video from "./Video"
 import DocumentFields from "./DocumentFields"
 import Edit from "./Edit"
 import CropIcon from "./CropIcon"
+import { List } from "lucide-react"
+
 class Icons {
   static Background = Background
   static Elements = Elements
@@ -54,7 +56,7 @@ class Icons {
   static ArrowBackOutline = ArrowBackOutline
   static Underline = Underline
   static Add = Add
-  static DocumentFields = DocumentFields
+  static DocumentFields = List
   static Edit = Edit
   static CropIcon = CropIcon
 }
