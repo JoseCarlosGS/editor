@@ -5,7 +5,7 @@ import CropControls from "./Shared/CropControls"
 import { Button, KIND, SIZE } from "baseui/button"
 import useAppContext from "~/hooks/useAppContext"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
-import { SlidersHorizontal } from "lucide-react"
+import { SlidersHorizontal, Blend } from "lucide-react"
 
 const Image = () => {
   const { setActiveSubMenu } = useAppContext()
@@ -27,24 +27,30 @@ const Image = () => {
           display: "flex",
           alignItems: "center",
           padding: "0 12px",
-          justifyContent: "space-between",
+          justifyContent: "space-start",
         }}>
         <Flip />
         <CropControls />
-        <Button onClick={() => {
-          setIsSideBarOpen(true);
-          setActiveSubMenu('Filters');
-
-        }} kind={KIND.tertiary} size={SIZE.mini} >
-          {/* <CropIcon size={20} /> */}
-          Filtros
+        <Button
+          onClick={() => {
+            setIsSideBarOpen(true);
+            setActiveSubMenu('Filters');
+          }}
+          kind={KIND.tertiary}
+          size={SIZE.mini}
+          title="Apply Filters"
+        >
+          <Blend size={20} />
         </Button>
-        <Button onClick={() => {
-          setIsSideBarOpen(true);
-          setActiveSubMenu('ImageSettings');
-
-        }} kind={KIND.tertiary} size={SIZE.mini} >
-          {/* <CropIcon size={20} /> */}
+        <Button
+          onClick={() => {
+            setIsSideBarOpen(true);
+            setActiveSubMenu('ImageSettings');
+          }}
+          kind={KIND.tertiary}
+          size={SIZE.mini}
+          title="Image Settings"
+        >
           <SlidersHorizontal size={20} />
         </Button>
       </Block>

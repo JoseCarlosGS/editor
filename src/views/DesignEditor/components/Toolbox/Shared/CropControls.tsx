@@ -80,7 +80,7 @@ const CropControls = () => {
 
     return (
         <Block>
-            <Button onClick={createCropArea} kind={KIND.tertiary} size={SIZE.mini} >
+            <Button onClick={createCropArea} kind={KIND.tertiary} size={SIZE.mini} title="Crop">
                 <CropIcon size={20} />
             </Button>
         </Block>

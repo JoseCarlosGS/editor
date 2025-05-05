@@ -26,7 +26,7 @@ export const useLoadGraphicTemplate = (
     try {
       const scenes: IScene[] = []
       const { scenes: scns, ...design } = payload
-
+      console.log(payload)
       for (const scn of scns) {
         const scene: IScene = {
           name: scn.name,
@@ -36,10 +36,7 @@ export const useLoadGraphicTemplate = (
           metadata: {},
         }
         const loadedScene = await loadVideoEditorAssets(scene)
-        console.log("Editor status", editor.state)
-        console.log("Editor not ready, waiting...")
         await loadTemplateFonts(loadedScene)
-
 
         const preview = (await editor.renderer.render(loadedScene)) as string
         scenes.push({ ...loadedScene, preview })
