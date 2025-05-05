@@ -189,7 +189,6 @@ const DocumentFields = () => {
         }
         editor.objects.add(options)
       }
-      // Reset form
       resetForm();
       setIsModalOpen(false);
     }
