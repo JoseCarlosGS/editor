@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useAppContext from '~/hooks/useAppContext';
 import { useEditor } from '@layerhub-io/react';
 import { Block } from 'baseui/block';
@@ -47,6 +47,61 @@ const ImageSettings = () => {
         fabricFilter: any; // eg: fabric.Image.filters.Brightness
         propName: string;  // eg: 'brightness', 'contrast'
     };
+
+    const lastObjectRef = React.useRef<fabric.Object | null>(null);
+
+    useEffect(() => {
+        if (!activeObject) return;
+
+        if (lastObjectRef.current === activeObject) return;
+        lastObjectRef.current = activeObject as fabric.Object;
+
+        const image = activeObject as fabric.Image;
+        const filters = image.filters || [];
+
+        const applied = new Set<string>();
+
+        filters.forEach((filter) => {
+            if (filter instanceof fabric.Image.filters.Brightness) {
+                const value = (filter as any).brightness ?? 0;
+                setBrightnessOptions((prev) => (prev.ratio !== Math.round(value * 100) ? { ratio: Math.round(value * 100) } : prev));
+                applied.add('Brightness');
+            }
+            if (filter instanceof fabric.Image.filters.Contrast) {
+                const value = (filter as any).contrast ?? 0;
+                setContrastOptions((prev) => (prev.ratio !== Math.round(value * 100) ? { ratio: Math.round(value * 100) } : prev));
+                applied.add('Contrast')
+            }
+            if (filter instanceof fabric.Image.filters.Grayscale) {
+                setGrayScaleOptions({ ratio: 1 });
+            }
+            if (filter instanceof fabric.Image.filters.Blur) {
+                const value = (filter as any).blur ?? 0;
+                setBlurOptions((prev) => (prev.ratio !== Math.round(value * 100) ? { ratio: Math.round(value * 100) } : prev));
+                applied.add('Blur')
+            }
+            if (filter instanceof fabric.Image.filters.Saturation) {
+                const value = (filter as any).saturation ?? 0;
+                setSaturationOptions((prev) => (prev.ratio !== Math.round(value * 100) ? { ratio: Math.round(value * 100) } : prev));
+                applied.add('Saturation')
+            }
+        });
+        if (!applied.has('Brightness')) {
+            setBrightnessOptions({ ratio: 0 });
+        }
+        if (!applied.has('Contrast')) {
+            setContrastOptions({ ratio: 0 });
+        }
+        if (!applied.has('Grayscale')) {
+            setGrayScaleOptions({ ratio: 0 });
+        }
+        if (!applied.has('Blur')) {
+            setBlurOptions({ ratio: 1 }); // Assuming 1 is your default
+        }
+        if (!applied.has('Saturation')) {
+            setSaturationOptions({ ratio: 0 });
+        }
+    }, [activeObject]);
 
     const applyImageFilter = (
         activeObject: fabric.Object,
