@@ -21,13 +21,13 @@ import { FormControl } from "baseui/form-control";
 import EditableName from "~/components/EditableName"
 import { toBase64 } from "~/utils/data"
 import ImagePreview from "~/views/DesignEditor/utils/common/ImagePreview"
+import { Type, Image, QrCode } from "lucide-react"
 
 const DocumentFields = () => {
   const editor = useEditor()
   const activeObject = useActiveObject() as ILayer
   const setIsSidebarOpen = useSetIsSidebarOpen()
   const objects = useObjects() as ILayer[]
-  //const textObjects = objects.filter(obj => obj.type === 'StaticText');
   const [editingId, setEditingId] = useState(null);
   const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
   const [editValue, setEditValue] = useState('');
@@ -49,40 +49,15 @@ const DocumentFields = () => {
     setLocalObjects(currentObjects)
   })
   const localTextObjects = localObjects.filter(obj => {
-    console.log("Objeto:", obj.id, obj.type, obj);
     return obj.metadata?.type === 'field';
   })
   // Opciones para el combobox
   const typeOptions = [
-    { id: "text", label: "Texto" },
-    { id: "signature", label: "Firma" },
-    { id: "image", label: "Imagen" }
+    { id: "text", label: "Texto", icon: Type },
+    //{ id: "signature", label: "Firma", icon: Type },
+    { id: "image", label: "Imagen", icon: Image },
+    { id: "qr-code", label: "Codigo QR", icon: QrCode },
   ];
-
-  const addObject = async () => {
-    if (editor) {
-      const font: FontItem = {
-        name: "OpenSans-Regular",
-        url: "https://fonts.gstatic.com/s/opensans/v27/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0C4nY1M2xLER.ttf",
-      }
-      await loadFonts([font])
-      const options = {
-        id: nanoid(),
-        type: "StaticText",
-        width: 420,
-        text: "Add some text",
-        fontSize: 40,
-        fontFamily: font.name,
-        textAlign: "center",
-        fontStyle: "normal",
-        fontURL: font.url,
-        fill: "#333333",
-        name: "Text",
-        metadata: {},
-      }
-      editor.objects.add(options)
-    }
-  }
 
   const handleAddNewField = async () => {
 
@@ -111,6 +86,7 @@ const DocumentFields = () => {
             name: newFieldName,
             metadata: {
               type: "field",
+              contentType: "text"
             },
           }
           editor.objects.add(options)
@@ -171,6 +147,26 @@ const DocumentFields = () => {
           editor.objects.add(line)
           editor.objects.add(firma)
         }
+        if (fieldType[0].id === "qr-code") {
+          const response = await fetch("https://cdn-icons-png.flaticon.com/512/714/714390.png")
+          const blob = await response.blob()
+          const file = new File([blob], "image.jpg", { type: blob.type });
+          const base64 = await toBase64(file) as unknown as string
+          const options = {
+            id: nanoid(),
+            type: "StaticImage",
+            name: newFieldName,
+            src: base64,
+            preview: base64,
+            scaleX: 0.4,
+            scaleY: 0.4,
+            metadata: {
+              type: "field",
+              contentType: "qr"
+            },
+          }
+          editor.objects.add(options)
+        }
 
         //addObject(fieldData);
       } else {
@@ -188,11 +184,11 @@ const DocumentFields = () => {
           scaleY: 0.5,
           metadata: {
             type: "field",
+            contentType: "image"
           },
         }
         editor.objects.add(options)
       }
-      // Reset form
       resetForm();
       setIsModalOpen(false);
     }
@@ -238,13 +234,6 @@ const DocumentFields = () => {
       return selectedObject === currentObject
     }
     return false
-  }
-
-  const handleUpdateImage = (image: string) => {
-    if (activeObject) {
-      editor.objects.update({ src: image })
-    }
-    console.log('Actualizando imagen:', image);
   }
 
   return (
@@ -408,12 +397,32 @@ const DocumentFields = () => {
         <ModalHeader>Nuevo campo</ModalHeader>
         <ModalBody>
           <FormControl label="Tipo de campo">
-            <Select
-              options={typeOptions}
-              value={fieldType}
-              onChange={({ value }) => setFieldType(value as { id: string; label: string }[])}
-              clearable={false}
-              searchable={false} />
+            <Block display="flex" justifyContent="space-between" marginBottom="1rem">
+              {typeOptions.map(option => (
+                <Button
+                  key={option.id}
+                  onClick={() => setFieldType([option])}
+                  kind={fieldType[0].id === option.id ? "primary" : "secondary"}
+                  size={SIZE.compact}
+                  overrides={{
+                    Root: {
+                      style: {
+                        flex: 1,
+                        marginLeft: "0.5rem",
+                        marginRight: "0.5rem",
+                        marginTop: "0",
+                        marginBottom: "0",
+                        backgroundColor: fieldType[0].id === option.id ? "#0070f3" : "#f0f0f0",
+                        color: fieldType[0].id === option.id ? "#ffffff" : "#000000",
+                      },
+                    },
+                  }}
+                >
+                  <option.icon size={48} />
+                  {option.label}
+                </Button>
+              ))}
+            </Block>
           </FormControl>
 
           <FormControl label="Nombre del campo">
@@ -423,19 +432,6 @@ const DocumentFields = () => {
               placeholder="Ej: Título, Fecha, Nombre..."
               clearOnEscape />
           </FormControl>
-
-          {/* {fieldType[0].id === "text" && (
-            <FormControl label="Contenido del campo">
-              <Textarea
-                value={newFieldContent}
-                onChange={e => setNewFieldContent(e.target.value)}
-                placeholder="Escribe aquí el contenido..."
-                size="compact"
-                rows={3}
-                 
-              />
-            </FormControl>
-          )} */}
 
           {fieldType[0].id === "image" && (
             <Block padding="1rem" display="none" justifyContent="center">
