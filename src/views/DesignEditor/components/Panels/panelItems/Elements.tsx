@@ -2,11 +2,11 @@ import React from "react"
 import { useEditor } from "@layerhub-io/react"
 import { useStyletron } from "baseui"
 import { Block } from "baseui/block"
-import { Button, SIZE } from "baseui/button"
 import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
 import Scrollable from "~/components/Scrollable"
 import { graphics } from "~/constants/mock-data"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
+import { customElements, lines } from "~/constants/custom-elements"
 
 const Elements = () => {
   const editor = useEditor()
@@ -54,8 +54,31 @@ const Elements = () => {
           </Button>
         </Block> */}
         <Block>
+          <Block $style={{ marginLeft: "20px" }}>
+            Lines
+          </Block>
+          <Block $style={{ display: "grid", gap: "8px", padding: "1.5rem", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
+            {lines.map((graphic, index) => (
+              <ImageItem onClick={() => addObject(graphic)} key={index} preview={graphic!.preview} />
+            ))}
+          </Block>
+        </Block>
+        <Block>
+          <Block $style={{ marginLeft: "20px" }}>
+            Forms
+          </Block>
           <Block $style={{ display: "grid", gap: "8px", padding: "1.5rem", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
             {graphics.map((graphic, index) => (
+              <ImageItem onClick={() => addObject(graphic)} key={index} preview={graphic.preview} />
+            ))}
+          </Block>
+        </Block>
+        <Block>
+          <Block $style={{ marginLeft: "20px" }}>
+            Custom
+          </Block>
+          <Block $style={{ display: "grid", gap: "8px", padding: "1.5rem", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
+            {customElements.map((graphic, index) => (
               <ImageItem onClick={() => addObject(graphic)} key={index} preview={graphic.preview} />
             ))}
           </Block>
@@ -72,7 +95,7 @@ const ImageItem = ({ preview, onClick }: { preview: any; onClick?: (option: any)
       onClick={onClick}
       className={css({
         position: "relative",
-        background: "#f8f8fb",
+        //background: "#f8f8fb",
         cursor: "pointer",
         borderRadius: "8px",
         overflow: "hidden",

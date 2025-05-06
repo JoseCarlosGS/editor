@@ -15,7 +15,7 @@ class ApiService {
       baseURL: "https://66sqhsvx-8080.brs.devtunnels.ms/api",
       //baseURL: "https://burly-note-production.up.railway.app",
       headers: {
-        Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGJlcnRvQGxpdmUuY29tIiwiaWF0IjoxNzQ2NDUyMTg1LCJleHAiOjE3NDY0ODgxODV9.Z3ZwEDOiXDOfIGCJnzoYJv0qIXvsCo2Xo4MR54L3qo0",
+        Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGJlcnRvQGxpdmUuY29tIiwiaWF0IjoxNzQ2NTM3ODcyLCJleHAiOjE3NDY1NzM4NzJ9.XyYQT7Bcv5_S9vkXpwbQksXSZoIPQ8TeTrqgb7jf5Gg",
       },
     })
   }

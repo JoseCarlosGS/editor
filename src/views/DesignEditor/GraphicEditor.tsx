@@ -7,14 +7,17 @@ import EditorContainer from "./components/EditorContainer"
 import { useLocation } from "react-router-dom";
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
 import { useEditor } from "@layerhub-io/react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import api from "~/services/api"
 import { useLoadGraphicTemplate } from "../../hooks/useLoadTemplate"
 import { IDesign } from "~/interfaces/DesignEditor"
+import { useActiveObject } from "@layerhub-io/react"
+import { ILayer } from "@layerhub-io/types"
 
 const GraphicEditor = () => {
   const location = useLocation();
-  const editor = useEditor()
+  const editor = useEditor();
+  const active = useActiveObject();
   const { setEditorType, setScenes, setCurrentDesign: originalSetCurrentDesign } = useDesignEditorContext()
   const setCurrentDesign = (design: Partial<IDesign>) => {
     originalSetCurrentDesign((prev) => ({ ...prev, ...design }));
@@ -23,6 +26,7 @@ const GraphicEditor = () => {
   const filename = queryParams.get("filename");
   const personaId = queryParams.get("personaId");
   const eventoId = queryParams.get("eventoId");
+  const [showToolbox, setShowToolbox] = useState(false)
 
   const { load, loading, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
 
@@ -34,12 +38,18 @@ const GraphicEditor = () => {
 
   useEffect(() => {
     if (!editor) return
-
     if (filename) {
       loadProject()
     }
   }, [editor, filename, personaId, eventoId])
 
+  useEffect(() => {
+    if (active && (active as ILayer).id !== 'frame') {
+      setShowToolbox(true)
+    } else {
+      setShowToolbox(false)
+    }
+  }, [active])
 
   const loadProject = async () => {
     const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
@@ -52,6 +62,8 @@ const GraphicEditor = () => {
   if (error) {
     console.log("Error:", error)
   }
+
+  console.log(active)
 
   const LoadingOverlay = () => (
     <div style={{
@@ -92,7 +104,16 @@ const GraphicEditor = () => {
       <div style={{ display: "flex", flex: 1 }}>
         <Panels />
         <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
-          <Toolbox />
+          <div
+            style={{
+              transition: "opacity 0.3s ease-in-out, transform 0.3s ease-in-out",
+              opacity: showToolbox ? 1 : 0,
+              transform: showToolbox ? "translateY(0)" : "translateY(10px)",
+              pointerEvents: showToolbox ? "auto" : "none",
+            }}
+          >
+            <Toolbox />
+          </div>
           <Canvas />
           <Footer />
         </div>
