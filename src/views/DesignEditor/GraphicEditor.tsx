@@ -63,8 +63,6 @@ const GraphicEditor = () => {
     console.log("Error:", error)
   }
 
-  console.log(active)
-
   const LoadingOverlay = () => (
     <div style={{
       position: "absolute",
@@ -104,16 +102,7 @@ const GraphicEditor = () => {
       <div style={{ display: "flex", flex: 1 }}>
         <Panels />
         <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
-          <div
-            style={{
-              transition: "opacity 0.3s ease-in-out, transform 0.3s ease-in-out",
-              opacity: showToolbox ? 1 : 0,
-              transform: showToolbox ? "translateY(0)" : "translateY(10px)",
-              pointerEvents: showToolbox ? "auto" : "none",
-            }}
-          >
-            <Toolbox />
-          </div>
+          {showToolbox && (<Toolbox />)}
           <Canvas />
           <Footer />
         </div>

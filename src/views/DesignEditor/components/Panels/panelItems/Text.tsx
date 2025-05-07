@@ -23,29 +23,29 @@ const Text = () => {
   const setIsSidebarOpen = useSetIsSidebarOpen()
   const objects = useObjects() as ILayer[]
   //const textObjects = objects.filter(obj => obj.type === 'StaticText');
-   const [editingId, setEditingId] = useState(null);
-   const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
-   const [editValue, setEditValue] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
+  const [editValue, setEditValue] = useState('');
 
-   const [localObjects, setLocalObjects] = useState<ILayer[]>([])
+  const [localObjects, setLocalObjects] = useState<ILayer[]>([])
 
-   useEffect(() => {
+  useEffect(() => {
     setLocalObjects(objects)
   }, [objects])
-    
+
   useEditorHistoryListener(() => {
-      console.log('Editor history changed')
-      const currentObjects = editor.objects.list() as ILayer[]
-      setLocalObjects(currentObjects)
+    console.log('Editor history changed')
+    const currentObjects = editor.objects.list() as ILayer[]
+    setLocalObjects(currentObjects)
   })
-   const localTextObjects = localObjects.filter(obj => obj.type === 'StaticText')
-   // Opciones para el combobox
-   const typeOptions = [
-     { label: 'Nombre', id: 'name' },
-     { label: 'Firma', id: 'signature' },
-     { label: 'Emisor', id: 'issuer' },
-     { label: 'Fecha', id: 'date' }
-   ];
+  const localTextObjects = localObjects.filter(obj => obj.type === 'StaticText')
+  // Opciones para el combobox
+  const typeOptions = [
+    { label: 'Nombre', id: 'name' },
+    { label: 'Firma', id: 'signature' },
+    { label: 'Emisor', id: 'issuer' },
+    { label: 'Fecha', id: 'date' }
+  ];
 
   const addObject = async () => {
     if (editor) {
@@ -65,9 +65,6 @@ const Text = () => {
         fontStyle: "normal",
         fontURL: font.url,
         fill: "#333333",
-        metadata: {
-          type: "field", 
-        },
       }
       editor.objects.add(options)
     }
@@ -88,17 +85,17 @@ const Text = () => {
         await loadFonts(filteredFonts)
       } else {
         if (component.type === "StaticText" || component.type === "DynamicText") {
-        fontItemsList.push({
-          name: component.fontFamily,
-          url: component.fontURL,
-        })
-        await loadFonts(fontItemsList)
-      }
+          fontItemsList.push({
+            name: component.fontFamily,
+            url: component.fontURL,
+          })
+          await loadFonts(fontItemsList)
+        }
       }
       editor.objects.add(component)
     }
   }
-  const handleEdit = (textObj:any) => {
+  const handleEdit = (textObj: any) => {
     console.log('Editando objeto:', textObj)
     if (editingId === textObj.id) {
       // Si ya estamos editando este objeto, cerramos el panel de edición
@@ -106,13 +103,13 @@ const Text = () => {
     } else {
       // Configuramos el objeto para edición
       setEditingId(textObj.id);
-      setEditType(textObj.fieldType ? 
-        [typeOptions.find(option => option.id === textObj.fieldType) || typeOptions[0]] : 
+      setEditType(textObj.fieldType ?
+        [typeOptions.find(option => option.id === textObj.fieldType) || typeOptions[0]] :
         [typeOptions[0]]);
       setEditValue(textObj.text || '');
     }
   };
-  
+
   const handleDelete = (id: string) => {
     if (activeObject) {
       editor.objects.remove(id);
@@ -120,7 +117,7 @@ const Text = () => {
     console.log('Eliminando objeto:', id);
   };
 
-  const handleSave = (text:string) => {
+  const handleSave = (text: string) => {
     if (activeObject) {
       editor.objects.update({ text: text })
     }
@@ -182,7 +179,7 @@ const Text = () => {
             ))}
           </Block>
 
-          
+
         </Block>
       </Scrollable>
     </Block>

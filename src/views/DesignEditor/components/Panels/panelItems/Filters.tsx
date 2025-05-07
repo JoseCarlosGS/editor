@@ -21,9 +21,6 @@ const Filters = () => {
     const editor = useEditor()
     const canvas = editor.canvas.canvas
     const activeObject = useActiveObject() as ILayer;
-    let frameRequest: number | null = null;
-    const ratioMin = -100
-    const ratioMax = 100
     const [previews, setPreviews] = useState<{ name: string; preview: string }[]>([]);
 
     const STATIC_FILTERS = [
@@ -43,10 +40,12 @@ const Filters = () => {
 
     useEffect(() => {
         if (!activeObject) return;
-
+        if (activeObject.id === 'frame') return;
         const img = new Image();
-        img.crossOrigin = "anonymous"; // necesario si cargas imágenes externas
-        img.src = activeObject.preview!;
+        img.crossOrigin = "anonymous";
+        //img.src = (activeObject as any).preview!;
+        console.log(activeObject)
+        img.src = (activeObject as any).getSrc();
 
         img.onload = () => {
             const fabricImg = new fabric.Image(img, {
