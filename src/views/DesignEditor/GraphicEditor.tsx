@@ -18,6 +18,7 @@ const GraphicEditor = () => {
   const location = useLocation();
   const editor = useEditor();
   const active = useActiveObject();
+  const [isAutenticated, setIsAutenticated] = useState(false)
   const { setEditorType, setScenes, setCurrentDesign: originalSetCurrentDesign } = useDesignEditorContext()
   const setCurrentDesign = (design: Partial<IDesign>) => {
     originalSetCurrentDesign((prev) => ({ ...prev, ...design }));
@@ -26,6 +27,7 @@ const GraphicEditor = () => {
   const filename = queryParams.get("filename");
   const personaId = queryParams.get("personaId");
   const eventoId = queryParams.get("eventoId");
+  const id = queryParams.get("id")
   const [showToolbox, setShowToolbox] = useState(false)
 
   const { load, loading, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
@@ -35,6 +37,11 @@ const GraphicEditor = () => {
   useEffect(() => {
     setEditorType("GRAPHIC");
   }, []);
+
+  useEffect(() => {
+    if (!id) return
+    loadToken(id)
+  }, [])
 
   useEffect(() => {
     if (!editor) return
@@ -50,6 +57,18 @@ const GraphicEditor = () => {
       setShowToolbox(false)
     }
   }, [active])
+
+  const loadToken = async (id: string) => {
+    const data = await api.getTokenById(id)
+    if (data) {
+      sessionStorage.setItem('auth_token', data.data)
+      sessionStorage.setItem('personaId', personaId!)
+      sessionStorage.setItem('eventoId', eventoId!)
+      api.setAuthToken(data.data)
+      setIsAutenticated(true)
+      return data
+    }
+  }
 
   const loadProject = async () => {
     const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)

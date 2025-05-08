@@ -256,7 +256,10 @@ const DocumentFields = () => {
       <Scrollable>
         <Block padding="0 1.5rem">
           <Button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              editor.objects.deselect();
+              setIsModalOpen(true);
+            }}
             size={SIZE.compact}
             overrides={{
               Root: {

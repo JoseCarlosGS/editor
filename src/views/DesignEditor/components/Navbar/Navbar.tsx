@@ -14,6 +14,7 @@ import { loadVideoEditorAssets } from "~/utils/video"
 import DesignTitle from "./DesignTitle"
 import { IDesign } from "~/interfaces/DesignEditor"
 import Github from "~/components/Icons/Github"
+import api from "~/services/api"
 
 const Container = styled<"div", {}, Theme>("div", ({ $theme }) => ({
   height: "50px",
@@ -265,6 +266,43 @@ const Navbar = () => {
     }
   }
 
+  const saveProject = async () => {
+    const currentScene = editor.scene.exportToJSON()
+
+    const updatedScenes = scenes.map((scn) => {
+      if (scn.id === currentScene.id) {
+        return {
+          id: currentScene.id,
+          layers: currentScene.layers,
+          name: currentScene.name,
+        }
+      }
+      return {
+        id: scn.id,
+        layers: scn.layers,
+        name: scn.name,
+      }
+    })
+    if (currentDesign) {
+      const graphicTemplate: IDesign = {
+        id: currentDesign.id,
+        type: "GRAPHIC",
+        name: currentDesign.name,
+        frame: currentDesign.frame,
+        scenes: updatedScenes,
+        metadata: {},
+        preview: "",
+      }
+      const response = await api.createProject(sessionStorage.getItem('personaId')!, sessionStorage.getItem('eventoId')!, graphicTemplate)
+      makeDownload(graphicTemplate)
+
+      if (response) console.log("creado con exito", response)
+
+    } else {
+      console.log("NO CURRENT DESIGN")
+    }
+  }
+
   return (
     // @ts-ignore
     <ThemeProvider theme={DarkTheme}>
@@ -314,6 +352,20 @@ const Navbar = () => {
             }}
           >
             Export
+          </Button>
+          <Button
+            size="compact"
+            onClick={saveProject}
+            kind={KIND.tertiary}
+            overrides={{
+              StartEnhancer: {
+                style: {
+                  marginRight: "4px",
+                },
+              },
+            }}
+          >
+            Save
           </Button>
           <Button
             size="compact"
