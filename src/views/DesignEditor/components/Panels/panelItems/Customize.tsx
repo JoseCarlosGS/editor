@@ -15,6 +15,8 @@ import SwapHorizontal from "~/components/Icons/SwapHorizontal"
 import { Tabs, Tab } from "baseui/tabs"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
+import { useActiveObject } from "@layerhub-io/react"
+
 
 const colors = ["#ffffff", "#9B9B9B", "#4A4A4A", "#000000", "#A70C2C", "#DA9A15", "#F8E71D", "#47821A", "#4990E2"]
 
@@ -167,6 +169,7 @@ const ResizeTemplate = () => {
   const [activeKey, setActiveKey] = React.useState<string | number>("0")
   const { currentDesign, setCurrentDesign } = useDesignEditorContext()
   const editor = useEditor()
+  const active = useActiveObject()
   const [desiredFrame, setDesiredFrame] = React.useState({
     width: 0,
     height: 0,
@@ -186,6 +189,10 @@ const ResizeTemplate = () => {
       })
     }
   }, [frame])
+
+  React.useEffect(() => {
+    console.log(active)
+  }, [])
 
   const applyResize = () => {
     // @ts-ignore
@@ -214,7 +221,10 @@ const ResizeTemplate = () => {
   return (
     <>
       <Button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          editor.objects.deselect();
+          setIsOpen(true)
+        }}
         size={SIZE.compact}
         overrides={{
           Root: {
@@ -237,6 +247,7 @@ const ResizeTemplate = () => {
         overrides={{
           Dialog: {
             style: {
+              zIndex: 9999,
               borderTopRightRadius: "8px",
               borderEndStartRadius: "8px",
               borderEndEndRadius: "8px",
@@ -321,10 +332,11 @@ const ResizeTemplate = () => {
             <Tab title="Custom size">
               <Block $style={{ padding: "2rem 2rem" }}>
                 <Block
-                  $style={{ display: "grid", 
-                    gridTemplateColumns: "1fr 50px 1fr", 
-                    alignItems: "end", 
-                    fontSize: "14px" 
+                  $style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 50px 1fr",
+                    alignItems: "end",
+                    fontSize: "14px"
                   }}
                 >
                   <Input
@@ -357,11 +369,12 @@ const ResizeTemplate = () => {
             </Tab>
           </Tabs>
         </Block>
-        <Block $style={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          paddingBottom: "2rem" }}>
+        <Block $style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingBottom: "2rem"
+        }}>
           <Button disabled={!isEnabled} onClick={applyResize} style={{ width: "190px" }}>
             Resize template
           </Button>
