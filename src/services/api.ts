@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios"
 import { Resource } from "~/interfaces/editor"
 // Removed "fs" import as it is not compatible with browser environments.
-import path from "path";
+import path from "path"
 
 type IElement = any
 type IFontFamily = any
@@ -10,14 +10,21 @@ type Template = any
 
 class ApiService {
   base: AxiosInstance
+
   constructor() {
     this.base = axios.create({
       baseURL: "https://66sqhsvx-8080.brs.devtunnels.ms/api",
-      //baseURL: "https://burly-note-production.up.railway.app",
       headers: {
-        Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGJlcnRvQGxpdmUuY29tIiwiaWF0IjoxNzQ2NTM3ODcyLCJleHAiOjE3NDY1NzM4NzJ9.XyYQT7Bcv5_S9vkXpwbQksXSZoIPQ8TeTrqgb7jf5Gg",
+        //Authorization: `Bearer ${sessionStorage.getItem("auth_token")}` || "",
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3NlQGdtYWlsLmNvbSIsImlhdCI6MTc0NjcxMjM5MywiZXhwIjoxNzQ2NzQ4MzkzfQ.HSCuZugyQlaI-tclJasGk5yVf3ncqOPn36kaEGDkQ7E",
       },
     })
+  }
+
+  setAuthToken(token: string) {
+    this.base.defaults.headers.common["Authorization"] = `Bearer ${token}`
+    sessionStorage.setItem("auth_token", token)
   }
 
   signin(props: any) {
@@ -266,10 +273,40 @@ class ApiService {
     })
   }
 
-  getTemplateByParams(personaId:string, eventoId:string, filename:string): Promise<any>{
+  getTemplateByParams(personaId: string, eventoId: string, filename: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await this.base.get(`/archivos/leer?personaId=${personaId}&eventoId=${eventoId}&filename=${filename}`)
+        const { data } = await this.base.get(
+          `/archivos/leer?personaId=${personaId}&eventoId=${eventoId}&filename=${filename}`
+        )
+        resolve(data)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  getTokenById(id: string): Promise<any> {
+    const url = this.base.defaults.baseURL
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await axios.get(`${url}/data/get/${id}`)
+        resolve(data)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  createProject(personaId: string, eventoId: string, proyecto: any): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      const request = {
+        personaId: personaId,
+        eventoId: eventoId,
+        data: proyecto,
+      }
+      try {
+        const data = await this.base.post(`/archivos/guardar`, request)
         resolve(data)
       } catch (err) {
         reject(err)

@@ -10,6 +10,9 @@ import { customElements, lines } from "~/constants/custom-elements"
 import { svgElements } from "~/constants/svg-elements"
 import { fabric } from "fabric"
 import { nanoid } from "nanoid"
+import { ILayer, IStaticPath } from "@layerhub-io/types"
+import { Button, KIND, SIZE } from "baseui/button"
+import { PencilLine } from "lucide-react"
 
 const Elements = () => {
   const editor = useEditor()
@@ -22,20 +25,81 @@ const Elements = () => {
       }
     },
     [editor]
-  )
+  );
+
+  const enableLineTool = () => {
+    const canvas = editor.canvas.canvas;
+    let isDrawing = false;
+    let line: fabric.Line | null = null;
+
+    canvas.on("mouse:down", (opt) => {
+      isDrawing = true;
+      const pointer = canvas.getPointer(opt.e);
+      line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+        stroke: "black",
+        strokeWidth: 2,
+        selectable: false,
+        evented: false,
+      });
+      canvas.add(line);
+    });
+
+    canvas.on("mouse:move", (opt) => {
+      if (!isDrawing || !line) return;
+      const pointer = canvas.getPointer(opt.e);
+      line.set({ x2: pointer.x, y2: pointer.y });
+      canvas.requestRenderAll();
+    });
+
+    canvas.on("mouse:up", () => {
+      if (line) {
+        // Convertir a StaticPath
+        const pathData = `["M", ${line.x1}, ${line.y1}], ["L", ${line.x2}, ${line.y2}]`
+        const staticPath = {
+          id: String(Date.now()),
+          name: "Line",
+          type: "StaticPath",
+          left: Math.min(line.x1!, line.x2!),
+          top: Math.min(line.y1!, line.y2!),
+          width: Math.abs(line.x2! - line.x1!),
+          height: Math.abs(line.y2! - line.y1!),
+          path: pathData,
+          stroke: line.stroke as string,
+          strokeWidth: line.strokeWidth!,
+          fill: "",
+          metadata: {},
+        };
+
+        editor.objects.add(staticPath);
+        canvas.remove(line);
+      }
+      isDrawing = false;
+      line = null;
+    });
+  };
+
+  const addLine = () => {
+    const line = new fabric.Line([50, 100, 200, 100], {
+      stroke: "black",
+      strokeWidth: 2,
+      selectable: true,
+      evented: true,
+    });
+
+    editor.canvas.canvas.add(line);
+    editor.canvas.canvas.renderAll();
+  };
 
   const handleAddSvg = (svgString: string) => {
     fabric.loadSVGFromString(svgString, (objects, options) => {
       const group = fabric.util.groupSVGElements(objects, options);
       group.clone((clonedGroup: any) => {
-        const bounds = clonedGroup.getBoundingRect(true, true); // Incluye transformaciones
-
+        const bounds = clonedGroup.getBoundingRect(true, true);
         const tempCanvas = new fabric.StaticCanvas(null, {
           width: bounds.width,
           height: bounds.height,
         });
 
-        // Reposicionar el grupo para que esté dentro del canvas temporal
         clonedGroup.set({
           left: bounds.width / 2,
           top: bounds.height / 2,
@@ -48,7 +112,7 @@ const Elements = () => {
 
         const dataUrl = tempCanvas.toDataURL({
           format: 'png',
-          multiplier: 3, // Aumenta este valor si ves que se pixela
+          multiplier: 3,
         });
 
         fabric.Image.fromURL(dataUrl, (img) => {
@@ -106,6 +170,13 @@ const Elements = () => {
             Lines
           </Block>
           <Block $style={{ display: "grid", gap: "8px", padding: "1.5rem", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
+            <Button
+              onClick={enableLineTool}
+              size={SIZE.mini}
+              kind={KIND.secondary}
+            >
+              <PencilLine size={24} />
+            </Button>
             {lines.map((graphic, index) => (
               <ImageItem onClick={() => addObject(graphic)} key={index} preview={graphic!.preview} />
             ))}
