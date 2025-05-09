@@ -1,7 +1,6 @@
 import axios, { AxiosInstance } from "axios"
 import { Resource } from "~/interfaces/editor"
-// Removed "fs" import as it is not compatible with browser environments.
-import path from "path"
+import { environment } from "~/constants/environment/environment"
 
 type IElement = any
 type IFontFamily = any
@@ -13,11 +12,11 @@ class ApiService {
 
   constructor() {
     this.base = axios.create({
-      baseURL: "https://66sqhsvx-8080.brs.devtunnels.ms/api",
+      baseURL: environment.apiBaseUrl,
       headers: {
-        //Authorization: `Bearer ${sessionStorage.getItem("auth_token")}` || "",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3NlQGdtYWlsLmNvbSIsImlhdCI6MTc0NjcxMjM5MywiZXhwIjoxNzQ2NzQ4MzkzfQ.HSCuZugyQlaI-tclJasGk5yVf3ncqOPn36kaEGDkQ7E",
+        Authorization: `Bearer ${sessionStorage.getItem("auth_token")}` || "",
+        // Authorization:
+        //   "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3NlQGdtYWlsLmNvbSIsImlhdCI6MTc0NjcxMjM5MywiZXhwIjoxNzQ2NzQ4MzkzfQ.HSCuZugyQlaI-tclJasGk5yVf3ncqOPn36kaEGDkQ7E",
       },
     })
   }
