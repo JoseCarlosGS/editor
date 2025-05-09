@@ -18,7 +18,6 @@ const GraphicEditor = () => {
   const location = useLocation();
   const editor = useEditor();
   const active = useActiveObject();
-  const [isAutenticated, setIsAutenticated] = useState(false)
   const { setEditorType, setScenes, setCurrentDesign: originalSetCurrentDesign } = useDesignEditorContext()
   const setCurrentDesign = (design: Partial<IDesign>) => {
     originalSetCurrentDesign((prev) => ({ ...prev, ...design }));
@@ -27,28 +26,32 @@ const GraphicEditor = () => {
   const filename = queryParams.get("filename");
   const personaId = queryParams.get("personaId");
   const eventoId = queryParams.get("eventoId");
-  const id = queryParams.get("id")
   const [showToolbox, setShowToolbox] = useState(false)
+  const [loadedNew, setLoadedNew] = useState(false)
 
   const { load, loading, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
 
   //console.log("Id from URL:", idProject);
-
   useEffect(() => {
     setEditorType("GRAPHIC");
   }, []);
 
   useEffect(() => {
-    if (!id) return
-    loadToken(id)
-  }, [])
+    if (!editor) return
+    if (personaId) sessionStorage.setItem('personaId', personaId)
+    else return
+    if (eventoId) sessionStorage.setItem('eventoId', eventoId)
+    else return
+    setLoadedNew(true)
+  }, [editor, personaId, eventoId])
 
   useEffect(() => {
     if (!editor) return
+    if (!loadedNew) return
     if (filename) {
       loadProject()
     }
-  }, [editor, filename, personaId, eventoId])
+  }, [editor, filename, loadedNew])
 
   useEffect(() => {
     if (active && (active as ILayer).id !== 'frame') {
@@ -57,18 +60,6 @@ const GraphicEditor = () => {
       setShowToolbox(false)
     }
   }, [active])
-
-  const loadToken = async (id: string) => {
-    const data = await api.getTokenById(id)
-    if (data) {
-      sessionStorage.setItem('auth_token', data.data)
-      sessionStorage.setItem('personaId', personaId!)
-      sessionStorage.setItem('eventoId', eventoId!)
-      api.setAuthToken(data.data)
-      setIsAutenticated(true)
-      return data
-    }
-  }
 
   const loadProject = async () => {
     const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
