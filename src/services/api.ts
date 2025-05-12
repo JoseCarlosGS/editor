@@ -275,6 +275,7 @@ class ApiService {
   getTemplateByParams(personaId: string, eventoId: string, filename: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
+        console.log(this.base.defaults)
         const { data } = await this.base.get(
           `/archivos/leer?personaId=${personaId}&eventoId=${eventoId}&filename=${filename}`
         )
@@ -297,12 +298,13 @@ class ApiService {
     })
   }
 
-  createProject(personaId: string, eventoId: string, proyecto: any): Promise<any> {
+  createProject(personaId: string, eventoId: string, filename: string | null, proyecto: any): Promise<any> {
     return new Promise(async (resolve, reject) => {
       const request = {
         personaId: personaId,
         eventoId: eventoId,
         data: proyecto,
+        filename: filename,
       }
       try {
         const data = await this.base.post(`/archivos/guardar`, request)

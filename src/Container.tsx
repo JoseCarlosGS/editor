@@ -90,7 +90,7 @@ const Container = ({ children }: { children: React.ReactNode }) => {
     const response = await api.getTokenById(id)
     if (response) {
       sessionStorage.setItem('auth_token', response.data);
-      sessionStorage.setItem('persona_id', response.data);
+      sessionStorage.setItem('persona_id', response.personaId);
       api.setAuthToken(response.data);
       setIsAutenticated(true);
     }

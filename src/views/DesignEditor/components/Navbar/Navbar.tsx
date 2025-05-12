@@ -30,6 +30,8 @@ const Navbar = () => {
   const editorType = useEditorType()
   const editor = useEditor()
   const inputFileRef = React.useRef<HTMLInputElement>(null)
+  const queryParams = new URLSearchParams(location.search);
+  const filename = queryParams.get("filename");
 
   const parseGraphicJSON = () => {
     const currentScene = editor.scene.exportToJSON()
@@ -293,8 +295,9 @@ const Navbar = () => {
         metadata: {},
         preview: "",
       }
-      const response = await api.createProject(sessionStorage.getItem('personaId')!, sessionStorage.getItem('eventoId')!, graphicTemplate)
-      makeDownload(graphicTemplate)
+      const response = await api.createProject(sessionStorage.getItem('persona_id')!, sessionStorage.getItem('evento_id')!, filename, graphicTemplate)
+      //makeDownload(graphicTemplate)
+      alert("Project saved")
 
       if (response) console.log("creado con exito", response)
 

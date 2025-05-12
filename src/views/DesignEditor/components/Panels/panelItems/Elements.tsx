@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback, useEffect } from "react"
 import { useEditor } from "@layerhub-io/react"
 import { useStyletron } from "baseui"
 import { Block } from "baseui/block"
@@ -18,6 +18,21 @@ const Elements = () => {
   const editor = useEditor()
   const setIsSidebarOpen = useSetIsSidebarOpen()
 
+  useEffect(() => {
+    const canvas = editor.canvas.canvas;
+
+    // Elimina listeners anteriores (por seguridad)
+    canvas.off("mouse:dblclick", handleDoubleClick);
+
+    // Agrega el nuevo listener SOLO una vez
+    canvas.on("mouse:dblclick", handleDoubleClick);
+
+    return () => {
+      // Limpieza al desmontar
+      canvas.off("mouse:dblclick", handleDoubleClick);
+    };
+  }, [editor]);
+
   const addObject = React.useCallback(
     (item: any) => {
       if (editor) {
@@ -32,7 +47,7 @@ const Elements = () => {
     let isDrawing = false;
     let line: fabric.Line | null = null;
 
-    canvas.on("mouse:down", (opt) => {
+    const handleMouseDown = (opt: fabric.IEvent) => {
       isDrawing = true;
       const pointer = canvas.getPointer(opt.e);
       line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
@@ -42,19 +57,23 @@ const Elements = () => {
         evented: false,
       });
       canvas.add(line);
-    });
+    };
 
-    canvas.on("mouse:move", (opt) => {
+    const handleMouseMove = (opt: fabric.IEvent) => {
       if (!isDrawing || !line) return;
       const pointer = canvas.getPointer(opt.e);
       line.set({ x2: pointer.x, y2: pointer.y });
       canvas.requestRenderAll();
-    });
+    };
 
-    canvas.on("mouse:up", () => {
+    const handleMouseUp = () => {
       if (line) {
         // Convertir a StaticPath
-        const pathData = `["M", ${line.x1}, ${line.y1}], ["L", ${line.x2}, ${line.y2}]`
+        const pathData = [
+          ["M", line.x1, line.y1],
+          ["L", line.x2, line.y2],
+        ];
+
         const staticPath = {
           id: String(Date.now()),
           name: "Line",
@@ -69,26 +88,195 @@ const Elements = () => {
           fill: "",
           metadata: {},
         };
+        const fabricPath = new fabric.Path(staticPath.path.map(([cmd, ...coords]) => `${cmd} ${coords.join(' ')}`).join(' '), {
+          left: staticPath.left,
+          top: staticPath.top,
+          stroke: staticPath.stroke,
+          strokeWidth: staticPath.strokeWidth,
+          fill: staticPath.fill,
+          originX: "left",
+          originY: "top",
+          name: "Line",
+          type: "StaticPath",
+        });
+        fabricPath.set({
+          id: staticPath.id,
+        });
 
-        editor.objects.add(staticPath);
+        //editor.objects.add(staticPath)
+        canvas.add(fabricPath);
         canvas.remove(line);
+        canvas.requestRenderAll();
+
       }
+
       isDrawing = false;
       line = null;
-    });
+
+      // ❗ Importante: quitar los listeners para salir del modo dibujo
+      canvas.off("mouse:down", handleMouseDown);
+      canvas.off("mouse:move", handleMouseMove);
+      canvas.off("mouse:up", handleMouseUp);
+    };
+
+    // Agregamos los listeners una sola vez por activación
+    canvas.on("mouse:down", handleMouseDown);
+    canvas.on("mouse:move", handleMouseMove);
+    canvas.on("mouse:up", handleMouseUp);
   };
 
-  const addLine = () => {
-    const line = new fabric.Line([50, 100, 200, 100], {
-      stroke: "black",
-      strokeWidth: 2,
-      selectable: true,
-      evented: true,
-    });
+  const handleDoubleClick = useCallback((opt: fabric.IEvent) => {
+    const target = opt.target;
+    if (target && target.type === "StaticPath" && target.name === "Line") {
+      const canvas = editor.canvas.canvas;
 
-    editor.canvas.canvas.add(line);
-    editor.canvas.canvas.renderAll();
-  };
+      const path = (target as fabric.Path).path as unknown as any[][] | undefined;
+      if (!path || path.length < 2) return;
+
+      const [moveCmd, lineCmd] = path;
+      const [, x1, y1] = moveCmd;
+      const [, x2, y2] = lineCmd;
+
+      canvas.remove(target);
+
+      const editableLine = new fabric.Line([x1, y1, x2, y2], {
+        stroke: "black",
+        strokeWidth: 2,
+        selectable: true,
+        hasControls: false,
+        hasBorders: false,
+        evented: true,
+      });
+
+      const pointer1 = new fabric.Circle({
+        radius: editableLine.strokeWidth! * 5,
+        left: x1,
+        top: y1,
+        fill: "blue",
+        opacity: 0.4,
+        originX: "center",
+        originY: "center",
+        hasControls: false,
+      });
+
+      const pointer2 = new fabric.Circle({
+        radius: editableLine.strokeWidth! * 5,
+        left: x2,
+        top: y2,
+        fill: "blue",
+        opacity: 0.4,
+        originX: "center",
+        originY: "center",
+        hasControls: false,
+      });
+
+      canvas.add(editableLine, pointer1, pointer2);
+      canvas.setActiveObject(editableLine);
+      canvas.requestRenderAll();
+
+      pointer1.set({ name: "pointer1" });
+      pointer2.set({ name: "pointer2" });
+      editableLine.set({
+        selectable: false,
+        evented: false,
+      });
+
+      // Escuchar cuando cualquier objeto se mueve
+      canvas.on("object:moving", (e) => {
+        const target = e.target;
+        if (!target || !editableLine) return;
+
+        if (target.name === "pointer1") {
+          editableLine.set({
+            x1: target.left,
+            y1: target.top,
+          });
+        } else if (target.name === "pointer2") {
+          editableLine.set({
+            x2: target.left,
+            y2: target.top,
+          });
+        }
+
+        editableLine.setCoords(); // Asegura actualización de hitbox
+        canvas.requestRenderAll(); // Redibuja el canvas
+      });
+      const finalizeEditableLine = () => {
+        // Obtener los extremos actualizados
+        const newX1 = pointer1.left!;
+        const newY1 = pointer1.top!;
+        const newX2 = pointer2.left!;
+        const newY2 = pointer2.top!;
+
+        // Eliminar los objetos del canvas
+        canvas.remove(editableLine, pointer1, pointer2);
+
+        // Crear nuevo objeto StaticPath compatible con Layerhub
+        const minX = Math.min(newX1, newX2);
+        const minY = Math.min(newY1, newY2);
+
+        const newStaticPath = {
+          id: String(Date.now()),
+          name: "Line",
+          type: "StaticPath",
+          left: minX,
+          top: minY,
+          width: Math.abs(newX2 - newX1),
+          height: Math.abs(newY2 - newY1),
+          path: [
+            ["M", newX1 - minX, newY1 - minY],
+            ["L", newX2 - minX, newY2 - minY],
+          ],
+          stroke: editableLine.stroke as string,
+          strokeWidth: editableLine.strokeWidth!,
+          fill: "",
+          metadata: {},
+          originX: "left",
+          originY: "top",
+        };
+
+        const fabricPath = new fabric.Path(newStaticPath.path.map(([cmd, ...coords]) => `${cmd} ${coords.join(' ')}`).join(' '), {
+          left: newStaticPath.left,
+          top: newStaticPath.top,
+          stroke: newStaticPath.stroke,
+          strokeWidth: newStaticPath.strokeWidth,
+          fill: newStaticPath.fill,
+          originX: newStaticPath.originX,
+          originY: newStaticPath.originY,
+          type: "StaticPath",
+          name: "Line"
+        });
+        fabricPath.set({
+          id: newStaticPath.id,
+        });
+        console.log({ fabricPath })
+        editor.canvas.canvas.add(fabricPath);
+      };
+
+      // Escuchar cuando los pointers son modificados
+      pointer1.on("modified", finalizeEditableLine);
+      pointer2.on("modified", finalizeEditableLine);
+    }
+  }, []);
+
+
+  function endPointOfLineToFollowPointer(o: any) {
+    let obj = o.target;
+    let canvas = editor.canvas.canvas;
+
+    if (obj && obj.id === 'pointer1') {
+      canvas.getActiveObjects().forEach((object: any) => {
+        if (o.name === 'Line') {
+          o.set({
+            x1: o.left,
+            y1: o.top,
+          })
+          o.setCoords();
+        }
+      })
+    }
+
+  }
 
   const handleAddSvg = (svgString: string) => {
     fabric.loadSVGFromString(svgString, (objects, options) => {

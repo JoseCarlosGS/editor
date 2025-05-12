@@ -1,7 +1,7 @@
 // hooks/useLoadGraphicTemplate.ts
 import { useState, useCallback } from "react"
 import { loadTemplateFonts } from "~/utils/fonts"
-import { useEditor } from "@layerhub-io/react" 
+import { useEditor } from "@layerhub-io/react"
 import { IScene } from "@layerhub-io/types"
 import { IDesign } from "~/interfaces/DesignEditor"
 import { loadVideoEditorAssets } from "~/utils/video"
@@ -19,45 +19,47 @@ export const useLoadGraphicTemplate = (
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const editor = useEditor()
-  const load = useCallback(async (payload: IDesign) => {
-    setLoading(true)
-    setError(null)
+  const load = useCallback(
+    async (payload: IDesign) => {
+      setLoading(true)
+      setError(null)
 
-    try {
-      const scenes: IScene[] = []
-      const { scenes: scns, ...design } = payload
-      console.log(payload)
-      for (const scn of scns) {
-        const scene: IScene = {
-          name: scn.name,
-          frame: payload.frame,
-          id: scn.id,
-          layers: scn.layers,
-          metadata: {},
+      try {
+        const scenes: IScene[] = []
+        const { scenes: scns, ...design } = payload
+        //console.log(payload)
+        for (const scn of scns) {
+          const scene: IScene = {
+            name: scn.name,
+            frame: payload.frame,
+            id: scn.id,
+            layers: scn.layers,
+            metadata: {},
+          }
+          const loadedScene = await loadVideoEditorAssets(scene)
+          await loadTemplateFonts(loadedScene)
+
+          const preview = (await editor.renderer.render(loadedScene)) as string
+          scenes.push({ ...loadedScene, preview })
         }
-        const loadedScene = await loadVideoEditorAssets(scene)
-        await loadTemplateFonts(loadedScene)
 
-        const preview = (await editor.renderer.render(loadedScene)) as string
-        scenes.push({ ...loadedScene, preview })
+        setScenes(scenes)
+        setCurrentDesign(design)
+
+        setTimeout(() => {
+          const objectToLock = editor.objects.findById("imgbck")
+          if (objectToLock) {
+            editor.objects.lock("imgbck")
+          }
+        }, 500)
+      } catch (err) {
+        setError((err as Error).message)
+      } finally {
+        setLoading(false)
       }
-
-      setScenes(scenes)
-      setCurrentDesign(design);
-
-      setTimeout(() => {
-        const objectToLock = editor.objects.findById("imgbck")
-        if (objectToLock) {
-          editor.objects.lock("imgbck")
-        }
-      }, 500)
-
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setLoading(false)
-    }
-  }, [setScenes, setCurrentDesign])
+    },
+    [setScenes, setCurrentDesign]
+  )
 
   return { load, loading, error }
 }

@@ -18,13 +18,16 @@ const GraphicEditor = () => {
   const location = useLocation();
   const editor = useEditor();
   const active = useActiveObject();
+  const [loadingProject, setLoadingProject] = useState(false)
   const { setEditorType, setScenes, setCurrentDesign: originalSetCurrentDesign } = useDesignEditorContext()
   const setCurrentDesign = (design: Partial<IDesign>) => {
     originalSetCurrentDesign((prev) => ({ ...prev, ...design }));
   };
+
+  const personaId = sessionStorage.getItem('persona_id')
   const queryParams = new URLSearchParams(location.search);
   const filename = queryParams.get("filename");
-  const personaId = queryParams.get("personaId");
+  //const personaId = queryParams.get("personaId");
   const eventoId = queryParams.get("eventoId");
   const [showToolbox, setShowToolbox] = useState(false)
   const [loadedNew, setLoadedNew] = useState(false)
@@ -38,12 +41,12 @@ const GraphicEditor = () => {
 
   useEffect(() => {
     if (!editor) return
-    if (personaId) sessionStorage.setItem('personaId', personaId)
+    if (eventoId) sessionStorage.setItem('evento_id', eventoId)
     else return
-    if (eventoId) sessionStorage.setItem('eventoId', eventoId)
-    else return
+    if (!personaId) return
     setLoadedNew(true)
-  }, [editor, personaId, eventoId])
+    console.log("inicializacion")
+  }, [editor, eventoId])
 
   useEffect(() => {
     if (!editor) return
@@ -51,6 +54,7 @@ const GraphicEditor = () => {
     if (filename) {
       loadProject()
     }
+    console.log("loadProject", filename)
   }, [editor, filename, loadedNew])
 
   useEffect(() => {
@@ -62,10 +66,12 @@ const GraphicEditor = () => {
   }, [active])
 
   const loadProject = async () => {
+    setLoadingProject(true)
     const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
-    //const project = await api.getTemplateById(filename || "")
     if (project) {
-      await load(project)
+      //await new Promise(resolve => setTimeout(resolve, 2000));
+      await load(project);
+      setLoadingProject(false)
     }
   }
 
@@ -117,7 +123,7 @@ const GraphicEditor = () => {
           <Footer />
         </div>
       </div>
-      {loading && <LoadingOverlay />}
+      {loadingProject && <LoadingOverlay />}
     </EditorContainer>
   )
 }
