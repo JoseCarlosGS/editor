@@ -29,7 +29,9 @@ import Edit from "./Edit"
 import CropIcon from "./CropIcon"
 import { List } from "lucide-react"
 import ArrowDiagonal from "./ArrowDiagonal"
-
+import DoubleArrowDiagonal from "./DoubleArrowDiagonal"
+import LineDiagonal from "./LineDiagonal"
+import DashedLineDiagonal from "./DashedLineDiagonal"
 class Icons {
   static Background = Background
   static Elements = Elements
@@ -61,6 +63,9 @@ class Icons {
   static Edit = Edit
   static CropIcon = CropIcon
   static ArrowDiagonal = ArrowDiagonal
+  static DoubleArrowDiagonal = DoubleArrowDiagonal
+  static LineDiagonal = LineDiagonal
+  static DashedLineDiagonal = DashedLineDiagonal
 }
 
 export default Icons
