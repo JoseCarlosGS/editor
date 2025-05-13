@@ -10,9 +10,11 @@ import { customElements, lines } from "~/constants/custom-elements"
 import { svgElements } from "~/constants/svg-elements"
 import { fabric } from "fabric"
 import { nanoid } from "nanoid"
-import { ILayer, IStaticPath } from "@layerhub-io/types"
 import { Button, KIND, SIZE } from "baseui/button"
-import { PencilLine } from "lucide-react"
+import ArrowDiagonal from "~/components/Icons/ArrowDiagonal"
+import DashedLineDiagonal from "~/components/Icons/DashedLineDiagonal"
+import DoubleArrowDiagonal from "~/components/Icons/DoubleArrowDiagonal"
+import LineDiagonal from "~/components/Icons/LineDiagonal"
 
 const Elements = () => {
   const editor = useEditor()
@@ -42,17 +44,46 @@ const Elements = () => {
     [editor]
   );
 
-  const enableLineTool = () => {
-    const canvas = editor.canvas.canvas;
+
+  type LineToolOptions = {
+    stroke?: string;
+    strokeWidth?: number;
+    isArrow?: boolean;
+    dashed?: boolean;
+    doubleArrow?: boolean;
+    name?: string;
+  };
+
+  function createLineTool(canvas: fabric.Canvas, options: LineToolOptions = {}) {
     let isDrawing = false;
     let line: fabric.Line | null = null;
+
+    const {
+      stroke = "black",
+      strokeWidth = 2,
+      isArrow = false,
+      dashed = false,
+      doubleArrow = false,
+      name = "Line",
+    } = options;
+
+    function rotatePoint(px: number, py: number, angle: number): [number, number] {
+      // Rotar un punto (px, py) con un ángulo en radianes
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return [
+        px * cos - py * sin,
+        px * sin + py * cos,
+      ];
+    }
 
     const handleMouseDown = (opt: fabric.IEvent) => {
       isDrawing = true;
       const pointer = canvas.getPointer(opt.e);
       line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
-        stroke: "black",
-        strokeWidth: 2,
+        stroke,
+        strokeWidth,
+        strokeDashArray: dashed ? [10, 5] : undefined,
         selectable: false,
         evented: false,
       });
@@ -67,8 +98,109 @@ const Elements = () => {
     };
 
     const handleMouseUp = () => {
+      if (!line) return;
+
+      const { x1, y1, x2, y2 } = line;
+      const dx = x2! - x1!;
+      const dy = y2! - y1!;
+      const angle = Math.atan2(dy, dx);
+
+      let path: any[][] = [["M", 0, 0], ["L", dx, dy]];
+
+      if (isArrow || doubleArrow) {
+        const length = 10;
+        const arrowAngle = Math.PI / 6;
+
+        const [hx1, hy1] = rotatePoint(-length, -length * Math.tan(arrowAngle), angle);
+        const [hx2, hy2] = rotatePoint(-length, length * Math.tan(arrowAngle), angle);
+
+        // Cabeza al final
+        path.push(["M", dx, dy], ["L", dx + hx1, dy + hy1]);
+        path.push(["M", dx, dy], ["L", dx + hx2, dy + hy2]);
+
+        // Cabeza al inicio (para doble flecha)
+        if (doubleArrow) {
+          const [hx3, hy3] = rotatePoint(length, -length * Math.tan(arrowAngle), angle);
+          const [hx4, hy4] = rotatePoint(length, length * Math.tan(arrowAngle), angle);
+
+          path.push(["M", 0, 0], ["L", hx3, hy3]);
+          path.push(["M", 0, 0], ["L", hx4, hy4]);
+        }
+      }
+
+      const pathString = path.map(([cmd, ...coords]) => `${cmd} ${coords.join(" ")}`).join(" ");
+
+      const fabricPath = new fabric.Path(pathString, {
+        left: Math.min(line.x1!, line.x2!),
+        top: Math.min(line.y1!, line.y2!),
+        stroke,
+        strokeWidth,
+        strokeDashArray: dashed ? [10, 5] : undefined,
+        fill: "",
+        originX: "left",
+        originY: "top",
+        name,
+        type: "StaticPath",
+      });
+
+      canvas.add(fabricPath);
+      canvas.remove(line);
+      canvas.requestRenderAll();
+
+      isDrawing = false;
+      line = null;
+
+      canvas.off("mouse:down", handleMouseDown);
+      canvas.off("mouse:move", handleMouseMove);
+      canvas.off("mouse:up", handleMouseUp);
+    };
+
+    // Activar listeners
+    canvas.on("mouse:down", handleMouseDown);
+    canvas.on("mouse:move", handleMouseMove);
+    canvas.on("mouse:up", handleMouseUp);
+  }
+
+  const enableDashedLineTool = () => {
+    const canvas = editor.canvas.canvas;
+    createLineTool(canvas, { dashed: true, name: "DashedLine" });
+  };
+
+  const enableDoubleArrowTool = () => {
+    const canvas = editor.canvas.canvas;
+    createLineTool(canvas, { isArrow: true, doubleArrow: true, name: "DoubleArrow" });
+  };
+
+  const enableLineTool = () => {
+    const canvas = editor.canvas.canvas;
+    let isDrawing = false;
+    let line: fabric.Line | null = null;
+
+    const upperCanvas = (editor.canvas.canvas as any).upperCanvasEl;
+    upperCanvas.style.setProperty("cursor", "crosshair", "important");
+
+    const handleMouseDown = (opt: fabric.IEvent) => {
+      isDrawing = true;
+      const pointer = canvas.getPointer(opt.e);
+      line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+        stroke: "black",
+        strokeWidth: 3,
+        selectable: false,
+        evented: false,
+      });
+      canvas.add(line);
+      canvas.defaultCursor = 'grabbing';
+    };
+
+    const handleMouseMove = (opt: fabric.IEvent) => {
+      if (!isDrawing || !line) return;
+      const pointer = canvas.getPointer(opt.e);
+      line.set({ x2: pointer.x, y2: pointer.y });
+      canvas.requestRenderAll();
+    };
+
+    const handleMouseUp = () => {
       if (line) {
-        // Convertir a StaticPath
         const pathData = [
           ["M", line.x1, line.y1],
           ["L", line.x2, line.y2],
@@ -112,14 +244,121 @@ const Elements = () => {
 
       isDrawing = false;
       line = null;
-
-      // ❗ Importante: quitar los listeners para salir del modo dibujo
+      canvas.defaultCursor = 'crosshair';
       canvas.off("mouse:down", handleMouseDown);
       canvas.off("mouse:move", handleMouseMove);
       canvas.off("mouse:up", handleMouseUp);
     };
 
     // Agregamos los listeners una sola vez por activación
+    canvas.on("mouse:down", handleMouseDown);
+    canvas.on("mouse:move", handleMouseMove);
+    canvas.on("mouse:up", handleMouseUp);
+    //canvas.defaultCursor = originalCursor;
+  };
+
+  const enableArrowTool = () => {
+    const canvas = editor.canvas.canvas;
+    let isDrawing = false;
+    let line: fabric.Line | null = null;
+
+    // 👉 Rotar un punto (px, py) con un ángulo en radianes
+    function rotatePoint(px: number, py: number, angle: number): [number, number] {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return [
+        px * cos - py * sin,
+        px * sin + py * cos,
+      ];
+    }
+
+    const handleMouseDown = (opt: fabric.IEvent) => {
+      isDrawing = true;
+      const pointer = canvas.getPointer(opt.e);
+      line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+        stroke: "black",
+        strokeWidth: 3,
+        selectable: false,
+        evented: false,
+      });
+      canvas.add(line);
+      canvas.defaultCursor = "grabbing";
+    };
+
+    const handleMouseMove = (opt: fabric.IEvent) => {
+      if (!isDrawing || !line) return;
+      const pointer = canvas.getPointer(opt.e);
+      line.set({ x2: pointer.x, y2: pointer.y });
+      canvas.requestRenderAll();
+    };
+
+    const handleMouseUp = () => {
+      if (line) {
+        const { x1, y1, x2, y2 } = line;
+        const dx = x2! - x1!;
+        const dy = y2! - y1!;
+        const angle = Math.atan2(dy, dx);
+
+        const length = 10;
+        const arrowAngle = Math.PI / 6; // 30°
+
+        // Calculamos las 2 puntas rotadas
+        const [hx1, hy1] = rotatePoint(-length, -length * Math.tan(arrowAngle), angle);
+        const [hx2, hy2] = rotatePoint(-length, length * Math.tan(arrowAngle), angle);
+
+        const arrowPath: any[][] = [
+          ["M", 0, 0],                // Inicio de la línea
+          ["L", dx, dy],              // Fin de la línea
+          ["M", dx, dy],              // Punto base de la cabeza
+          ["L", dx + hx1, dy + hy1],  // Primera ala
+          ["M", dx, dy],
+          ["L", dx + hx2, dy + hy2],  // Segunda ala
+        ];
+
+        const staticPath = {
+          id: String(Date.now()),
+          name: "Arrow",
+          type: "StaticPath",
+          left: Math.min(line.x1!, line.x2!),
+          top: Math.min(line.y1!, line.y2!),
+          width: Math.abs(dx),
+          height: Math.abs(dy),
+          path: arrowPath,
+          stroke: line.stroke as string,
+          strokeWidth: line.strokeWidth!,
+          fill: "",
+          metadata: {},
+        };
+
+        const pathString = arrowPath.map(([cmd, ...coords]) => `${cmd} ${coords.join(" ")}`).join(" ");
+
+        const fabricPath = new fabric.Path(pathString, {
+          left: staticPath.left,
+          top: staticPath.top,
+          stroke: staticPath.stroke,
+          strokeWidth: staticPath.strokeWidth,
+          fill: staticPath.fill,
+          originX: "left",
+          originY: "top",
+          name: staticPath.name,
+          type: staticPath.type,
+        });
+
+        fabricPath.set({ id: staticPath.id });
+
+        canvas.add(fabricPath);
+        canvas.remove(line);
+        canvas.requestRenderAll();
+      }
+
+      isDrawing = false;
+      line = null;
+
+      canvas.off("mouse:down", handleMouseDown);
+      canvas.off("mouse:move", handleMouseMove);
+      canvas.off("mouse:up", handleMouseUp);
+    };
+
     canvas.on("mouse:down", handleMouseDown);
     canvas.on("mouse:move", handleMouseMove);
     canvas.on("mouse:up", handleMouseUp);
@@ -259,25 +498,6 @@ const Elements = () => {
     }
   }, []);
 
-
-  function endPointOfLineToFollowPointer(o: any) {
-    let obj = o.target;
-    let canvas = editor.canvas.canvas;
-
-    if (obj && obj.id === 'pointer1') {
-      canvas.getActiveObjects().forEach((object: any) => {
-        if (o.name === 'Line') {
-          o.set({
-            x1: o.left,
-            y1: o.top,
-          })
-          o.setCoords();
-        }
-      })
-    }
-
-  }
-
   const handleAddSvg = (svgString: string) => {
     fabric.loadSVGFromString(svgString, (objects, options) => {
       const group = fabric.util.groupSVGElements(objects, options);
@@ -361,13 +581,34 @@ const Elements = () => {
             <Button
               onClick={enableLineTool}
               size={SIZE.mini}
-              kind={KIND.secondary}
+              kind={KIND.tertiary}
             >
-              <PencilLine size={24} />
+              <LineDiagonal size={40} />
             </Button>
-            {lines.map((graphic, index) => (
+            <Button
+              onClick={enableArrowTool}
+              size={SIZE.mini}
+              kind={KIND.tertiary}
+            >
+              <ArrowDiagonal size={40} />
+            </Button>
+            <Button
+              onClick={enableDashedLineTool}
+              size={SIZE.mini}
+              kind={KIND.tertiary}
+            >
+              <DashedLineDiagonal size={40} />
+            </Button>
+            <Button
+              onClick={enableDoubleArrowTool}
+              size={SIZE.mini}
+              kind={KIND.tertiary}
+            >
+              <DoubleArrowDiagonal size={40} />
+            </Button>
+            {/* {lines.map((graphic, index) => (
               <ImageItem onClick={() => addObject(graphic)} key={index} preview={graphic!.preview} />
-            ))}
+            ))} */}
           </Block>
         </Block>
         <Block>

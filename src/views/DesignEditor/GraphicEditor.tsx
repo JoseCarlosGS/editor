@@ -13,11 +13,15 @@ import { useLoadGraphicTemplate } from "../../hooks/useLoadTemplate"
 import { IDesign } from "~/interfaces/DesignEditor"
 import { useActiveObject } from "@layerhub-io/react"
 import { ILayer } from "@layerhub-io/types"
+import { useAutosaveProject } from "~/hooks/useAutoSaveProject"
+import { use } from "i18next"
 
 const GraphicEditor = () => {
   const location = useLocation();
   const editor = useEditor();
   const active = useActiveObject();
+  const [autosaveKey, setAutosaveKey] = useState<string | null>(null);
+  const { currentDesign, scenes } = useDesignEditorContext();
   const [loadingProject, setLoadingProject] = useState(false)
   const { setEditorType, setScenes, setCurrentDesign: originalSetCurrentDesign } = useDesignEditorContext()
   const setCurrentDesign = (design: Partial<IDesign>) => {
@@ -34,21 +38,79 @@ const GraphicEditor = () => {
 
   const { load, loading, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
 
+  // if (autosaveKey)
+  //   useAutosaveProject(autosaveKey, currentDesign, 1000)
+
   //console.log("Id from URL:", idProject);
   useEffect(() => {
     setEditorType("GRAPHIC");
   }, []);
 
-  useEffect(() => {
+  useEffect(() => {  // recuperar el proyecto desde sessionStorage si no es nuevo
+    if (!editor) return
+    if (!loadedNew) {
+      const key = sessionStorage.getItem('project_key');
+      const currentProject = sessionStorage.getItem(key || '');
+      if (currentProject) {
+        console.log("recuperando proyecto desde session")
+        const project = JSON.parse(currentProject);
+        if (project) {
+          load(project);
+        }
+      }
+      console.log("no es nuevo")
+    }
+  }, [loadedNew, editor])
+
+  const parseGraphicJSON = () => {
+    const currentScene = editor.scene.exportToJSON()
+
+    const updatedScenes = scenes.map((scn) => {
+      if (scn.id === currentScene.id) {
+        return {
+          id: currentScene.id,
+          layers: currentScene.layers,
+          name: currentScene.name,
+        }
+      }
+      return {
+        id: scn.id,
+        layers: scn.layers,
+        name: scn.name,
+      }
+    })
+
+    if (currentDesign) {
+      const graphicTemplate: IDesign = {
+        id: currentDesign.id,
+        type: "GRAPHIC",
+        name: currentDesign.name,
+        frame: currentDesign.frame,
+        scenes: updatedScenes,
+        metadata: {},
+        preview: "",
+      }
+      return graphicTemplate
+    } else {
+      console.log("NO CURRENT DESIGN")
+    }
+  }
+
+  useEffect(() => {  // inicializar proyecto nuevo
     if (!editor) return
     if (eventoId) sessionStorage.setItem('evento_id', eventoId)
     else return
     if (!personaId) return
+    const key = `prj_${filename}_${personaId}_${eventoId}`;
+    const currentProject = parseGraphicJSON();
+    sessionStorage.setItem(key, JSON.stringify(currentProject));
+    sessionStorage.setItem('project_key', key);
+    setAutosaveKey(key)
     setLoadedNew(true)
     console.log("inicializacion")
   }, [editor, eventoId])
 
-  useEffect(() => {
+  useEffect(() => {  //cargar proyecto desde API si hay filename
     if (!editor) return
     if (!loadedNew) return
     if (filename) {
@@ -69,8 +131,10 @@ const GraphicEditor = () => {
     setLoadingProject(true)
     const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
     if (project) {
-      //await new Promise(resolve => setTimeout(resolve, 2000));
       await load(project);
+      const key = `prj_${filename}_${personaId}_${eventoId}`;
+      sessionStorage.setItem(key, JSON.stringify(project));
+      sessionStorage.setItem('project_key', key);
       setLoadingProject(false)
     }
   }
