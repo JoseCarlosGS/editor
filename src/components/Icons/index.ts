@@ -28,6 +28,7 @@ import DocumentFields from "./DocumentFields"
 import Edit from "./Edit"
 import CropIcon from "./CropIcon"
 import { List } from "lucide-react"
+import ArrowDiagonal from "./ArrowDiagonal"
 
 class Icons {
   static Background = Background
@@ -59,6 +60,7 @@ class Icons {
   static DocumentFields = List
   static Edit = Edit
   static CropIcon = CropIcon
+  static ArrowDiagonal = ArrowDiagonal
 }
 
 export default Icons
