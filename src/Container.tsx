@@ -87,12 +87,18 @@ const Container = ({ children }: { children: React.ReactNode }) => {
   }
 
   const loadAuthentication = async (id: string) => {
-    const response = await api.getTokenById(id)
-    if (response) {
-      sessionStorage.setItem('auth_token', response.data);
-      sessionStorage.setItem('persona_id', response.personaId);
-      api.setAuthToken(response.data);
-      setIsAutenticated(true);
+    try {
+      const response = await api.getTokenById(id);
+      if (response) {
+        sessionStorage.setItem('auth_token', response.data);
+        sessionStorage.setItem('persona_id', response.personaId);
+        //api.setAuthToken(response.data);
+        setIsAutenticated(true);
+      }
+    } catch (e) {
+      console.error('Auth failed', e);
+    } finally {
+      setLoaded(true);
     }
   }
 

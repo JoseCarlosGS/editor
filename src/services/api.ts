@@ -13,11 +13,15 @@ class ApiService {
   constructor() {
     this.base = axios.create({
       baseURL: environment.apiBaseUrl,
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("auth_token")}` || "",
-        // Authorization:
-        //   "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3NlQGdtYWlsLmNvbSIsImlhdCI6MTc0NjcxMjM5MywiZXhwIjoxNzQ2NzQ4MzkzfQ.HSCuZugyQlaI-tclJasGk5yVf3ncqOPn36kaEGDkQ7E",
-      },
+    })
+
+    // Interceptor para añadir el token en cada request automáticamente
+    this.base.interceptors.request.use((config) => {
+      const token = sessionStorage.getItem("auth_token")
+      if (token) {
+        config.headers!.Authorization = `Bearer ${token}`
+      }
+      return config
     })
   }
 

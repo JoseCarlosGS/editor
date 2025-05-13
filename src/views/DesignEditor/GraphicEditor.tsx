@@ -69,7 +69,6 @@ const GraphicEditor = () => {
     setLoadingProject(true)
     const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
     if (project) {
-      //await new Promise(resolve => setTimeout(resolve, 2000));
       await load(project);
       setLoadingProject(false)
     }
