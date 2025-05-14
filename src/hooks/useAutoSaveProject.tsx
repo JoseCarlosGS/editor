@@ -1,22 +1,57 @@
 import { useEffect, useRef } from "react";
+import { useEditor } from "@layerhub-io/react";
+import useDesignEditorContext from "~/hooks/useDesignEditorContext"
 
-export function useAutosaveProject(key: string, projectData: any, delay = 1000) {
+export function useAutosaveProject(key: string, delay = 1000) {
+    const { scenes, currentDesign } = useDesignEditorContext();
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const editor = useEditor();
 
     useEffect(() => {
-        if (!projectData) return;
+        if (!editor) return;
 
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-        }
+        const saveProject = async () => {
+            const currentScene = editor.scene.exportToJSON();
 
-        timeoutRef.current = setTimeout(() => {
-            sessionStorage.setItem(key, JSON.stringify(projectData));
-            console.log("Proyecto guardado automáticamente");
-        }, delay);
+            const updatedScenes = scenes.map((scn) => {
+                if (scn.id === currentScene.id) {
+                    return {
+                        id: currentScene.id,
+                        layers: currentScene.layers,
+                        name: currentScene.name,
+                    }
+                }
+                return {
+                    id: scn.id,
+                    layers: scn.layers,
+                    name: scn.name,
+                }
+            })
+            const project = {
+                ...currentDesign,
+                scenes: updatedScenes,
+            };
+
+            sessionStorage.setItem(key, JSON.stringify(project));
+            console.log("Proyecto autoguardado:", project);
+        };
+        const scheduleAutosave = () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            timeoutRef.current = setTimeout(saveProject, delay);
+        };
+        editor.on("object:added", scheduleAutosave);
+        editor.on("object:modified", scheduleAutosave);
+        editor.on("object:removed", scheduleAutosave);
+        editor.on("history:changed", scheduleAutosave);
 
         return () => {
+            // Cleanup
+            editor.off("object:added", scheduleAutosave);
+            editor.off("object:modified", scheduleAutosave);
+            editor.off("object:removed", scheduleAutosave);
+            editor.off("history:changed", scheduleAutosave);
+
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
         };
-    }, [projectData, delay]);
+    }, [editor, delay, key]);
 }
