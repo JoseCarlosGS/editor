@@ -14,14 +14,15 @@ import { IDesign } from "~/interfaces/DesignEditor"
 import { useActiveObject } from "@layerhub-io/react"
 import { ILayer } from "@layerhub-io/types"
 import { useAutosaveProject } from "~/hooks/useAutoSaveProject"
-import { use } from "i18next"
+import CustomAlert from "~/components/Errors"
+import { ErrorType } from "~/components/Errors/CustomAlert"
 
 const GraphicEditor = () => {
   const location = useLocation();
   const editor = useEditor();
   const active = useActiveObject();
   const [autosaveKey, setAutosaveKey] = useState<string | null>(null);
-  const { currentDesign, scenes } = useDesignEditorContext();
+  const { currentDesign, scenes, currentScene } = useDesignEditorContext();
   const [loadingProject, setLoadingProject] = useState(false)
   const { setEditorType, setScenes, setCurrentDesign: originalSetCurrentDesign } = useDesignEditorContext()
   const setCurrentDesign = (design: Partial<IDesign>) => {
@@ -35,18 +36,25 @@ const GraphicEditor = () => {
   const eventoId = queryParams.get("eventoId");
   const [showToolbox, setShowToolbox] = useState(false)
   const [loadedNew, setLoadedNew] = useState(false)
-
+  const [alert, setAlert] = useState<{
+    open: boolean;
+    message: string;
+    type: ErrorType;
+  }>({
+    open: false,
+    message: '',
+    type: 'info',
+  });
   const { load, loading, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
 
-  // if (autosaveKey)
-  //   useAutosaveProject(autosaveKey, currentDesign, 1000)
 
-  //console.log("Id from URL:", idProject);
+  useAutosaveProject(autosaveKey || '', 1000);
+
   useEffect(() => {
     setEditorType("GRAPHIC");
   }, []);
 
-  useEffect(() => {  // recuperar el proyecto desde sessionStorage si no es nuevo
+  useEffect(() => {  //recuperar el proyecto desde sessionStorage si no es nuevo
     if (!editor) return
     if (!loadedNew) {
       const key = sessionStorage.getItem('project_key');
@@ -58,7 +66,6 @@ const GraphicEditor = () => {
           load(project);
         }
       }
-      console.log("no es nuevo")
     }
   }, [loadedNew, editor])
 
@@ -116,7 +123,6 @@ const GraphicEditor = () => {
     if (filename) {
       loadProject()
     }
-    console.log("loadProject", filename)
   }, [editor, filename, loadedNew])
 
   useEffect(() => {
@@ -129,12 +135,19 @@ const GraphicEditor = () => {
 
   const loadProject = async () => {
     setLoadingProject(true)
-    const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
-    if (project) {
-      await load(project);
-      const key = `prj_${filename}_${personaId}_${eventoId}`;
-      sessionStorage.setItem(key, JSON.stringify(project));
-      sessionStorage.setItem('project_key', key);
+    try {
+      const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
+      if (project) {
+        await load(project);
+        const key = `prj_${filename}_${personaId}_${eventoId}`;
+        sessionStorage.setItem(key, JSON.stringify(project));
+        sessionStorage.setItem('project_key', key);
+        setAlert({ open: true, message: "Proyecto cargado!", type: "success" })
+        setLoadingProject(false)
+      }
+    } catch (error) {
+      console.log("Error loading project:", error)
+      setAlert({ open: true, message: (error as any).response.data, type: "error" })
       setLoadingProject(false)
     }
   }
@@ -178,6 +191,13 @@ const GraphicEditor = () => {
 
   return (
     <EditorContainer>
+      <CustomAlert
+        type={alert.type}
+        message={alert.message}
+        open={alert.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        duration={4000}
+      />
       <Navbar />
       <div style={{ display: "flex", flex: 1 }}>
         <Panels />
