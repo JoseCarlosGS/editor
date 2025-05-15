@@ -2,16 +2,18 @@ import { useEffect, useRef } from "react";
 import { useEditor } from "@layerhub-io/react";
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
 
-export function useAutosaveProject(key: string, delay = 1000) {
+export function useAutosaveProject(key: string, delay = 1000, enabled: boolean = true) {
     const { scenes, currentDesign } = useDesignEditorContext();
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const editor = useEditor();
 
     useEffect(() => {
-        if (!editor) return;
+        if (!editor || !enabled) return;
 
         const saveProject = async () => {
             const currentScene = editor.scene.exportToJSON();
+            console.log("Guardando proyecto:", currentScene);
+            console.log("escenas:", currentDesign);
 
             const updatedScenes = scenes.map((scn) => {
                 if (scn.id === currentScene.id) {
@@ -53,5 +55,5 @@ export function useAutosaveProject(key: string, delay = 1000) {
 
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
         };
-    }, [editor, delay, key]);
+    }, [editor, delay, key, enabled]);
 }

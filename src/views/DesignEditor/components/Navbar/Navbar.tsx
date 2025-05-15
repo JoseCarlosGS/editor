@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { styled, ThemeProvider, DarkTheme } from "baseui"
 import { Theme } from "baseui/theme"
 import { Button, KIND } from "baseui/button"
@@ -15,6 +15,9 @@ import DesignTitle from "./DesignTitle"
 import { IDesign } from "~/interfaces/DesignEditor"
 import Github from "~/components/Icons/Github"
 import api from "~/services/api"
+import CustomAlert from "~/components/Errors"
+import { ErrorType } from "~/components/Errors/CustomAlert"
+import { set } from "lodash"
 
 const Container = styled<"div", {}, Theme>("div", ({ $theme }) => ({
   height: "50px",
@@ -31,7 +34,17 @@ const Navbar = () => {
   const editor = useEditor()
   const inputFileRef = React.useRef<HTMLInputElement>(null)
   const queryParams = new URLSearchParams(location.search);
-  const filename = queryParams.get("filename");
+  const filename = sessionStorage.getItem('f_nm') || queryParams.get("filename");
+  const [loading, setLoading] = useState(false)
+  const [alert, setAlert] = useState<{
+    open: boolean;
+    message: string;
+    type: ErrorType;
+  }>({
+    open: false,
+    message: '',
+    type: 'info',
+  });
 
   const parseGraphicJSON = () => {
     const currentScene = editor.scene.exportToJSON()
@@ -268,6 +281,35 @@ const Navbar = () => {
     }
   }
 
+  async function getPreviewBase64(scene: IScene): Promise<string> {
+    // Genera imagen en alta calidad
+    const originalBase64 = await editor.renderer.toDataURL(scene, {
+      format: "jpeg",
+      quality: 0.8, // aún buena, sin pérdida visual fuerte
+    }) as string
+
+    // Crea una imagen a partir del base64
+    const image = new Image()
+    image.src = originalBase64
+
+    // Espera a que cargue
+    await new Promise((resolve) => {
+      image.onload = resolve
+    })
+    const targetWidth = 300
+    const targetHeight = (image.height / image.width) * targetWidth
+
+    const canvas = document.createElement("canvas")
+    canvas.width = targetWidth
+    canvas.height = targetHeight
+
+    const ctx = canvas.getContext("2d")!
+    ctx.drawImage(image, 0, 0, targetWidth, targetHeight)
+
+    // Exporta con calidad baja
+    return canvas.toDataURL("image/jpeg", 0.4) // baja calidad y peso
+  }
+
   const saveProject = async () => {
     const currentScene = editor.scene.exportToJSON()
 
@@ -285,6 +327,14 @@ const Navbar = () => {
         name: scn.name,
       }
     })
+
+    //let previewBase64 = await editor.renderer.render(currentScene);
+    let previewBase64 = ""
+    try {
+      previewBase64 = await getPreviewBase64(currentScene)
+    } catch (err) {
+      console.warn("No se pudo generar preview reducido:", err)
+    }
     if (currentDesign) {
       const graphicTemplate: IDesign = {
         id: currentDesign.id,
@@ -293,13 +343,21 @@ const Navbar = () => {
         frame: currentDesign.frame,
         scenes: updatedScenes,
         metadata: {},
-        preview: "",
+        preview: previewBase64 as string
       }
-      const response = await api.createProject(sessionStorage.getItem('persona_id')!, sessionStorage.getItem('evento_id')!, filename, graphicTemplate)
-      //makeDownload(graphicTemplate)
-      alert("Project saved")
-
-      if (response) console.log("creado con exito", response)
+      try {
+        setLoading(true)
+        const response = await api.createProject(sessionStorage.getItem('persona_id')!, sessionStorage.getItem('evento_id')!, filename, graphicTemplate)
+        if (response) {
+          setAlert({ open: true, message: "Proyecto guardado correctamente", type: "success" })
+          console.log("creado con exito", response)
+        }
+      } catch (error) {
+        console.log("error al guardar el proyecto", error)
+        setAlert({ open: true, message: "Error al guardar el proyecto", type: "error" })
+      } finally {
+        setLoading(false)
+      }
 
     } else {
       console.log("NO CURRENT DESIGN")
@@ -313,6 +371,13 @@ const Navbar = () => {
         <div style={{ color: "#ffffff" }}>
           <Logo size={30} />
         </div>
+        <CustomAlert
+          type={alert.type}
+          message={alert.message}
+          open={alert.open}
+          onClose={() => setAlert({ ...alert, open: false })}
+          duration={4000}
+        />
         <DesignTitle />
         <Block $style={{
           display: "flex",
@@ -360,6 +425,7 @@ const Navbar = () => {
             size="compact"
             onClick={saveProject}
             kind={KIND.tertiary}
+            disabled={loading}
             overrides={{
               StartEnhancer: {
                 style: {
@@ -368,7 +434,35 @@ const Navbar = () => {
               },
             }}
           >
-            Save
+            {loading ? (
+              <span className="loader" style={{ display: "flex", alignItems: "center" }}>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 38 38"
+                  xmlns="http://www.w3.org/2000/svg"
+                  stroke="#fff"
+                >
+                  <g fill="none" fillRule="evenodd">
+                    <g transform="translate(1 1)" strokeWidth="2">
+                      <circle strokeOpacity=".3" cx="18" cy="18" r="18" />
+                      <path d="M36 18c0-9.94-8.06-18-18-18">
+                        <animateTransform
+                          attributeName="transform"
+                          type="rotate"
+                          from="0 18 18"
+                          to="360 18 18"
+                          dur="1s"
+                          repeatCount="indefinite"
+                        />
+                      </path>
+                    </g>
+                  </g>
+                </svg>
+              </span>
+            ) : (
+              "Save"
+            )}
           </Button>
           <Button
             size="compact"
