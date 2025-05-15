@@ -16,6 +16,7 @@ import { ILayer } from "@layerhub-io/types"
 import { useAutosaveProject } from "~/hooks/useAutoSaveProject"
 import CustomAlert from "~/components/Errors"
 import { ErrorType } from "~/components/Errors/CustomAlert"
+import { last, set } from "lodash"
 
 const GraphicEditor = () => {
   const location = useLocation();
@@ -24,6 +25,7 @@ const GraphicEditor = () => {
   const [autosaveKey, setAutosaveKey] = useState<string | null>(null);
   const { currentDesign, scenes, currentScene } = useDesignEditorContext();
   const [loadingProject, setLoadingProject] = useState(false)
+  const [projectLoaded, setProjectLoaded] = useState(false);
   const { setEditorType, setScenes, setCurrentDesign: originalSetCurrentDesign } = useDesignEditorContext()
   const setCurrentDesign = (design: Partial<IDesign>) => {
     originalSetCurrentDesign((prev) => ({ ...prev, ...design }));
@@ -45,29 +47,77 @@ const GraphicEditor = () => {
     message: '',
     type: 'info',
   });
-  const { load, loading, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
+  const { load, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
 
 
-  useAutosaveProject(autosaveKey || '', 1000);
+  //useAutosaveProject(autosaveKey || '', 1000, projectLoaded);
 
   useEffect(() => {
     setEditorType("GRAPHIC");
   }, []);
 
   useEffect(() => {  //recuperar el proyecto desde sessionStorage si no es nuevo
+
+    console.log("I recuperando proyecto desde session")
+
     if (!editor) return
-    if (!loadedNew) {
+    if (projectLoaded) {
       const key = sessionStorage.getItem('project_key');
-      const currentProject = sessionStorage.getItem(key || '');
+      if (!key) return
+      const currentProject = sessionStorage.getItem(key);
       if (currentProject) {
         console.log("recuperando proyecto desde session")
         const project = JSON.parse(currentProject);
         if (project) {
-          load(project);
+          load(project).then(() => {
+            setProjectLoaded(true);
+          });
         }
       }
     }
-  }, [loadedNew, editor])
+  }, [projectLoaded, editor])
+
+  useEffect(() => {  // inicializar proyecto nuevo
+    if (!editor) return
+    if (eventoId) sessionStorage.setItem('evento_id', eventoId)
+    else return
+    if (!personaId) return
+    console.log("priemr control", filename)
+    if (filename) return
+    console.log("II inicializando proyecto nuevo")
+    const lastProject = sessionStorage.getItem('project_key');
+    if (!lastProject) {
+      console.log("no hay key, inicializando proyecto nuevo")
+      const key = `prj_${filename}_${personaId}_${eventoId}`;
+      const currentProject = parseGraphicJSON();
+      sessionStorage.setItem(key, JSON.stringify(currentProject));
+      sessionStorage.setItem('project_key', key);
+      setAutosaveKey(key)
+      console.log("inicializacion")
+    } else {
+      setAutosaveKey(lastProject)
+    }
+    setProjectLoaded(true);
+    setLoadedNew(true)
+  }, [editor, eventoId])
+
+  useEffect(() => {  //cargar proyecto desde API si hay filename
+    if (!editor) return
+    if (loadedNew) return
+    if (filename) {
+      console.log("III cargando proyecto desde API")
+      loadProject()
+      setProjectLoaded(true);
+    }
+  }, [editor, filename, loadedNew])
+
+  useEffect(() => {
+    if (active && (active as ILayer).id !== 'frame') {
+      setShowToolbox(true)
+    } else {
+      setShowToolbox(false)
+    }
+  }, [active])
 
   const parseGraphicJSON = () => {
     const currentScene = editor.scene.exportToJSON()
@@ -103,51 +153,36 @@ const GraphicEditor = () => {
     }
   }
 
-  useEffect(() => {  // inicializar proyecto nuevo
-    if (!editor) return
-    if (eventoId) sessionStorage.setItem('evento_id', eventoId)
-    else return
-    if (!personaId) return
-    const key = `prj_${filename}_${personaId}_${eventoId}`;
-    const currentProject = parseGraphicJSON();
-    sessionStorage.setItem(key, JSON.stringify(currentProject));
-    sessionStorage.setItem('project_key', key);
-    setAutosaveKey(key)
-    setLoadedNew(true)
-    console.log("inicializacion")
-  }, [editor, eventoId])
-
-  useEffect(() => {  //cargar proyecto desde API si hay filename
-    if (!editor) return
-    if (!loadedNew) return
-    if (filename) {
-      loadProject()
-    }
-  }, [editor, filename, loadedNew])
-
-  useEffect(() => {
-    if (active && (active as ILayer).id !== 'frame') {
-      setShowToolbox(true)
-    } else {
-      setShowToolbox(false)
-    }
-  }, [active])
-
   const loadProject = async () => {
     setLoadingProject(true)
+    const lastProject = sessionStorage.getItem('project_key');
+    console.log(lastProject)
+    const key = `prj_${filename}_${personaId}_${eventoId}`;
     try {
       const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
+      console.log("proyecto recuperado desde API", project)
       if (project) {
-        await load(project);
-        const key = `prj_${filename}_${personaId}_${eventoId}`;
+        if (lastProject) {
+          console.log("eliminando proyecto anterior")
+          sessionStorage.removeItem(lastProject);
+        }
+        load(project).then(() => {
+          setProjectLoaded(true);
+        });
+
         sessionStorage.setItem(key, JSON.stringify(project));
         sessionStorage.setItem('project_key', key);
-        setAlert({ open: true, message: "Proyecto cargado!", type: "success" })
+        sessionStorage.setItem('f_nm', filename!);
+        const params = new URLSearchParams(location.search);
+        params.delete("filename");
+        window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
+        setAlert({ open: true, message: "Proyecto cargado correctamente", type: "success" })
+        setAutosaveKey(key)
         setLoadingProject(false)
       }
     } catch (error) {
       console.log("Error loading project:", error)
-      setAlert({ open: true, message: (error as any).response.data, type: "error" })
+      setAlert({ open: true, message: (error as any).response.data || "Ocurrio un error", type: "error" })
       setLoadingProject(false)
     }
   }
