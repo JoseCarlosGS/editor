@@ -26,6 +26,7 @@ const GraphicEditor = () => {
   const { currentDesign, scenes, currentScene } = useDesignEditorContext();
   const [loadingProject, setLoadingProject] = useState(false)
   const [projectLoaded, setProjectLoaded] = useState(false);
+  const [designLoaded, setDesignLoaded] = useState(false);
   const { setEditorType, setScenes, setCurrentDesign: originalSetCurrentDesign } = useDesignEditorContext()
   const setCurrentDesign = (design: Partial<IDesign>) => {
     originalSetCurrentDesign((prev) => ({ ...prev, ...design }));
@@ -50,44 +51,48 @@ const GraphicEditor = () => {
   const { load, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
 
 
-  //useAutosaveProject(autosaveKey || '', 1000, projectLoaded);
+  useAutosaveProject(autosaveKey || '', 1000, designLoaded);
 
   useEffect(() => {
     setEditorType("GRAPHIC");
   }, []);
 
+
+
+
   useEffect(() => {  //recuperar el proyecto desde sessionStorage si no es nuevo
 
     console.log("I recuperando proyecto desde session")
 
-    if (!editor) return
-    if (projectLoaded) {
-      const key = sessionStorage.getItem('project_key');
-      if (!key) return
-      const currentProject = sessionStorage.getItem(key);
-      if (currentProject) {
-        console.log("recuperando proyecto desde session")
-        const project = JSON.parse(currentProject);
-        if (project) {
-          load(project).then(() => {
-            setProjectLoaded(true);
-          });
-        }
+    if (!editor) return;
+    if (loadedNew) return;
+    if (projectLoaded || filename) return;
+    const key = sessionStorage.getItem('project_key');
+    if (!key) return
+    const currentProject = sessionStorage.getItem(key);
+    if (currentProject) {
+      console.log("recuperando proyecto desde session")
+      const project = JSON.parse(currentProject);
+      if (project) {
+        load(project).then(() => {
+          setProjectLoaded(true);
+          setDesignLoaded(true);
+        });
       }
     }
-  }, [projectLoaded, editor])
+  }, [projectLoaded, editor, loadedNew])
 
   useEffect(() => {  // inicializar proyecto nuevo
     if (!editor) return
     if (eventoId) sessionStorage.setItem('evento_id', eventoId)
     else return
     if (!personaId) return
-    console.log("priemr control", filename)
+    console.log("priemer control", filename)
     if (filename) return
     console.log("II inicializando proyecto nuevo")
     const lastProject = sessionStorage.getItem('project_key');
     if (!lastProject) {
-      console.log("no hay key, inicializando proyecto nuevo")
+      //console.log("no hay key, inicializando proyecto nuevo")
       const key = `prj_${filename}_${personaId}_${eventoId}`;
       const currentProject = parseGraphicJSON();
       sessionStorage.setItem(key, JSON.stringify(currentProject));
@@ -98,7 +103,8 @@ const GraphicEditor = () => {
       setAutosaveKey(lastProject)
     }
     setProjectLoaded(true);
-    setLoadedNew(true)
+    setLoadedNew(true);
+    setDesignLoaded(true);
   }, [editor, eventoId])
 
   useEffect(() => {  //cargar proyecto desde API si hay filename
@@ -107,7 +113,6 @@ const GraphicEditor = () => {
     if (filename) {
       console.log("III cargando proyecto desde API")
       loadProject()
-      setProjectLoaded(true);
     }
   }, [editor, filename, loadedNew])
 
@@ -168,6 +173,7 @@ const GraphicEditor = () => {
         }
         load(project).then(() => {
           setProjectLoaded(true);
+          setDesignLoaded(true);
         });
 
         sessionStorage.setItem(key, JSON.stringify(project));
@@ -178,11 +184,11 @@ const GraphicEditor = () => {
         window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
         setAlert({ open: true, message: "Proyecto cargado correctamente", type: "success" })
         setAutosaveKey(key)
-        setLoadingProject(false)
       }
     } catch (error) {
       console.log("Error loading project:", error)
       setAlert({ open: true, message: (error as any).response.data || "Ocurrio un error", type: "error" })
+    } finally {
       setLoadingProject(false)
     }
   }

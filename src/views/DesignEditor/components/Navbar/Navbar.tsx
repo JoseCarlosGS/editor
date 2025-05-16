@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { styled, ThemeProvider, DarkTheme } from "baseui"
 import { Theme } from "baseui/theme"
 import { Button, KIND } from "baseui/button"
@@ -35,6 +35,7 @@ const Navbar = () => {
   const inputFileRef = React.useRef<HTMLInputElement>(null)
   const queryParams = new URLSearchParams(location.search);
   const filename = sessionStorage.getItem('f_nm') || queryParams.get("filename");
+  const [changesSaved, setChangesSaved] = useState(false)
   const [loading, setLoading] = useState(false)
   const [alert, setAlert] = useState<{
     open: boolean;
@@ -45,6 +46,27 @@ const Navbar = () => {
     message: '',
     type: 'info',
   });
+
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleChange = () => {
+      setChangesSaved(false);
+    };
+
+
+    editor.on("object:added", handleChange);
+    editor.on("object:modified", handleChange);
+    editor.on("object:removed", handleChange);
+    editor.on("history:changed", handleChange);
+
+    return () => {
+      editor.off("object:added", handleChange);
+      editor.off("object:modified", handleChange);
+      editor.off("object:removed", handleChange);
+      editor.off("history:changed", handleChange);
+    };
+  }, [editor]);
 
   const parseGraphicJSON = () => {
     const currentScene = editor.scene.exportToJSON()
@@ -349,6 +371,15 @@ const Navbar = () => {
         setLoading(true)
         const response = await api.createProject(sessionStorage.getItem('persona_id')!, sessionStorage.getItem('evento_id')!, filename, graphicTemplate)
         if (response) {
+          const key = `prj_${filename}_${sessionStorage.getItem('persona_id')!}_${sessionStorage.getItem('evento_id')!}`;
+          sessionStorage.setItem(key, JSON.stringify(graphicTemplate));
+          sessionStorage.setItem('project_key', key);
+          const currentPj = sessionStorage.getItem(filename!);
+          if (!currentPj) {
+            const fileNameOnly = response.data.archivo.replace(/\.json$/i, "");
+            sessionStorage.setItem('f_nm', fileNameOnly);
+          }
+          setChangesSaved(true)
           setAlert({ open: true, message: "Proyecto guardado correctamente", type: "success" })
           console.log("creado con exito", response)
         }
@@ -378,7 +409,7 @@ const Navbar = () => {
           onClose={() => setAlert({ ...alert, open: false })}
           duration={4000}
         />
-        <DesignTitle />
+        <DesignTitle changesSaved={changesSaved} />
         <Block $style={{
           display: "flex",
           alignItems: "center",
