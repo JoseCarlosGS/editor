@@ -12,8 +12,8 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
 
         const saveProject = async () => {
             const currentScene = editor.scene.exportToJSON();
-            console.log("Guardando proyecto:", currentScene);
-            console.log("escenas:", currentDesign);
+            console.log("Escena actual:", currentScene);
+            console.log("Diseño actual:", currentDesign);
 
             const updatedScenes = scenes.map((scn) => {
                 if (scn.id === currentScene.id) {
@@ -33,7 +33,7 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
                 ...currentDesign,
                 scenes: updatedScenes,
             };
-
+            console.log('Escenas actualizadas:', updatedScenes);
             sessionStorage.setItem(key, JSON.stringify(project));
             console.log("Proyecto autoguardado:", project);
         };

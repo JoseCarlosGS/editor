@@ -349,6 +349,14 @@ const Navbar = () => {
         setLoading(true)
         const response = await api.createProject(sessionStorage.getItem('persona_id')!, sessionStorage.getItem('evento_id')!, filename, graphicTemplate)
         if (response) {
+          const key = `prj_${filename}_${sessionStorage.getItem('persona_id')!}_${sessionStorage.getItem('evento_id')!}`;
+          sessionStorage.setItem(key, JSON.stringify(graphicTemplate));
+          sessionStorage.setItem('project_key', key);
+          const currentPj = sessionStorage.getItem(filename!);
+          if (!currentPj) {
+            const fileNameOnly = response.data.archivo.replace(/\.json$/i, "");
+            sessionStorage.setItem('f_nm', fileNameOnly);
+          }
           setAlert({ open: true, message: "Proyecto guardado correctamente", type: "success" })
           console.log("creado con exito", response)
         }
