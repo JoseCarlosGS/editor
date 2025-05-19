@@ -6,16 +6,30 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
     const { scenes, currentDesign } = useDesignEditorContext();
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const editor = useEditor();
+    const latestDesignRef = useRef(currentDesign);
+    const latestScenesRef = useRef(scenes);
+
+    useEffect(() => {
+        latestDesignRef.current = currentDesign;
+    }, [currentDesign]);
+
+    useEffect(() => {
+        latestScenesRef.current = scenes;
+    }, [scenes]);
 
     useEffect(() => {
         if (!editor || !enabled) return;
 
         const saveProject = async () => {
             const currentScene = editor.scene.exportToJSON();
-            console.log("Escena actual:", currentScene);
-            console.log("Diseño actual:", currentDesign);
+            //console.log("Escena actual:", latestScenesRef.current);
+            //console.log("Diseño actual:", latestDesignRef.current);
 
-            const updatedScenes = scenes.map((scn) => {
+            if (!currentScene?.layers?.length) {
+                console.warn("Autoguardado cancelado: escena vacía");
+                return;
+            }
+            const updatedScenes = latestScenesRef.current.map((scn) => {
                 if (scn.id === currentScene.id) {
                     return {
                         id: currentScene.id,
@@ -30,12 +44,12 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
                 }
             })
             const project = {
-                ...currentDesign,
+                ...latestDesignRef.current,
                 scenes: updatedScenes,
             };
-            console.log('Escenas actualizadas:', updatedScenes);
+            //console.log('Escenas actualizadas:', updatedScenes);
             sessionStorage.setItem(key, JSON.stringify(project));
-            console.log("Proyecto autoguardado:", project);
+            //console.log("Proyecto autoguardado:", project);
         };
         const scheduleAutosave = () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);

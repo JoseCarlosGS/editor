@@ -16,7 +16,6 @@ import { ILayer } from "@layerhub-io/types"
 import { useAutosaveProject } from "~/hooks/useAutoSaveProject"
 import CustomAlert from "~/components/Errors"
 import { ErrorType } from "~/components/Errors/CustomAlert"
-import { last, set } from "lodash"
 
 const GraphicEditor = () => {
   const location = useLocation();
@@ -62,7 +61,7 @@ const GraphicEditor = () => {
 
   useEffect(() => {  //recuperar el proyecto desde sessionStorage si no es nuevo
 
-    console.log("I recuperando proyecto desde session")
+    //console.log("I recuperando proyecto desde session")
 
     if (!editor) return;
     if (loadedNew) return;
@@ -71,13 +70,15 @@ const GraphicEditor = () => {
     if (!key) return
     const currentProject = sessionStorage.getItem(key);
     if (currentProject) {
-      console.log("recuperando proyecto desde session")
+      //console.log("recuperando proyecto desde session")
       const project = JSON.parse(currentProject);
       if (project) {
         load(project).then(() => {
+          //console.log("proyecto cargado al editor", editor.objects.list())
           setProjectLoaded(true);
           setDesignLoaded(true);
         });
+        //console.log("proyecto cargado al editor", editor.objects.list())
       }
     }
   }, [projectLoaded, editor, loadedNew])
@@ -87,9 +88,9 @@ const GraphicEditor = () => {
     if (eventoId) sessionStorage.setItem('evento_id', eventoId)
     else return
     if (!personaId) return
-    console.log("priemer control", filename)
+    //console.log("priemer control", filename)
     if (filename) return
-    console.log("II inicializando proyecto nuevo")
+    //console.log("II inicializando proyecto nuevo")
     const lastProject = sessionStorage.getItem('project_key');
     if (!lastProject) {
       //console.log("no hay key, inicializando proyecto nuevo")
@@ -98,7 +99,7 @@ const GraphicEditor = () => {
       sessionStorage.setItem(key, JSON.stringify(currentProject));
       sessionStorage.setItem('project_key', key);
       setAutosaveKey(key)
-      console.log("inicializacion")
+      //console.log("inicializacion")
     } else {
       setAutosaveKey(lastProject)
     }
@@ -111,7 +112,7 @@ const GraphicEditor = () => {
     if (!editor) return
     if (loadedNew) return
     if (filename) {
-      console.log("III cargando proyecto desde API")
+      //console.log("III cargando proyecto desde API")
       loadProject()
     }
   }, [editor, filename, loadedNew])
@@ -161,21 +162,22 @@ const GraphicEditor = () => {
   const loadProject = async () => {
     setLoadingProject(true)
     const lastProject = sessionStorage.getItem('project_key');
-    console.log(lastProject)
+    //console.log(lastProject)
     const key = `prj_${filename}_${personaId}_${eventoId}`;
     try {
       const project = await api.getTemplateByParams(personaId!, eventoId!, filename!)
-      console.log("proyecto recuperado desde API", project)
+      //console.log("proyecto recuperado desde API", project)
       if (project) {
         if (lastProject) {
-          console.log("eliminando proyecto anterior")
+          //console.log("eliminando proyecto anterior")
           sessionStorage.removeItem(lastProject);
         }
-        load(project).then(() => {
+        await load(project).then(() => {
+          //console.log("proyecto cargado al editor", currentScene)
           setProjectLoaded(true);
           setDesignLoaded(true);
         });
-
+        //console.log("proyecto cargado al editor", currentScene)
         sessionStorage.setItem(key, JSON.stringify(project));
         sessionStorage.setItem('project_key', key);
         sessionStorage.setItem('f_nm', filename!);
@@ -186,7 +188,7 @@ const GraphicEditor = () => {
         setAutosaveKey(key)
       }
     } catch (error) {
-      console.log("Error loading project:", error)
+      //console.log("Error loading project:", error)
       setAlert({ open: true, message: (error as any).response.data || "Ocurrio un error", type: "error" })
     } finally {
       setLoadingProject(false)
