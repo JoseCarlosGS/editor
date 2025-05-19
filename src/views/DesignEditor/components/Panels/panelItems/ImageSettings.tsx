@@ -11,6 +11,7 @@ import FilterAdjuster from './utils';
 import { Sun, Contrast, Palette, Droplet, Rainbow, Loader, Circle } from "lucide-react";
 import { useActiveObject } from '@layerhub-io/react';
 import { fabric } from 'fabric';
+import { useAutosaveProject } from '~/hooks/useAutoSaveProject';
 
 interface Options {
     ratio: number
@@ -19,6 +20,7 @@ const ImageSettings = () => {
     const editor = useEditor()
     const canvas = editor.canvas.canvas
     const activeObject = useActiveObject()
+    const { forceSaveProject } = useAutosaveProject(sessionStorage.getItem('project_key')!)
     let frameRequest: number | null = null;
     const ratioMin = -100
     const ratioMax = 100
@@ -127,6 +129,24 @@ const ImageSettings = () => {
         }
 
         active.applyFilters();
+        active.metadata = {
+            filters: active.filters.map((f: any) => {
+                const filterData: any = { type: f.type }
+
+                // Serializar propiedades conocidas (puedes ampliar esta lista)
+                for (const key in f) {
+                    if (Object.prototype.hasOwnProperty.call(f, key)) {
+                        const val = f[key]
+                        if (typeof val !== 'function') {
+                            filterData[key] = val
+                        }
+                    }
+                }
+
+                return filterData
+            })
+        }
+        forceSaveProject()
         editor.canvas?.requestRenderAll();
     };
 
@@ -174,6 +194,9 @@ const ImageSettings = () => {
             }
             active.filters = [];
             active.applyFilters();
+            active.metadata = {
+                filters: []
+            }
             editor.canvas?.requestRenderAll();
             return true;
         }

@@ -13,18 +13,23 @@ export const useRestoreImageFilters = () => {
 
         objects.forEach((obj: any) => {
             if (obj.type === "StaticImage" && obj.metadata?.filters) {
+                // Obtenemos el array serializado desde metadata
                 const rawFilters = Array.isArray(obj.metadata.filters)
                     ? obj.metadata.filters
                     : typeof obj.metadata.filters === "string"
                         ? JSON.parse(obj.metadata.filters)
                         : []
 
-                const restoredFilters = rawFilters
-                    .map((name: string) =>
-                        STATIC_FILTERS.find((f) => f.name === name)?.filter || null
-                    )
-                    .filter((f: any): f is fabric.IBaseFilter => f !== null)
+                // Restauramos los filtros desde su serialización
+                const restoredFilters = rawFilters.map((f: any) => {
+                    const FilterClass = (fabric.Image.filters as any)[f.type]
+                    if (!FilterClass) return null
 
+                    // Creamos instancia con las propiedades personalizadas
+                    return new FilterClass(f)
+                }).filter(Boolean) // eliminamos nulls
+
+                // Aplicamos los filtros restaurados
                 if ("applyFilters" in obj && typeof obj.applyFilters === "function") {
                     obj.filters = restoredFilters
                     obj.applyFilters()

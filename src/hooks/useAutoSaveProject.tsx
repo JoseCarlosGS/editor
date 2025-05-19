@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useEditor } from "@layerhub-io/react";
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
 
@@ -17,51 +17,44 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
         latestScenesRef.current = scenes;
     }, [scenes]);
 
+    const forceSaveProject = useCallback(async () => {
+        if (!editor) return;
+
+        const currentScene = editor.scene.exportToJSON();
+        if (!currentScene?.layers?.length) {
+            console.warn("Guardado forzado cancelado: escena vacía");
+            return;
+        }
+
+        const updatedScenes = latestScenesRef.current.map((scn) => {
+            return scn.id === currentScene.id
+                ? { id: currentScene.id, layers: currentScene.layers, name: currentScene.name }
+                : scn;
+        });
+
+        const project = {
+            ...latestDesignRef.current,
+            scenes: updatedScenes,
+        };
+
+        sessionStorage.setItem(key, JSON.stringify(project));
+        console.log("Guardado forzado exitoso");
+    }, [editor, key]);
+
     useEffect(() => {
         if (!editor || !enabled) return;
 
-        const saveProject = async () => {
-            const currentScene = editor.scene.exportToJSON();
-            //console.log("Escena actual:", latestScenesRef.current);
-            //console.log("Diseño actual:", latestDesignRef.current);
-
-            if (!currentScene?.layers?.length) {
-                console.warn("Autoguardado cancelado: escena vacía");
-                return;
-            }
-            const updatedScenes = latestScenesRef.current.map((scn) => {
-                if (scn.id === currentScene.id) {
-                    return {
-                        id: currentScene.id,
-                        layers: currentScene.layers,
-                        name: currentScene.name,
-                    }
-                }
-                return {
-                    id: scn.id,
-                    layers: scn.layers,
-                    name: scn.name,
-                }
-            })
-            const project = {
-                ...latestDesignRef.current,
-                scenes: updatedScenes,
-            };
-            //console.log('Escenas actualizadas:', updatedScenes);
-            sessionStorage.setItem(key, JSON.stringify(project));
-            //console.log("Proyecto autoguardado:", project);
-        };
         const scheduleAutosave = () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
-            timeoutRef.current = setTimeout(saveProject, delay);
+            timeoutRef.current = setTimeout(forceSaveProject, delay);
         };
+
         editor.on("object:added", scheduleAutosave);
         editor.on("object:modified", scheduleAutosave);
         editor.on("object:removed", scheduleAutosave);
         editor.on("history:changed", scheduleAutosave);
 
         return () => {
-            // Cleanup
             editor.off("object:added", scheduleAutosave);
             editor.off("object:modified", scheduleAutosave);
             editor.off("object:removed", scheduleAutosave);
@@ -69,5 +62,9 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
 
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
         };
-    }, [editor, delay, key, enabled]);
+    }, [editor, delay, key, enabled, forceSaveProject]);
+
+    return {
+        forceSaveProject, // exportamos esta función
+    };
 }

@@ -7,18 +7,17 @@ import Delete from 'baseui/icon/delete';
 import useSetIsSidebarOpen from '~/hooks/useSetIsSidebarOpen';
 import Scrollable from '~/components/Scrollable';
 import { Button, KIND, SIZE } from 'baseui/button';
-import FilterAdjuster from './utils';
-import { Sun, Contrast, Palette, Droplet, Rainbow, Loader, Circle } from "lucide-react";
 import { useActiveObject } from '@layerhub-io/react';
 import { fabric } from 'fabric';
 import { useStyletron, styled } from 'styletron-react';
 import { ILayer } from '@layerhub-io/types';
-
+import { useAutosaveProject } from '~/hooks/useAutoSaveProject';
 interface Options {
     ratio: number
 }
 const Filters = () => {
     const editor = useEditor()
+    const { forceSaveProject } = useAutosaveProject(sessionStorage.getItem('project_key')!)
     const canvas = editor.canvas.canvas
     const activeObject = useActiveObject() as ILayer;
     const [previews, setPreviews] = useState<{ name: string; preview: string }[]>([]);
@@ -142,7 +141,24 @@ const Filters = () => {
         );
         active.filters.push(filter);
         active.applyFilters();
-        active.metadata = { filters: active.filters.map((f: any) => f.type) };
+        active.metadata = {
+            filters: active.filters.map((f: any) => {
+                const filterData: any = { type: f.type }
+
+                // Serializar propiedades conocidas (puedes ampliar esta lista)
+                for (const key in f) {
+                    if (Object.prototype.hasOwnProperty.call(f, key)) {
+                        const val = f[key]
+                        if (typeof val !== 'function') {
+                            filterData[key] = val
+                        }
+                    }
+                }
+
+                return filterData
+            })
+        }
+        forceSaveProject()
         editor.canvas?.requestRenderAll();
     }
 
