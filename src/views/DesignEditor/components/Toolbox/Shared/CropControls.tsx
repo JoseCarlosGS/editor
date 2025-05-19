@@ -5,8 +5,12 @@ import { useEditor } from "@layerhub-io/react"
 import { fabric } from "fabric"
 import { useEffect } from "react"
 import CropIcon from "~/components/Icons/CropIcon"
+import useAppContext from "~/hooks/useAppContext"
+import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 
 const CropControls = () => {
+    const { setActiveSubMenu } = useAppContext()
+    const setIsSideBarOpen = useSetIsSidebarOpen()
     const editor = useEditor()
     const canvas = editor.canvas.canvas;
 
@@ -34,6 +38,9 @@ const CropControls = () => {
 
     const createCropArea = async () => {
         const active = canvas.getActiveObject();
+
+        //setActiveSubMenu('ImageSettings');
+        //setIsSideBarOpen(false)
 
         setOriginalObject(active);
         if (!active) {

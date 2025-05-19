@@ -5,6 +5,8 @@ import { useEditor } from "@layerhub-io/react"
 import { IScene } from "@layerhub-io/types"
 import { IDesign } from "~/interfaces/DesignEditor"
 import { loadVideoEditorAssets } from "~/utils/video"
+import { fabric } from "fabric"
+import { useRestoreImageFilters } from "./useRestoreImageFilters"
 
 interface UseLoadGraphicTemplateResult {
   load: (payload: IDesign) => Promise<void>
@@ -19,6 +21,7 @@ export const useLoadGraphicTemplate = (
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const editor = useEditor()
+  const restoreFilters = useRestoreImageFilters()
   const load = useCallback(
     async (payload: IDesign) => {
       setLoading(true)
@@ -38,15 +41,14 @@ export const useLoadGraphicTemplate = (
           }
           const loadedScene = await loadVideoEditorAssets(scene)
           await loadTemplateFonts(loadedScene)
-
           const preview = (await editor.renderer.render(loadedScene)) as string
           scenes.push({ ...loadedScene, preview })
         }
 
         setScenes(scenes)
         setCurrentDesign(design)
-
         setTimeout(() => {
+          restoreFilters()
           const objectToLock = editor.objects.findById("imgbck")
           if (objectToLock) {
             editor.objects.lock("imgbck")

@@ -7,21 +7,22 @@ import Delete from 'baseui/icon/delete';
 import useSetIsSidebarOpen from '~/hooks/useSetIsSidebarOpen';
 import Scrollable from '~/components/Scrollable';
 import { Button, KIND, SIZE } from 'baseui/button';
-import FilterAdjuster from './utils';
-import { Sun, Contrast, Palette, Droplet, Rainbow, Loader, Circle } from "lucide-react";
 import { useActiveObject } from '@layerhub-io/react';
 import { fabric } from 'fabric';
 import { useStyletron, styled } from 'styletron-react';
 import { ILayer } from '@layerhub-io/types';
-
+import { useAutosaveProject } from '~/hooks/useAutoSaveProject';
 interface Options {
     ratio: number
 }
 const Filters = () => {
     const editor = useEditor()
+    const { forceSaveProject } = useAutosaveProject(sessionStorage.getItem('project_key')!)
     const canvas = editor.canvas.canvas
     const activeObject = useActiveObject() as ILayer;
     const [previews, setPreviews] = useState<{ name: string; preview: string }[]>([]);
+    const [isLoaded, setIsLoaded] = useState(false)
+    const [lastObjectId, setLastObjectId] = useState<string | null>(null)
 
     const STATIC_FILTERS = [
         { name: "Grayscale", filter: new fabric.Image.filters.Grayscale() },
@@ -39,45 +40,58 @@ const Filters = () => {
     const setIsSidebarOpen = useSetIsSidebarOpen()
 
     useEffect(() => {
-        if (!activeObject) return;
-        if (activeObject.id === 'frame') return;
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        //img.src = (activeObject as any).preview!;
-        console.log(activeObject)
-        img.src = (activeObject as any).getSrc();
+        if (!activeObject || activeObject.id === "frame") return
+
+        if (activeObject.id !== lastObjectId) {
+            setIsLoaded(false) // forzar recarga si se cambia de imagen
+            setLastObjectId(activeObject.id)
+        }
+
+        if (isLoaded) return
+
+        const img = new Image()
+        img.crossOrigin = "anonymous"
+
+        try {
+            img.src = (activeObject as any).getSrc()
+        } catch (err) {
+            console.warn("No se pudo obtener la imagen:", err)
+            return
+        }
 
         img.onload = () => {
             const fabricImg = new fabric.Image(img, {
                 selectable: false,
                 evented: false,
-            });
+            })
 
             const previewsPromises = STATIC_FILTERS.map(({ name, filter }) => {
                 return new Promise<{ name: string; preview: string }>((resolve) => {
                     fabricImg.clone((clone: any) => {
-
-                        clone.filters = [filter];
-                        clone.applyFilters();
+                        clone.filters = [filter]
+                        clone.applyFilters()
 
                         const canvas = new fabric.StaticCanvas(null, {
                             width: 100,
                             height: 100,
-                        });
+                        })
 
-                        canvas.add(clone);
-                        clone.scaleToWidth(100);
-                        clone.scaleToHeight(100);
-                        canvas.renderAll();
+                        clone.scaleToWidth(100)
+                        clone.scaleToHeight(100)
+                        canvas.add(clone)
+                        canvas.renderAll()
 
-                        resolve({ name, preview: canvas.toDataURL() });
-                    });
-                });
-            });
+                        resolve({ name, preview: canvas.toDataURL() })
+                    })
+                })
+            })
 
-            Promise.all(previewsPromises).then(setPreviews);
-        };
-    }, [activeObject]);
+            Promise.all(previewsPromises).then((result) => {
+                setPreviews(result)
+                setIsLoaded(true)
+            })
+        }
+    }, [activeObject, isLoaded, lastObjectId])
 
 
     const removeFilter = (filterType: any): boolean => {
@@ -125,9 +139,26 @@ const Filters = () => {
         active.filters = active.filters.filter(
             f => !(f instanceof fabric.Image.filters.Grayscale || f instanceof fabric.Image.filters.Invert || f instanceof fabric.Image.filters.Sepia)
         );
-
         active.filters.push(filter);
         active.applyFilters();
+        active.metadata = {
+            filters: active.filters.map((f: any) => {
+                const filterData: any = { type: f.type }
+
+                // Serializar propiedades conocidas (puedes ampliar esta lista)
+                for (const key in f) {
+                    if (Object.prototype.hasOwnProperty.call(f, key)) {
+                        const val = f[key]
+                        if (typeof val !== 'function') {
+                            filterData[key] = val
+                        }
+                    }
+                }
+
+                return filterData
+            })
+        }
+        forceSaveProject()
         editor.canvas?.requestRenderAll();
     }
 

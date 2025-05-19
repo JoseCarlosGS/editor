@@ -17,7 +17,7 @@ import Github from "~/components/Icons/Github"
 import api from "~/services/api"
 import CustomAlert from "~/components/Errors"
 import { ErrorType } from "~/components/Errors/CustomAlert"
-import { set } from "lodash"
+import { useRestoreImageFilters } from "~/hooks/useRestoreImageFilters"
 
 const Container = styled<"div", {}, Theme>("div", ({ $theme }) => ({
   height: "50px",
@@ -46,6 +46,7 @@ const Navbar = () => {
     message: '',
     type: 'info',
   });
+  const restoreFilters = useRestoreImageFilters()
 
   useEffect(() => {
     if (!editor) return;
@@ -207,11 +208,11 @@ const Navbar = () => {
       //const obj = editor.objects.findById("imgbck")
       const loadedScene = await loadVideoEditorAssets(scene)
       await loadTemplateFonts(loadedScene)
-
       const preview = (await editor.renderer.render(loadedScene)) as string
       scenes.push({ ...loadedScene, preview })
     }
     setTimeout(() => {
+      restoreFilters()
       const objectToLock = editor.objects.findById("imgbck");
       if (objectToLock) {
         editor.objects.lock("imgbck");
@@ -381,7 +382,6 @@ const Navbar = () => {
           }
           setChangesSaved(true)
           setAlert({ open: true, message: "Proyecto guardado correctamente", type: "success" })
-          console.log("creado con exito", response)
         }
       } catch (error) {
         console.log("error al guardar el proyecto", error)

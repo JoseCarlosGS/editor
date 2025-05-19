@@ -279,7 +279,7 @@ class ApiService {
   getTemplateByParams(personaId: string, eventoId: string, filename: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(this.base.defaults)
+        //console.log(this.base.defaults)
         const { data } = await this.base.get(
           `/archivos/leer?personaId=${personaId}&eventoId=${eventoId}&filename=${filename}`
         )
