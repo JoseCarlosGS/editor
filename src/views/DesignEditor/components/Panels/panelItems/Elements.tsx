@@ -15,10 +15,12 @@ import ArrowDiagonal from "~/components/Icons/ArrowDiagonal"
 import DashedLineDiagonal from "~/components/Icons/DashedLineDiagonal"
 import DoubleArrowDiagonal from "~/components/Icons/DoubleArrowDiagonal"
 import LineDiagonal from "~/components/Icons/LineDiagonal"
+import { useTranslation } from "react-i18next"
 
 const Elements = () => {
   const editor = useEditor()
   const setIsSidebarOpen = useSetIsSidebarOpen()
+  const { t } = useTranslation("editor")
 
   useEffect(() => {
     const canvas = editor.canvas.canvas;
@@ -566,7 +568,7 @@ const Elements = () => {
           padding: "1.5rem",
         }}
       >
-        <Block>Elements</Block>
+        <Block>{t(`panels.elements.elements`)}</Block>
 
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
           <AngleDoubleLeft size={18} />
@@ -575,7 +577,7 @@ const Elements = () => {
       <Scrollable>
         <Block>
           <Block $style={{ marginLeft: "20px" }}>
-            Lines
+            {t(`panels.elements.lines`)}
           </Block>
           <Block $style={{ display: "grid", gap: "8px", padding: "1.5rem", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
             <Button
@@ -613,7 +615,7 @@ const Elements = () => {
         </Block>
         <Block>
           <Block $style={{ marginLeft: "20px" }}>
-            Forms
+            {t(`panels.elements.forms`)}
           </Block>
           <Block $style={{ display: "grid", gap: "8px", padding: "1.5rem", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
             {graphics.map((graphic, index) => (
@@ -626,7 +628,7 @@ const Elements = () => {
         </Block>
         <Block>
           <Block $style={{ marginLeft: "20px" }}>
-            Custom
+            {t(`panels.elements.custom`)}
           </Block>
           <Block $style={{ display: "grid", gap: "8px", padding: "1.5rem", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
             {customElements.map((graphic, index) => (

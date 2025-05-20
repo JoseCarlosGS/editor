@@ -10,18 +10,16 @@ import { Block } from "baseui/block"
 import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
 import Scrollable from "~/components/Scrollable"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
-import Delete from "~/components/Icons/Delete"
-import { ChevronDown } from "baseui/icon"
-import { ChevronUp } from "baseui/icon"
-import { useEffect, useReducer, useState } from "react"
-import { Textarea } from 'baseui/textarea';
+import { useEffect, useState } from "react"
 import useEditorHistoryListener from "~/hooks/useEditorHistoryListener"
+import { useTranslation } from "react-i18next"
 
 const Text = () => {
   const editor = useEditor()
   const activeObject = useActiveObject()
   const setIsSidebarOpen = useSetIsSidebarOpen()
   const objects = useObjects() as ILayer[]
+  const { t } = useTranslation("editor");
   //const textObjects = objects.filter(obj => obj.type === 'StaticText');
   const [editingId, setEditingId] = useState(null);
   const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
@@ -144,7 +142,7 @@ const Text = () => {
           padding: "1.5rem",
         }}
       >
-        <Block>Text</Block>
+        <Block>{t(`panels.panelsList.text`)}</Block>
 
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
           <AngleDoubleLeft size={18} />
@@ -163,7 +161,7 @@ const Text = () => {
               },
             }}
           >
-            Add text
+            {t(`panels.common.addText`)}
           </Button>
 
           <Block

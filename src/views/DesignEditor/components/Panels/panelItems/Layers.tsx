@@ -11,10 +11,12 @@ import EyeCrossed from "~/components/Icons/EyeCrossed"
 import Delete from "~/components/Icons/Delete"
 import { Button, KIND, SIZE } from "baseui/button"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
+import { useTranslation } from "react-i18next"
 
 const Layers = () => {
   const editor = useEditor()
   const objects = useObjects() as ILayer[]
+  const { t } = useTranslation("editor");
   const [layerObjects, setLayerObjects] = React.useState<any[]>([])
   const setIsSidebarOpen = useSetIsSidebarOpen()
 
@@ -51,7 +53,7 @@ const Layers = () => {
           padding: "1.5rem",
         }}
       >
-        <Block>Layers</Block>
+        <Block>{t(`panels.panelsList.layers`)}</Block>
 
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
           <AngleDoubleLeft size={18} />
@@ -73,7 +75,7 @@ const Layers = () => {
               key={object.id}
             >
               <Block $style={{ cursor: "pointer" }} onClick={() => editor.objects.select(object.id)}>
-              {object.type === "staticText" ? object.text : object.name}
+                {object.type === "staticText" ? object.text : object.name}
               </Block>
               <Block $style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
                 {object.locked ? (

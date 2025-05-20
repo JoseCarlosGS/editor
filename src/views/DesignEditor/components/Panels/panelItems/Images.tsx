@@ -6,10 +6,12 @@ import Scrollable from "~/components/Scrollable"
 import { images } from "~/constants/mock-data"
 import { useEditor } from "@layerhub-io/react"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
+import { useTranslation } from "react-i18next"
 
 const Images = () => {
   const editor = useEditor()
   const setIsSidebarOpen = useSetIsSidebarOpen()
+  const { t } = useTranslation("editor")
 
   const addObject = React.useCallback(
     (url: string, prev: string) => {
@@ -36,7 +38,7 @@ const Images = () => {
           padding: "1.5rem",
         }}
       >
-        <Block>Images</Block>
+        <Block>{t(`panels.panelsList.images`)}</Block>
 
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
           <AngleDoubleLeft size={18} />

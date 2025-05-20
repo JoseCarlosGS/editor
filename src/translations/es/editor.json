@@ -6,12 +6,69 @@
             "elements": "Elementos",
             "images": "Imagenes",
             "videos": "Videos",
-            "uploads": "Cargas",
+            "uploads": "Subidos",
             "text": "Texto",
             "graphics": "Graficos",
             "pixabay": "Pixabay",
             "layers": "Capas",
             "documentFields": "Campos"
+        },
+        "fields": {
+            "fields": "Campos",
+            "add": "Añadir",
+            "modal": {
+                "newField": "Nuevo campo",
+                "fieldType": "Tipo de campo",
+                "text": "Texto",
+                "image": "Imagen",
+                "qrCode": "Codigo QR",
+                "fieldName": "Nombre del campo",
+                "createField": "Crear campo",
+                "example": "Ej: Titulo, Fecha, Nombre..."
+            }
+        },
+        "customize": {
+            "customize": "Personalizar",
+            "backgroundColor": "Color de fondo",
+            "modal": {
+                "title": "Elija un formato y cambie el tamaño de su plantilla.",
+                "presetSize": "Tamaño preestablecido",
+                "customSize": "Tamaño personalizado",
+                "resizeTemplate": "Cambiar tamaño"
+            }
+        },
+        "elements": {
+            "elements": "Elementos",
+            "lines": "Lineas",
+            "forms": "Formas",
+            "custom": "Figuras"
+        },
+        "imageSettings": {
+            "settings": "Ajustes",
+            "restore": "Restablecer",
+            "brightness": "Brillo",
+            "contrast": "Contraste",
+            "saturation": "Saturacion",
+            "blur": "Desenfoque"
+        },
+        "filters": {
+            "filters": "Filtros",
+            "restore": "Restablecer"
+        },
+        "common": {
+            "addText": "Añadir texto",
+            "computer": "Archivos"
+        }
+    },
+    "navbar": {
+        "import": "Importar",
+        "export": "Exportar",
+        "save": "Guardar"
+    },
+    "common": {
+        "buttonLabels": {
+            "cancel": "Cancelar",
+            "accept": "Aceptar"
         }
     }
 }

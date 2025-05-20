@@ -59,7 +59,7 @@ const PanelListItem = ({ label, icon, activePanel, name }: any) => {
         justifyContent: "center",
         fontFamily: "Roboto, sans-serif",
         fontWeight: 500,
-        fontSize: "0.8rem",
+        fontSize: "0.75rem",
         userSelect: "none",
         transition: "all 0.5s",
         gap: "0.1rem",
