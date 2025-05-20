@@ -38,7 +38,7 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
         };
 
         sessionStorage.setItem(key, JSON.stringify(project));
-        console.log("Guardado forzado exitoso");
+        //console.log("Guardado forzado exitoso");
     }, [editor, key]);
 
     useEffect(() => {

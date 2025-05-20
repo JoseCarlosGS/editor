@@ -581,6 +581,7 @@ const Elements = () => {
           </Block>
           <Block $style={{ display: "grid", gap: "8px", padding: "1.5rem", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
             <Button
+              disabled
               onClick={enableLineTool}
               size={SIZE.mini}
               kind={KIND.tertiary}
@@ -588,6 +589,7 @@ const Elements = () => {
               <LineDiagonal size={40} />
             </Button>
             <Button
+              disabled
               onClick={enableArrowTool}
               size={SIZE.mini}
               kind={KIND.tertiary}
@@ -595,6 +597,7 @@ const Elements = () => {
               <ArrowDiagonal size={40} />
             </Button>
             <Button
+              disabled
               onClick={enableDashedLineTool}
               size={SIZE.mini}
               kind={KIND.tertiary}
@@ -602,6 +605,7 @@ const Elements = () => {
               <DashedLineDiagonal size={40} />
             </Button>
             <Button
+              disabled
               onClick={enableDoubleArrowTool}
               size={SIZE.mini}
               kind={KIND.tertiary}
