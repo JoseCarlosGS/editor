@@ -10,22 +10,15 @@ import { Block } from "baseui/block"
 import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
 import Scrollable from "~/components/Scrollable"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
-import Delete from "~/components/Icons/Delete"
-import { ChevronDown } from "baseui/icon"
-import { ChevronUp } from "baseui/icon"
-import { useEffect, useReducer, useState } from "react"
-import { Textarea } from 'baseui/textarea';
+import { useEffect, useState } from "react"
 import useEditorHistoryListener from "~/hooks/useEditorHistoryListener"
+import { useTranslation } from "react-i18next"
 
 const Text = () => {
   const editor = useEditor()
-  const activeObject = useActiveObject()
   const setIsSidebarOpen = useSetIsSidebarOpen()
   const objects = useObjects() as ILayer[]
-  //const textObjects = objects.filter(obj => obj.type === 'StaticText');
-  const [editingId, setEditingId] = useState(null);
-  const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
-  const [editValue, setEditValue] = useState('');
+  const { t } = useTranslation("editor");
 
   const [localObjects, setLocalObjects] = useState<ILayer[]>([])
 
@@ -38,14 +31,6 @@ const Text = () => {
     const currentObjects = editor.objects.list() as ILayer[]
     setLocalObjects(currentObjects)
   })
-  const localTextObjects = localObjects.filter(obj => obj.type === 'StaticText')
-  // Opciones para el combobox
-  const typeOptions = [
-    { label: 'Nombre', id: 'name' },
-    { label: 'Firma', id: 'signature' },
-    { label: 'Emisor', id: 'issuer' },
-    { label: 'Fecha', id: 'date' }
-  ];
 
   const addObject = async () => {
     if (editor) {
@@ -95,43 +80,6 @@ const Text = () => {
       editor.objects.add(component)
     }
   }
-  const handleEdit = (textObj: any) => {
-    console.log('Editando objeto:', textObj)
-    if (editingId === textObj.id) {
-      // Si ya estamos editando este objeto, cerramos el panel de edición
-      setEditingId(null);
-    } else {
-      // Configuramos el objeto para edición
-      setEditingId(textObj.id);
-      setEditType(textObj.fieldType ?
-        [typeOptions.find(option => option.id === textObj.fieldType) || typeOptions[0]] :
-        [typeOptions[0]]);
-      setEditValue(textObj.text || '');
-    }
-  };
-
-  const handleDelete = (id: string) => {
-    if (activeObject) {
-      editor.objects.remove(id);
-    }
-    console.log('Eliminando objeto:', id);
-  };
-
-  const handleSave = (text: string) => {
-    if (activeObject) {
-      editor.objects.update({ text: text })
-    }
-  };
-
-  const isSelected = (id: string) => {
-    const currentObject = activeObject as IStaticText
-    const selectedObjects = editor.objects.findById(id);
-    const selectedObject = Array.isArray(selectedObjects) && selectedObjects.length > 0 ? selectedObjects[0] as IStaticText : null;
-    if (activeObject) {
-      return selectedObject === currentObject
-    }
-    return false
-  }
 
   return (
     <Block $style={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -144,7 +92,7 @@ const Text = () => {
           padding: "1.5rem",
         }}
       >
-        <Block>Text</Block>
+        <Block>{t(`panels.panelsList.text`)}</Block>
 
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
           <AngleDoubleLeft size={18} />
@@ -163,7 +111,7 @@ const Text = () => {
               },
             }}
           >
-            Add text
+            {t(`panels.common.addText`)}
           </Button>
 
           <Block

@@ -3537,7 +3537,8 @@ const textComponent2 = {
 const textComponent3 = {
   id: "FIRMACOMPONENT",
   layers: [
-    {angle: 0,
+    {
+      angle: 0,
       stroke: null,
       strokeWidth: 0,
       left: 0,
@@ -3616,41 +3617,12 @@ const textComponent3 = {
           skewY: 0,
           visible: true,
           shadow: null,
-          path: [
-              [
-                  "M",
-                  60,
-                  0
-              ],
-              [
-                  "L",
-                  0,
-                  0
-              ],
-              [
-                  "L",
-                  0,
-                  60
-              ],
-              [
-                  "L",
-                  60,
-                  60
-              ],
-              [
-                  "L",
-                  60,
-                  0
-              ],
-              [
-                  "Z"
-              ]
-          ],
+          path: [["M", 60, 0], ["L", 0, 0], ["L", 0, 60], ["L", 60, 60], ["L", 60, 0], ["Z"]],
           fill: "#000000",
-          metadata: {}
-      },
-      ]
-    }
+          metadata: {},
+        },
+      ],
+    },
   ],
   metadata: {
     category: "single",
@@ -3660,7 +3632,7 @@ const textComponent3 = {
   userId: "_O8L0WDPlpKhDXspugZe3",
 }
 
-export const textComponents = [textComponent1, textComponent2, textComponent3]
+export const textComponents = [textComponent1, textComponent2]
 
 export const sampleFrames = [
   {
@@ -3669,7 +3641,7 @@ export const sampleFrames = [
     width: 1024,
     height: 768,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-presentation-4x3.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/4x3.png?updatedAt=1747752429651",
   },
   {
     id: 2,
@@ -3677,7 +3649,7 @@ export const sampleFrames = [
     width: 1920,
     height: 1080,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-presentation-16x9.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/16x9.png?updatedAt=1747752830507",
   },
   {
     id: 3,
@@ -3685,7 +3657,7 @@ export const sampleFrames = [
     width: 1080,
     height: 1920,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-social-media-story.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/9x16.png?updatedAt=1747753125459",
   },
   {
     id: 4,
@@ -3693,7 +3665,7 @@ export const sampleFrames = [
     width: 1080,
     height: 1080,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-social-media-post.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/9x9.png?updatedAt=1747755718049",
   },
   {
     id: 5,
@@ -3701,7 +3673,7 @@ export const sampleFrames = [
     width: 1200,
     height: 1200,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-social-media-post.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/9x9.png?updatedAt=1747755718049",
   },
   {
     id: 6,
@@ -3709,7 +3681,7 @@ export const sampleFrames = [
     width: 1702,
     height: 630,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-facebook-event-cover.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/9x1.png?updatedAt=1747755718101",
   },
   {
     id: 7,
@@ -3717,7 +3689,7 @@ export const sampleFrames = [
     width: 1920,
     height: 1080,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-facebook-event-cover.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/192x108.png?updatedAt=1747756013885",
   },
   {
     id: 8,
@@ -3725,7 +3697,7 @@ export const sampleFrames = [
     width: 2560,
     height: 1440,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-youtube-channel-art.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/256x144.png?updatedAt=1747756013961",
   },
   {
     id: 9,
@@ -3733,7 +3705,7 @@ export const sampleFrames = [
     width: 1280,
     height: 720,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-youtube-thumbnail.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/120x67.png?updatedAt=1747756014473",
   },
   {
     id: 10,
@@ -3741,7 +3713,7 @@ export const sampleFrames = [
     width: 1200,
     height: 675,
     unit: "px",
-    preview: "https://ik.imagekit.io/scenify/social-twittter-post.svg",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/preview/120x67.png?updatedAt=1747756014473",
   },
 ]
 

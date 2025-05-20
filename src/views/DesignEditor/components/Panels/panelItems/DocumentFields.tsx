@@ -22,12 +22,15 @@ import EditableName from "~/components/EditableName"
 import { toBase64 } from "~/utils/data"
 import ImagePreview from "~/views/DesignEditor/utils/common/ImagePreview"
 import { Type, Image, QrCode } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 const DocumentFields = () => {
   const editor = useEditor()
   const activeObject = useActiveObject() as ILayer
   const setIsSidebarOpen = useSetIsSidebarOpen()
+  const { t } = useTranslation("editor")
   const objects = useObjects() as ILayer[]
+  const [thereIsQr, setThereIsQr] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editType, setEditType] = useState<{ label: string; id: string }[]>([]);
   const [editValue, setEditValue] = useState('');
@@ -50,20 +53,24 @@ const DocumentFields = () => {
   })
   const localTextObjects = localObjects.filter(obj => {
     return obj.metadata?.type === 'field';
+
   })
-  // Opciones para el combobox
+
+  useEffect(() => {
+    const hasQr = localObjects.some(obj => obj.metadata?.contentType === 'qr');
+    setThereIsQr(hasQr);
+  }, [localObjects]);
+
   const typeOptions = [
-    { id: "text", label: "Texto", icon: Type },
+    { id: "text", label: t(`panels.fields.modal.text`), icon: Type },
     //{ id: "signature", label: "Firma", icon: Type },
-    { id: "image", label: "Imagen", icon: Image },
-    { id: "qr-code", label: "Codigo QR", icon: QrCode },
+    { id: "image", label: t(`panels.fields.modal.image`), icon: Image },
+    { id: "qr-code", label: t(`panels.fields.modal.qrCode`), icon: QrCode },
   ];
 
   const handleAddNewField = async () => {
 
     if (newFieldName.trim()) {
-      console.log('Creando nuevo campo:', newFieldName, fieldType[0].id, newFieldContent)
-
       if (fieldType[0].id !== "image") {
         const font: FontItem = {
           name: "OpenSans-Regular",
@@ -201,7 +208,6 @@ const DocumentFields = () => {
   };
 
   const handleEdit = (textObj: any) => {
-    console.log('Editando objeto:', textObj)
     if (editingId === textObj.id) {
       setEditingId(null);
     } else {
@@ -217,7 +223,6 @@ const DocumentFields = () => {
     if (activeObject) {
       editor.objects.remove(id);
     }
-    console.log('Eliminando objeto:', id);
   };
 
   const handleSave = (name: string) => {
@@ -247,7 +252,7 @@ const DocumentFields = () => {
           padding: "1.5rem",
         }}
       >
-        <Block>Campos</Block>
+        <Block>{t(`panels.fields.fields`)}</Block>
 
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
           <AngleDoubleLeft size={18} />
@@ -269,7 +274,7 @@ const DocumentFields = () => {
               },
             }}
           >
-            Add
+            {t(`panels.fields.add`)}
           </Button>
           {localTextObjects.map((textObj) => (
             <Block
@@ -342,8 +347,8 @@ const DocumentFields = () => {
                       }}
                       placeholder="Ingrese el valor"
                       size="compact"
-                      rows={2} // Número de filas visibles inicialmente
-                      maxLength={500} // Opcional: limitar caracteres si es necesario
+                      rows={2}
+                      maxLength={500}
                       overrides={{
                         Input: {
                           style: {
@@ -397,42 +402,49 @@ const DocumentFields = () => {
       size={SIZE.default}
       role={ROLE.dialog}
     >
-        <ModalHeader>Nuevo campo</ModalHeader>
+        <ModalHeader>{t(`panels.fields.modal.newField`)}</ModalHeader>
         <ModalBody>
-          <FormControl label="Tipo de campo">
+          <FormControl label={t(`panels.fields.modal.fieldType`)}>
             <Block display="flex" justifyContent="space-between" marginBottom="1rem">
-              {typeOptions.map(option => (
-                <Button
-                  key={option.id}
-                  onClick={() => setFieldType([option])}
-                  kind={fieldType[0].id === option.id ? "primary" : "secondary"}
-                  size={SIZE.compact}
-                  overrides={{
-                    Root: {
-                      style: {
-                        flex: 1,
-                        marginLeft: "0.5rem",
-                        marginRight: "0.5rem",
-                        marginTop: "0",
-                        marginBottom: "0",
-                        backgroundColor: fieldType[0].id === option.id ? "#0070f3" : "#f0f0f0",
-                        color: fieldType[0].id === option.id ? "#ffffff" : "#000000",
+              {typeOptions.map(option => {
+                const isQr = option.id === "qr-code";
+                const isDisabled = isQr && thereIsQr;
+                return (
+                  <Button
+                    key={option.id}
+                    onClick={() => setFieldType([option])}
+                    kind={fieldType[0].id === option.id ? "primary" : "secondary"}
+                    size={SIZE.compact}
+                    disabled={isDisabled}
+                    overrides={{
+                      Root: {
+                        style: {
+                          flex: 1,
+                          marginLeft: "0.5rem",
+                          marginRight: "0.5rem",
+                          marginTop: "0",
+                          marginBottom: "0",
+                          backgroundColor: fieldType[0].id === option.id ? "#0070f3" : "#f0f0f0",
+                          color: fieldType[0].id === option.id ? "#ffffff" : "#000000",
+                          opacity: isDisabled ? 0.5 : 1,
+                          cursor: isDisabled ? "not-allowed" : "pointer",
+                        },
                       },
-                    },
-                  }}
-                >
-                  <option.icon size={48} />
-                  {option.label}
-                </Button>
-              ))}
+                    }}
+                  >
+                    <option.icon size={48} />
+                    {option.label}
+                  </Button>
+                );
+              })}
             </Block>
           </FormControl>
 
-          <FormControl label="Nombre del campo">
+          <FormControl label={t(`panels.fields.modal.fieldName`)}>
             <Input
               value={newFieldName}
               onChange={e => setNewFieldName(e.target.value)}
-              placeholder="Ej: Título, Fecha, Nombre..."
+              placeholder={t(`panels.fields.modal.example`)}
               clearOnEscape />
           </FormControl>
 
@@ -443,10 +455,10 @@ const DocumentFields = () => {
         </ModalBody>
         <ModalFooter>
           <ModalButton kind="tertiary" onClick={() => setIsModalOpen(false)}>
-            Cancelar
+            {t(`common.buttonLabels.cancel`)}
           </ModalButton>
           <ModalButton onClick={handleAddNewField} >
-            Crear campo
+            {t(`panels.fields.modal.createField`)}
           </ModalButton>
         </ModalFooter>
       </Modal></>

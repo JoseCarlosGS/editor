@@ -18,6 +18,8 @@ import api from "~/services/api"
 import CustomAlert from "~/components/Errors"
 import { ErrorType } from "~/components/Errors/CustomAlert"
 import { useRestoreImageFilters } from "~/hooks/useRestoreImageFilters"
+import { Languages } from "lucide-react"
+import { useTranslation } from 'react-i18next';
 
 const Container = styled<"div", {}, Theme>("div", ({ $theme }) => ({
   height: "50px",
@@ -30,6 +32,8 @@ const Container = styled<"div", {}, Theme>("div", ({ $theme }) => ({
 
 const Navbar = () => {
   const { setDisplayPreview, setScenes, setCurrentDesign, currentDesign, scenes } = useDesignEditorContext()
+  const { i18n } = useTranslation()
+  const { t } = useTranslation("editor")
   const editorType = useEditorType()
   const editor = useEditor()
   const inputFileRef = React.useRef<HTMLInputElement>(null)
@@ -68,6 +72,10 @@ const Navbar = () => {
       editor.off("history:changed", handleChange);
     };
   }, [editor]);
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
 
   const parseGraphicJSON = () => {
     const currentScene = editor.scene.exportToJSON()
@@ -395,6 +403,8 @@ const Navbar = () => {
     }
   }
 
+  const [showLangMenu, setShowLangMenu] = useState(false);
+
   return (
     // @ts-ignore
     <ThemeProvider theme={DarkTheme}>
@@ -435,7 +445,7 @@ const Navbar = () => {
               },
             }}
           >
-            Import
+            {t(`navbar.import`)}
           </Button>
 
           <Button
@@ -450,7 +460,7 @@ const Navbar = () => {
               },
             }}
           >
-            Export
+            {t(`navbar.export`)}
           </Button>
           <Button
             size="compact"
@@ -492,9 +502,69 @@ const Navbar = () => {
                 </svg>
               </span>
             ) : (
-              "Save"
+              t(`navbar.save`)
             )}
           </Button>
+          <div style={{ position: "relative" }}>
+            <Button
+              size="compact"
+              onClick={() => setShowLangMenu((prev) => !prev)}
+              kind={KIND.tertiary}
+              overrides={{
+                StartEnhancer: {
+                  style: {
+                    marginRight: "4px",
+                  },
+                },
+              }}
+            >
+              <Languages size={24} />
+            </Button>
+            {showLangMenu && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "100%",
+                  background: "#222",
+                  color: "#fff",
+                  borderRadius: 4,
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                  zIndex: 10,
+                  minWidth: 120,
+                  marginTop: 4,
+                  padding: "4px 0",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    fontSize: 14,
+                  }}
+                  onClick={() => {
+                    changeLanguage("es");
+                    setShowLangMenu(false);
+                  }}
+                >
+                  es-Español
+                </div>
+                <div
+                  style={{
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    fontSize: 14,
+                  }}
+                  onClick={() => {
+                    changeLanguage("en");
+                    setShowLangMenu(false);
+                  }}
+                >
+                  en-English
+                </div>
+              </div>
+            )}
+          </div>
           <Button
             size="compact"
             onClick={() => setDisplayPreview(true)}
@@ -518,14 +588,14 @@ const Navbar = () => {
             <Github size={24} />
           </Button>
 
-          <Button
+          {/* <Button
             style={{ marginLeft: "0.5rem" }}
             size="compact"
             onClick={() => window.location.replace("https://editor.layerhub.io")}
             kind={KIND.primary}
           >
             Try PRO
-          </Button>
+          </Button> */}
         </Block>
       </Container>
     </ThemeProvider>

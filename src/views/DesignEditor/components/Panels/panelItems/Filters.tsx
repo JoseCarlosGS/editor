@@ -12,13 +12,14 @@ import { fabric } from 'fabric';
 import { useStyletron, styled } from 'styletron-react';
 import { ILayer } from '@layerhub-io/types';
 import { useAutosaveProject } from '~/hooks/useAutoSaveProject';
+import { useTranslation } from 'react-i18next';
 interface Options {
     ratio: number
 }
 const Filters = () => {
     const editor = useEditor()
     const { forceSaveProject } = useAutosaveProject(sessionStorage.getItem('project_key')!)
-    const canvas = editor.canvas.canvas
+    const { t } = useTranslation("editor");
     const activeObject = useActiveObject() as ILayer;
     const [previews, setPreviews] = useState<{ name: string; preview: string }[]>([]);
     const [isLoaded, setIsLoaded] = useState(false)
@@ -177,7 +178,7 @@ const Filters = () => {
                 <Block onClick={() => setActiveSubMenu(activePanel)} $style={{ cursor: "pointer", display: "flex" }}>
                     <ArrowBackOutline size={24} />
                 </Block>
-                <Block>Filters</Block>
+                <Block>{t(`panels.filters.filters`)}</Block>
                 <Block
                     $style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}
                     onClick={() => setIsSidebarOpen(false)}
@@ -199,7 +200,7 @@ const Filters = () => {
                     <Button
                         onClick={removeAllFilters}
                         kind={KIND.tertiary}>
-                        Restablecer
+                        {t(`panels.filters.restore`)}
                     </Button>
                 </Block>
                 <Block padding="0 1.5rem">

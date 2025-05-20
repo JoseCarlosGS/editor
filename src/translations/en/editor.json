@@ -12,6 +12,63 @@
             "pixabay": "Pixabay",
             "layers": "Layers",
             "documentFields": "Fields"
+        },
+        "fields": {
+            "fields": "Fields",
+            "add": "Add",
+            "modal": {
+                "newField": "New field",
+                "fieldType": "Field type",
+                "text": "Text",
+                "image": "Image",
+                "qrCode": "QR Code",
+                "fieldName": "Field name",
+                "createField": "Create field",
+                "example": "Eg: Title, Date, Name..."
+            }
+        },
+        "customize": {
+            "customize": "Customize",
+            "backgroundColor": "Background color",
+            "modal": {
+                "title": "Choose a format and resize your template.",
+                "presetSize": "Preset size",
+                "customSize": "Custom size",
+                "resizeTemplate": "Resize template"
+            }
+        },
+        "elements": {
+            "elements": "Elements",
+            "lines": "Lines (Comming soon)",
+            "forms": "Forms",
+            "custom": "Figures"
+        },
+        "imageSettings": {
+            "settings": "Settings",
+            "restore": "Restore",
+            "brightness": "Brightness",
+            "contrast": "Contrast",
+            "saturation": "Saturation",
+            "blur": "Blur"
+        },
+        "filters": {
+            "filters": "Filters",
+            "restore": "Restore"
+        },
+        "common": {
+            "addText": "Add text",
+            "computer": "Computer"
+        }
+    },
+    "navbar": {
+        "import": "Import",
+        "export": "Export",
+        "save": "Save"
+    },
+    "common": {
+        "buttonLabels": {
+            "cancel": "Cancel",
+            "accept": "Accept"
         }
     }
 }

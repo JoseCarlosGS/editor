@@ -10,13 +10,14 @@ import { nanoid } from "nanoid"
 import { captureFrame, loadVideoResource } from "~/utils/video"
 import { ILayer } from "@layerhub-io/types"
 import { toBase64 } from "~/utils/data"
+import { useTranslation } from "react-i18next"
 
 export default function () {
   const inputFileRef = React.useRef<HTMLInputElement>(null)
   const [uploads, setUploads] = React.useState<any[]>([])
   const editor = useEditor()
   const setIsSidebarOpen = useSetIsSidebarOpen()
-
+  const { t } = useTranslation("editor")
   const handleDropFiles = async (files: FileList) => {
     const file = files[0]
 
@@ -64,7 +65,7 @@ export default function () {
             padding: "1.5rem",
           }}
         >
-          <Block>Uploads</Block>
+          <Block>{t(`panels.panelsList.uploads`)}</Block>
 
           <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
             <AngleDoubleLeft size={18} />
@@ -83,7 +84,7 @@ export default function () {
                 },
               }}
             >
-              Computer
+              {t(`panels.common.computer`)}
             </Button>
             <input onChange={handleFileInput} type="file" id="file" ref={inputFileRef} style={{ display: "none" }} />
 

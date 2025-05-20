@@ -12,6 +12,7 @@ import { Sun, Contrast, Palette, Droplet, Rainbow, Loader, Circle } from "lucide
 import { useActiveObject } from '@layerhub-io/react';
 import { fabric } from 'fabric';
 import { useAutosaveProject } from '~/hooks/useAutoSaveProject';
+import { useTranslation } from 'react-i18next';
 
 interface Options {
     ratio: number
@@ -20,6 +21,7 @@ const ImageSettings = () => {
     const editor = useEditor()
     const canvas = editor.canvas.canvas
     const activeObject = useActiveObject()
+    const { t } = useTranslation("editor")
     const { forceSaveProject } = useAutosaveProject(sessionStorage.getItem('project_key')!)
     let frameRequest: number | null = null;
     const ratioMin = -100
@@ -269,39 +271,6 @@ const ImageSettings = () => {
         }
     }
 
-    const handleGrayScale = (value: number) => {
-        const newValue = filterValue(value, 1, 0)
-        setGrayScaleOptions({ ratio: newValue })
-        if (newValue === 1) {
-            applyImageFilter(activeObject as fabric.Image, {
-                value: newValue,
-                fabricFilter: fabric.Image.filters.Grayscale,
-                propName: "grayscale"
-            })
-
-        }
-        else if (newValue === 0) {
-            removeFilter(fabric.Image.filters.Grayscale)
-        }
-
-    }
-    const handleInvert = (value: number) => {
-        const newValue = filterValue(value, 1, 0)
-        setInvertOptions({ ratio: newValue })
-        if (newValue === 1) {
-            applyImageFilter(activeObject as fabric.Image, {
-                value: newValue,
-                fabricFilter: fabric.Image.filters.Invert,
-                propName: "invert"
-            })
-
-        }
-        else if (newValue === 0) {
-            removeFilter(fabric.Image.filters.Invert)
-        }
-
-    }
-
     return (
         <Block $style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <Block
@@ -316,7 +285,7 @@ const ImageSettings = () => {
                 <Block onClick={() => setActiveSubMenu(activePanel)} $style={{ cursor: "pointer", display: "flex" }}>
                     <ArrowBackOutline size={24} />
                 </Block>
-                <Block>Settings</Block>
+                <Block>{t(`panels.imageSettings.settings`)}</Block>
                 <Block
                     $style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}
                     onClick={() => setIsSidebarOpen(false)}
@@ -338,12 +307,12 @@ const ImageSettings = () => {
                     <Button
                         onClick={removeAllFilters}
                         kind={KIND.tertiary}>
-                        Restablecer
+                        {t(`panels.imageSettings.restore`)}
                     </Button>
                 </Block>
                 <Block padding="0 1.5rem">
                     <FilterAdjuster
-                        label="Brillo"
+                        label={t(`panels.imageSettings.brightness`)}
                         icon={<Sun size={18} />}
                         value={brightnessOptions.ratio}
                         min={ratioMin}
@@ -353,7 +322,7 @@ const ImageSettings = () => {
                         defaultValue={0}
                     />
                     <FilterAdjuster
-                        label="Contraste"
+                        label={t(`panels.imageSettings.contrast`)}
                         icon={<Contrast size={18} />}
                         value={contrastOptions.ratio}
                         min={ratioMin}
@@ -363,7 +332,7 @@ const ImageSettings = () => {
                         defaultValue={0}
                     />
                     <FilterAdjuster
-                        label="Saturacion"
+                        label={t(`panels.imageSettings.saturation`)}
                         icon={<Loader size={18} />}
                         value={saturationOptions.ratio}
                         min={ratioMin}
@@ -373,7 +342,7 @@ const ImageSettings = () => {
                         defaultValue={0}
                     />
                     <FilterAdjuster
-                        label="Desenfoque"
+                        label={t(`panels.imageSettings.blur`)}
                         icon={<Droplet size={18} />}
                         value={blurOptions.ratio}
                         min={1}
