@@ -296,31 +296,60 @@ const ResizeTemplate = () => {
             <Tab title={t(`panels.customize.modal.presetSize`)}>
               <Block $style={{ width: "100%", height: "400px" }}>
                 <Scrollbar>
-                  <Block $style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>
+                  <Block
+                    $style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                      gap: "1rem",
+                      justifyItems: "center",
+                    }}
+                  >
                     {sampleFrames.map((sampleFrame, index) => (
                       <Block
                         onClick={() => setSelectedFrame(sampleFrame)}
                         $style={{
+                          width: "190px",
+                          height: "250px",
                           padding: "0.5rem",
-                          backgroundColor: selectedFrame.id === sampleFrame.id ? "rgb(243,244,245)" : "#ffffff",
+                          backgroundColor:
+                            selectedFrame.id === sampleFrame.id
+                              ? "rgb(232, 232, 233)"
+                              : "rgb(247, 250, 252)",
                           ":hover": {
-                            backgroundColor: "rgb(246,247,248)",
+                            backgroundColor: "rgb(232, 232, 233)",
                             cursor: "pointer",
                           },
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
                         }}
                         key={index}
                       >
                         <Block
                           $style={{
-                            height: "120px",
+                            flex: 1,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            overflow: "hidden",
                           }}
                         >
-                          <img src={sampleFrame.preview} />
+                          <img
+                            src={sampleFrame.preview}
+                            style={{
+                              maxWidth: "100%",
+                              maxHeight: "100%",
+                              objectFit: "contain",
+                            }}
+                          />
                         </Block>
-                        <Block $style={{ fontSize: "13px", textAlign: "center" }}>
+                        <Block
+                          $style={{
+                            fontSize: "13px",
+                            textAlign: "center",
+                            paddingTop: "0.5rem",
+                          }}
+                        >
                           <Block $style={{ fontWeight: 500 }}>{sampleFrame.name}</Block>
                           <Block $style={{ color: "rgb(119,119,119)" }}>
                             {sampleFrame.width} x {sampleFrame.height}px
