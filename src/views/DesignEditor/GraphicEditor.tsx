@@ -17,6 +17,12 @@ import { useAutosaveProject } from "~/hooks/useAutoSaveProject"
 import CustomAlert from "~/components/Errors"
 import { ErrorType } from "~/components/Errors/CustomAlert"
 
+declare global {
+  interface Window {
+    editor: any;
+  }
+}
+
 const GraphicEditor = () => {
   const location = useLocation();
   const editor = useEditor();
@@ -34,6 +40,7 @@ const GraphicEditor = () => {
   const personaId = sessionStorage.getItem('persona_id')
   const queryParams = new URLSearchParams(location.search);
   const filename = queryParams.get("filename");
+  const renderMode = queryParams.get("render_mode");
   //const personaId = queryParams.get("personaId");
   const eventoId = queryParams.get("eventoId");
   const [showToolbox, setShowToolbox] = useState(false)
@@ -56,7 +63,22 @@ const GraphicEditor = () => {
     setEditorType("GRAPHIC");
   }, []);
 
+  useEffect(() => {
+    console.log("exponiendo editor", renderMode)
+    if (editor && renderMode === "true") {
+      // Exponer el editor para Puppeteer
+      window.editor = editor;
 
+      (window as any).loadProjectFromWindow = async (json: any) => {
+        await load(json);
+      };
+
+      // Opcional: ocultar la UI si estás haciendo solo render
+      document.body.style.overflow = "hidden";
+      document.getElementById("toolbar")?.style.setProperty("display", "none");
+      document.getElementById("sidebar")?.style.setProperty("display", "none");
+    }
+  }, [editor])
 
 
   useEffect(() => {  //recuperar el proyecto desde sessionStorage si no es nuevo
@@ -188,7 +210,6 @@ const GraphicEditor = () => {
         setAutosaveKey(key)
       }
     } catch (error) {
-      //console.log("Error loading project:", error)
       setAlert({ open: true, message: (error as any).response.data || "Ocurrio un error", type: "error" })
     } finally {
       setLoadingProject(false)
