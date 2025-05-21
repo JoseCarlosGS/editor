@@ -54,13 +54,16 @@ const CropControls = () => {
         });
 
         canvas.getObjects().forEach(obj => {
-            if (obj.metadata?.type === 'isCut') {
+            if (obj.metadata?.action === 'isCut') {
                 delete obj.metadata.type;
             }
         });
 
         active.set({
-            metadata: { type: "isCut" }
+            metadata: {
+                ...active.metadata,
+                action: "isCut"
+            }
         });
 
         const cropRect = new fabric.Rect({

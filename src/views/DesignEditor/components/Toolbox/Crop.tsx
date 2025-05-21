@@ -20,7 +20,7 @@ const Crop = () => {
         const findImageToCrop = () => {
             const allObjects = canvas.getObjects();
             const imageToCrop = allObjects.find(obj =>
-                obj.metadata?.type === 'isCut' && obj.type !== 'rect'
+                obj.metadata?.action === 'isCut' && obj.type !== 'rect'
             ) as fabric.Image;
 
             if (imageToCrop && (!originalObject || originalObject.id !== imageToCrop.id)) {
@@ -122,8 +122,14 @@ const Crop = () => {
                     type: 'StaticImage'
                 });
                 if (originalObject.metadata) {
-                    delete originalObject.metadata.type;
+                    delete originalObject.metadata.action;
                 }
+                newImage.set({
+                    name: originalObject.name,
+                    metadata: {
+                        ...originalObject.metadata
+                    }
+                })
                 canvas.add(newImage);
                 canvas.setActiveObject(newImage);
 

@@ -135,6 +135,8 @@ const Filters = () => {
         const filter = STATIC_FILTERS.find(f => f.name === name)?.filter;
         if (!filter || !editor) return;
         removeAllFilters()
+        // const savedMetadata = editor.objects.findById(activeObject.id)[0]
+        // console.log(savedMetadata)
         const active = activeObject as fabric.Image;
         if (!active.filters) active.filters = [];
         active.filters = active.filters.filter(
@@ -143,6 +145,7 @@ const Filters = () => {
         active.filters.push(filter);
         active.applyFilters();
         active.metadata = {
+            ...active.metadata,
             filters: active.filters.map((f: any) => {
                 const filterData: any = { type: f.type }
 

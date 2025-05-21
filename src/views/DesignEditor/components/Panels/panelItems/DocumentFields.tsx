@@ -47,7 +47,7 @@ const DocumentFields = () => {
   }, [objects])
 
   useEditorHistoryListener(() => {
-    console.log('Editor history changed')
+    //console.log('Editor history changed')
     const currentObjects = editor.objects.list() as ILayer[]
     setLocalObjects(currentObjects)
   })
@@ -375,7 +375,7 @@ const DocumentFields = () => {
                             if (obj && typeof obj.setSrc === "function") {
                               // Usa setSrc para actualizar el src de manera persistente
                               obj.setSrc(src, () => {
-                                console.log('src actualizado correctamente:', obj.getSrc());
+                                //console.log('src actualizado correctamente:', obj.getSrc());
                               });
                               // Opcional: Actualiza el preview si es necesario
                               editor.objects.update({ id: textObj.id, preview: src });
