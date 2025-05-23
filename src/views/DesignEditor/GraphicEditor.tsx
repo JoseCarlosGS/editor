@@ -16,6 +16,7 @@ import { ILayer } from "@layerhub-io/types"
 import { useAutosaveProject } from "~/hooks/useAutoSaveProject"
 import CustomAlert from "~/components/Errors"
 import { ErrorType } from "~/components/Errors/CustomAlert"
+import { useEditScene, FieldData } from "~/hooks/useEditScene"
 
 declare global {
   interface Window {
@@ -55,7 +56,7 @@ const GraphicEditor = () => {
     type: 'info',
   });
   const { load, error } = useLoadGraphicTemplate(setScenes, setCurrentDesign)
-
+  const { updateFieldsScene } = useEditScene()
 
   useAutosaveProject(autosaveKey || '', 1000, designLoaded);
 
@@ -67,11 +68,30 @@ const GraphicEditor = () => {
     console.log("exponiendo editor", renderMode)
     if (editor && renderMode === "true") {
       // Exponer el editor para Puppeteer
+      console.log("editor expuesto")
       window.editor = editor;
 
       (window as any).loadProjectFromWindow = async (json: any) => {
+        console.log("cargando proyecto...")
         await load(json);
       };
+
+      (window as any).updateTemplateWithData = async (data: any) => {
+        console.log("actualizando campos a: ", data)
+        while (!window.editor.objects.list().length) {
+          await new Promise(r => setTimeout(r, 100));
+        }
+
+        const objects = window.editor.objects.list();
+        const fieldObjects = objects.filter((obj: any) => obj.metadata?.type === 'field');
+
+        for (const obj of fieldObjects) {
+          const field = data.find((item: any) => item.name === obj.name);
+          if (field) {
+            await window.editor.objects.update({ text: field.value }, obj.id);
+          }
+        }
+      }
 
       // Opcional: ocultar la UI si estás haciendo solo render
       document.body.style.overflow = "hidden";

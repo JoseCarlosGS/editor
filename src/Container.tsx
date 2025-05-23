@@ -112,12 +112,12 @@ const Container = ({ children }: { children: React.ReactNode }) => {
         width: "100vw",
       }}
     >
-      {/* {loaded ? <>{children} </> : <Loading />} */}
-      {loaded ? (
+      {loaded ? <>{children} </> : <Loading />}
+      {/* {loaded ? (
         isAutenticated ? <>{children}</> : <Error403 />
       ) : (
         <Loading />
-      )}
+      )} */}
     </div>
   )
 
