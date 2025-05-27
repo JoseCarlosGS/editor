@@ -58,6 +58,19 @@
         "common": {
             "addText": "Añadir texto",
             "computer": "Archivos"
+        },
+        "templates": {
+            "basicTemplates": "Plantillas basicas",
+            "templates": "Plantillas",
+            "search": "Buscar plantillas",
+            "createNew": "Crear nueva plantilla",
+            "templateName": "Nombre de la plantilla",
+            "myTemplates": "Mis plantillas",
+            "certificates": "Certificados",
+            "invitations": "Invitaciones",
+            "businessCards": "Tarjetas de visita",
+            "flyers": "Volantes",
+            "credentials": "Credenciales"
         }
     },
     "navbar": {

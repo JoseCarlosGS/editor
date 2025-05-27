@@ -65,19 +65,19 @@ const GraphicEditor = () => {
   }, []);
 
   useEffect(() => {
-    console.log("exponiendo editor", renderMode)
+    //console.log("exponiendo editor", renderMode)
     if (editor && renderMode === "true") {
       // Exponer el editor para Puppeteer
-      console.log("editor expuesto")
+      //console.log("editor expuesto")
       window.editor = editor;
 
       (window as any).loadProjectFromWindow = async (json: any) => {
-        console.log("cargando proyecto...")
+        //console.log("cargando proyecto...")
         await load(json);
       };
 
       (window as any).updateTemplateWithData = async (data: any) => {
-        console.log("actualizando campos a: ", data)
+        //console.log("actualizando campos a: ", data)
         while (!window.editor.objects.list().length) {
           await new Promise(r => setTimeout(r, 100));
         }

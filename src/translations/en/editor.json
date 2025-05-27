@@ -58,6 +58,19 @@
         "common": {
             "addText": "Add text",
             "computer": "Computer"
+        },
+        "templates": {
+            "basicTemplates": "Basic templates",
+            "templates": "Templates",
+            "search": "Search templates",
+            "createNew": "Create new template",
+            "templateName": "Template name",
+            "myTemplates": "My templates",
+            "certificates": "Certificates",
+            "invitations": "Invitations",
+            "businessCards": "Business cards",
+            "flyers": "Flyers",
+            "credentials": "Credentials"
         }
     },
     "navbar": {
