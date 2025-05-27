@@ -1,19 +1,36 @@
 import { Button, SIZE } from "baseui/button"
 import { textComponents } from "~/constants/editor"
 import { useStyletron } from "styletron-react"
-import { useEditor } from "@layerhub-io/react"
+import { useActiveObject, useEditor, useObjects } from "@layerhub-io/react"
 import { FontItem } from "~/interfaces/common"
 import { loadFonts } from "~/utils/fonts"
-import { IStaticText } from "@layerhub-io/types"
+import { ILayer, IStaticText } from "@layerhub-io/types"
 import { nanoid } from "nanoid"
 import { Block } from "baseui/block"
 import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
 import Scrollable from "~/components/Scrollable"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
+import { useEffect, useState } from "react"
+import useEditorHistoryListener from "~/hooks/useEditorHistoryListener"
+import { useTranslation } from "react-i18next"
 
 const Text = () => {
   const editor = useEditor()
   const setIsSidebarOpen = useSetIsSidebarOpen()
+  const objects = useObjects() as ILayer[]
+  const { t } = useTranslation("editor");
+
+  const [localObjects, setLocalObjects] = useState<ILayer[]>([])
+
+  useEffect(() => {
+    setLocalObjects(objects)
+  }, [objects])
+
+  useEditorHistoryListener(() => {
+    console.log('Editor history changed')
+    const currentObjects = editor.objects.list() as ILayer[]
+    setLocalObjects(currentObjects)
+  })
 
   const addObject = async () => {
     if (editor) {
@@ -33,9 +50,8 @@ const Text = () => {
         fontStyle: "normal",
         fontURL: font.url,
         fill: "#333333",
-        metadata: {},
       }
-      editor.objects.add<IStaticText>(options)
+      editor.objects.add(options)
     }
   }
   const addComponent = async (component: any) => {
@@ -54,16 +70,17 @@ const Text = () => {
         await loadFonts(filteredFonts)
       } else {
         if (component.type === "StaticText" || component.type === "DynamicText") {
-        fontItemsList.push({
-          name: component.fontFamily,
-          url: component.fontURL,
-        })
-        await loadFonts(fontItemsList)
-      }
+          fontItemsList.push({
+            name: component.fontFamily,
+            url: component.fontURL,
+          })
+          await loadFonts(fontItemsList)
+        }
       }
       editor.objects.add(component)
     }
   }
+
   return (
     <Block $style={{ flex: 1, display: "flex", flexDirection: "column" }}>
       <Block
@@ -75,7 +92,7 @@ const Text = () => {
           padding: "1.5rem",
         }}
       >
-        <Block>Text</Block>
+        <Block>{t(`panels.panelsList.text`)}</Block>
 
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
           <AngleDoubleLeft size={18} />
@@ -94,7 +111,7 @@ const Text = () => {
               },
             }}
           >
-            Add text
+            {t(`panels.common.addText`)}
           </Button>
 
           <Block
@@ -109,6 +126,8 @@ const Text = () => {
               <TextComponentItem onClick={addComponent} key={tc.id} component={tc} />
             ))}
           </Block>
+
+
         </Block>
       </Scrollable>
     </Block>

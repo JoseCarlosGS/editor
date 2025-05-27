@@ -1,10 +1,13 @@
-import React from "react"
+import React, { useState } from "react";
 import { Block } from "baseui/block"
 import Scrollable from "~/components/Scrollable"
 import { HexColorPicker } from "react-colorful"
 import { Delete } from "baseui/icon"
-import { throttle } from "lodash"
+import { set, throttle } from "lodash"
 import { useEditor } from "@layerhub-io/react"
+import useAppContext from "~/hooks/useAppContext"
+import ArrowBackOutline from "~/components/Icons/ArrowBackOutline";
+import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen";
 
 const PRESET_COLORS = [
   "#f44336",
@@ -23,10 +26,15 @@ const PRESET_COLORS = [
 
 const CanvasFill = () => {
   const editor = useEditor()
+  const { activePanel, setActiveSubMenu } = useAppContext();
+  const setIsSidebarOpen = useSetIsSidebarOpen()
 
   const updateCanvasBackground = throttle((color: string) => {
     editor.canvas.setBackgroundColor(color)
   }, 100)
+
+  const [isVisible, setIsVisible] = useState(true);
+
 
   return (
     <Block $style={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -39,9 +47,16 @@ const CanvasFill = () => {
           padding: "1.5rem",
         }}
       >
+        <Block onClick={() => setActiveSubMenu(activePanel)} $style={{ cursor: "pointer", display: "flex" }}>
+          <ArrowBackOutline size={24} />
+        </Block>
         <Block>Canvas Fill</Block>
 
-        <Block $style={{ cursor: "pointer", display: "flex" }}>
+        <Block
+          $style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}
+          onClick={() => setIsSidebarOpen(false)}// Ocultar el componente
+          aria-label="Close Canvas Fill"
+        >
           <Delete size={24} />
         </Block>
       </Block>

@@ -4,6 +4,11 @@ export const BASE_ITEMS = [
     name: "Templates",
   },
   {
+    id: "documentFields",
+    name: "DocumentFields",
+  },
+
+  {
     id: "customize",
     name: "Customize",
   },
@@ -23,15 +28,15 @@ export const BASE_ITEMS = [
     id: "text",
     name: "Text",
   },
-  {
-    id: "graphics",
-    name: "Graphics",
-  },
+  // {
+  //   id: "graphics",
+  //   name: "Graphics",
+  // },
 
-  {
-    id: "pixabay",
-    name: "Pixabay",
-  },
+  // {
+  //   id: "pixabay",
+  //   name: "Pixabay",
+  // },
   {
     id: "layers",
     name: "Layers",

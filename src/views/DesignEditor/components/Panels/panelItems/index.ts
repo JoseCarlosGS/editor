@@ -14,6 +14,10 @@ import TextFill from "./TextFill"
 import PathFill from "./PathFill"
 import CanvasFill from "./CanvasFill"
 import TextEffects from "./TextEffects"
+import DocumentFields from "./DocumentFields"
+import Filters from "./Filters"
+import ImageSettings from "./ImageSettings"
+
 export default {
   StaticText: TextProperties,
   Text: Text,
@@ -31,4 +35,7 @@ export default {
   PathFill: PathFill,
   CanvasFill: CanvasFill,
   TextEffects: TextEffects,
-}
+  DocumentFields: DocumentFields,
+  Filters: Filters,
+  ImageSettings: ImageSettings
+};

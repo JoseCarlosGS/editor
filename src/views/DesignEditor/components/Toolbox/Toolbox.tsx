@@ -13,9 +13,19 @@ interface ToolboxState {
 }
 
 const Container = styled("div", (props) => ({
-  boxShadow: "rgb(0 0 0 / 15%) 0px 1px 1px",
+  position: "absolute",
+  top: "10px",
+  left: "50%",
+  transform: "translateX(-50%)",
+  zIndex: 10,
+  boxShadow: "rgb(0 0 0 / 15%) 0px 3px 3px",
   height: "50px",
   display: "flex",
+  alignItems: "center",
+  padding: "0 12px",
+  backgroundColor: "white",
+  borderRadius: "8px",
+  transition: "opacity 0.3s ease, transform 0.3s ease",
 }))
 
 const Toolbox = () => {

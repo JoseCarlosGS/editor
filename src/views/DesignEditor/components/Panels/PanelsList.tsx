@@ -9,7 +9,7 @@ import Scrollable from "~/components/Scrollable"
 import { Block } from "baseui/block"
 
 const Container = styled("div", (props) => ({
-  width: "80px",
+  width: "70px",
   backgroundColor: props.$theme.colors.primary100,
   display: "flex",
 }))
@@ -50,16 +50,16 @@ const PanelListItem = ({ label, icon, activePanel, name }: any) => {
         setActivePanel(name)
       }}
       $style={{
-        width: "80px",
-        height: "80px",
+        width: "70px",
+        height: "70px",
         backgroundColor: name === activePanel ? theme.colors.white : theme.colors.primary100,
         display: "flex",
         alignItems: "center",
         flexDirection: "column",
         justifyContent: "center",
-        fontFamily: "Uber Move Text",
+        fontFamily: "Roboto, sans-serif",
         fontWeight: 500,
-        fontSize: "0.8rem",
+        fontSize: "0.75rem",
         userSelect: "none",
         transition: "all 0.5s",
         gap: "0.1rem",

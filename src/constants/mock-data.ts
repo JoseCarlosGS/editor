@@ -12,7 +12,7 @@ export const graphics = [
     path: [["M", 60, 0], ["L", 0, 0], ["L", 0, 60], ["L", 60, 60], ["L", 60, 0], ["Z"]],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635011325399_603749.png",
+    preview: "https://ik.imagekit.io/kz4jyfhac/assets/elements/elements/caja-cuadrada.png?updatedAt=1746534996371",
     id: "E2mcHFkwGA-MTJcfl3Abs",
   },
   {
@@ -29,7 +29,7 @@ export const graphics = [
     fill: "#CBCBCB",
     metadata: {},
     id: "SY15tkntkk8S1PudoMfRI",
-    preview: "https://ik.imagekit.io/scenify/1635011631415_820612.png",
+    preview: "https://ik.imagekit.io/cezllypgi/flecha-hacia-arriba.png?updatedAt=1743785126165",
   },
   {
     left: 0,
@@ -67,7 +67,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014101144_519480.png",
+    preview: "https://ik.imagekit.io/cezllypgi/hexagono.png?updatedAt=1743785126251",
     id: "9VWsxoB_O8LSAkCIRjNFY",
   },
   {
@@ -134,7 +134,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014130664_615881.png",
+    preview: "https://ik.imagekit.io/cezllypgi/estrella-de-david.png?updatedAt=1743785126163",
     id: "fRmRlanl-hydswssHKhn6",
   },
   {
@@ -217,7 +217,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014150489_628269.png",
+    preview: "https://ik.imagekit.io/cezllypgi/flores.png?updatedAt=1743785126408",
     id: "A8WLbfJFV1D58X1RUZADd",
   },
   {
@@ -304,7 +304,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014314495_390592.png",
+    preview: "https://ik.imagekit.io/cezllypgi/twitter.png?updatedAt=1743785126387",
     id: "0dwJMLuw8DK9jddPSapOV",
   },
   {
@@ -348,7 +348,7 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014323800_275038.png",
+    preview: "https://ik.imagekit.io/cezllypgi/corazon.png?updatedAt=1743785126454",
     id: "3w9KPQbyeUe3kgtwpMZx4",
   },
   {
@@ -481,9 +481,206 @@ export const graphics = [
     ],
     fill: "#CBCBCB",
     metadata: {},
-    preview: "https://ik.imagekit.io/scenify/1635014340531_452464.png",
+    preview: "https://ik.imagekit.io/cezllypgi/pulgar-arriba.png?updatedAt=1743785126170",
     id: "vAE3f8-4M0-2j5PF04cVY",
   },
+    {
+      "left": 0,
+      "top": 0,
+      "width": 60,
+      "height": 60,
+      "originX": "left",
+      "originY": "top",
+      "scaleX": 4,
+      "scaleY": 4,
+      "type": "StaticPath",
+      "path": [
+          ["M", 10, 0],    // Punto superior izquierdo (desplazado 10px a la derecha)
+          ["L", 50, 0],    // Punto superior derecho (desplazado 10px a la izquierda)
+          ["L", 60, 60],   // Punto inferior derecho (sin modificar)
+          ["L", 0, 60],    // Punto inferior izquierdo (sin modificar)
+          ["Z"]            // Cierra el path
+      ],
+      "fill": "#CBCBCB",
+      "metadata": {},
+      "preview": "https://ik.imagekit.io/kz4jyfhac/assets/elements/elements/trapecio.png?updatedAt=1746539202812",
+      "id": "trapezoid-" + Date.now().toString(36)
+  },
+    {
+      "left": 0,
+      "top": 0,
+      "width": 60,
+      "height": 60,
+      "originX": "left",
+      "originY": "top",
+      "scaleX": 4,
+      "scaleY": 4,
+      "type": "StaticPath",
+      "path": [
+          ["M", 0, 0],  
+          ["L", 60, 0], 
+          ["L", 50, 60],   
+          ["L", 10, 60],  
+          ["Z"]            
+      ],
+      "fill": "#CBCBCB",
+      "metadata": {},
+      "preview": "https://ik.imagekit.io/kz4jyfhac/assets/elements/elements/trapecio-inv.png?updatedAt=1746539202854",
+      "id": "trapezoid-" + Date.now().toString(36)
+  },
+  {
+    "left": 0,
+    "top": 0,
+    "width": 60,
+    "height": 60,
+    "originX": "left",
+    "originY": "top",
+    "scaleX": 4,
+    "scaleY": 4,
+    "type": "StaticPath",
+    "path": [
+        ["M", 20, 0], 
+        ["L", 60, 0],  
+        ["L", 40, 60],   
+        ["L", 0, 60],    
+        ["Z"]            
+    ],
+    "fill": "#CBCBCB",
+    "metadata": {},
+    "preview": "https://ik.imagekit.io/kz4jyfhac/assets/elements/elements/paralelogramo-inv.png?updatedAt=1746539660899",
+    "id": "parallelogram-" + Date.now().toString(36)
+  },
+  {
+    "left": 0,
+    "top": 0,
+    "width": 60,
+    "height": 60,
+    "originX": "left",
+    "originY": "top",
+    "scaleX": 4,
+    "scaleY": 4,
+    "type": "StaticPath",
+    "path": [
+        ["M", 0, 0],       // Punto superior izquierdo (sin cambio)
+        ["L", 40, 0],      // Punto superior derecho (desplazado 20px a la izquierda)
+        ["L", 60, 60],     // Punto inferior derecho (sin cambio)
+        ["L", 20, 60],     // Punto inferior izquierdo (desplazado 20px a la derecha)
+        ["Z"]
+    ],
+    "fill": "#CBCBCB",
+    "metadata": {},
+    "preview": "https://ik.imagekit.io/kz4jyfhac/assets/elements/elements/paralelogramo.png?updatedAt=1746539660927",
+    "id": "parallelogram-" + Date.now().toString(36)
+  },
+  {
+    "left": 0,
+    "top": 0,
+    "width": 60,
+    "height": 60,
+    "originX": "left",
+    "originY": "top",
+    "scaleX": 4,
+    "scaleY": 4,
+    "type": "StaticPath",
+    "path": [
+        ["M", 30, 0],                  // Punto superior (vértice 1)
+        ["L", 60, 23],                 // Punto superior derecho (vértice 2)
+        ["L", 48, 60],                 // Punto inferior derecho (vértice 3)
+        ["L", 12, 60],                 // Punto inferior izquierdo (vértice 4)
+        ["L", 0, 23],                  // Punto superior izquierdo (vértice 5)
+        ["Z"]                          // Cierra el path
+    ],
+    "fill": "#CBCBCB",
+    "metadata": {},
+    "preview": "https://ik.imagekit.io/kz4jyfhac/assets/elements/elements/pentagono.png?updatedAt=1746540021143",
+    "id": "pentagon-" + Date.now().toString(36)
+  },
+  {
+      "left": 0,
+    "top": 0,
+    "width": 80,  // Aumentado para mejor proporción
+    "height": 60,
+    "originX": "left",
+    "originY": "top",
+    "scaleX": 4,
+    "scaleY": 4,
+    "type": "StaticPath",
+    "path": [
+        ["M", 0, 20],      // Inicio línea (parte superior)
+        ["L", 50, 20],     // Línea hasta punta (grosor: 30px)
+        ["L", 50, 0],      // Esquina superior punta
+        ["L", 80, 30],     // Punta extrema
+        ["L", 50, 60],     // Esquina inferior punta
+        ["L", 50, 40],     // Vuelve a línea (parte inferior)
+        ["L", 0, 40],      // Cierre línea inferior
+        ["Z"]
+    ],
+    "fill": "#CBCBCB",
+    "metadata": {},
+    "preview": "https://ik.imagekit.io/kz4jyfhac/assets/elements/elements/flecha-correcta.png?updatedAt=1746540629195",
+    "id": "arrowH-wide-" + Date.now().toString(36)
+  },
+  {
+    "left": 0,
+    "top": 0,
+    "width": 60,
+    "height": 80,  // Aumentado para mejor proporción
+    "originX": "left",
+    "originY": "top",
+    "scaleX": 4,
+    "scaleY": 4,
+    "type": "StaticPath",
+    "path": [
+        ["M", 20, 80],     // Inicio línea (parte izquierda)
+        ["L", 20, 30],     // Línea hasta punta (grosor: 30px)
+        ["L", 0, 30],      // Esquina izquierda punta
+        ["L", 30, 0],      // Punta extrema
+        ["L", 60, 30],     // Esquina derecha punta
+        ["L", 40, 30],     // Vuelve a línea (parte derecha)
+        ["L", 40, 80],     // Cierre línea derecha
+        ["Z"]
+    ],
+    "fill": "#CBCBCB",
+    "metadata": {},
+    "preview": "https://ik.imagekit.io/kz4jyfhac/assets/elements/elements/flecha-correcta-inv.png?updatedAt=1746540629195",
+    "id": "arrowV-wide-" + Date.now().toString(36)
+  },
+  {
+    "id": "UXU4h1xR-M_oVOkbTw036s",
+    "angle": 0,
+    "left": 0,
+    "top": 0,
+    "width": 512,
+    "height": 455.52,
+    "originX": "left",
+    "originY": "top",
+    "scaleX": 0.30,
+    "scaleY": 0.30,
+    "type": "StaticPath",
+    "path": [
+        ["M", 270, 3697],
+        ["l", 0, -1034],
+        ["l", 113, -6],
+        ["c", 293, -17, 601, -115, 1002, -317],
+        ["c", 244, -124, 388, -207, 840, -488],
+        ["c", 528, -328, 666, -409, 925, -538],
+        ["c", 368, -183, 687, -282, 973, -300],
+        ["l", 107, -7],
+        ["l", 0, 1035],
+        ["l", 0, 1035],
+        ["l", -112, 6],
+        ["c", -290, 17, -611, 119, -1013, 322],
+        ["c", -237, 120, -379, 203, -865, 505],
+        ["c", -619, 384, -844, 509, -1165, 643],
+        ["c", -235, 99, -570, 177, -757, 177],
+        ["l", -48, 0],
+        ["l", 0, -1033],
+        ["Z"]
+      ],
+    "fill": "#000000",
+    "metadata": {},
+    "preview": "https://ik.imagekit.io/kz4jyfhac/assets/elements/elements/forma2.png?updatedAt=1746538240642"
+},
 ]
 
 export const vectors = [

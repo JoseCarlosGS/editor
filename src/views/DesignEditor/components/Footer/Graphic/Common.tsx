@@ -6,6 +6,10 @@ import { Button, KIND, SIZE } from "baseui/button"
 import { Slider } from "baseui/slider"
 import { Input } from "baseui/input"
 import { useEditor, useZoomRatio } from "@layerhub-io/react"
+import useAppContext from "~/hooks/useAppContext"
+import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
+import useIsSidebarOpen from "~/hooks/useIsSidebarOpen"
+import panelItems from "../../Panels/panelItems"
 
 const Container = styled<"div", {}, Theme>("div", ({ $theme }) => ({
   height: "50px",
@@ -27,9 +31,43 @@ const Common = () => {
   })
   const editor = useEditor()
   const zoomRatio: number = useZoomRatio()
+  const previousZoomRef = React.useRef(zoomRatio);
+  const { activePanel, setActivePanel, activeSubMenu, setActiveSubMenu } = useAppContext();
+  const setIsSidebarOpen = useSetIsSidebarOpen()
+  const isSidebarOpen = useIsSidebarOpen()
 
   React.useEffect(() => {
     setOptions({ ...options, zoomRatio: Math.round(zoomRatio * 100) })
+
+    if (editor && Math.abs(previousZoomRef.current - zoomRatio) > 0.001) {
+      const container = document.querySelector('.layerhub-canvas-container');
+
+      if (container) {
+        // Calcular el centro actual del viewport
+        const scrollLeft = container.scrollLeft;
+        const scrollTop = container.scrollTop;
+        const viewportWidth = container.clientWidth;
+        const viewportHeight = container.clientHeight;
+
+        const centerX = scrollLeft + viewportWidth / 2;
+        const centerY = scrollTop + viewportHeight / 2;
+
+        // Calcular el factor de escala entre el zoom anterior y el actual
+        const scaleFactor = zoomRatio / previousZoomRef.current;
+
+        // Calcular la nueva posición de desplazamiento para mantener el centro
+        const newScrollLeft = centerX * scaleFactor - viewportWidth / 2;
+        const newScrollTop = centerY * scaleFactor - viewportHeight / 2;
+
+        // Aplicar el desplazamiento
+        requestAnimationFrame(() => {
+          container.scrollLeft = newScrollLeft;
+          container.scrollTop = newScrollTop;
+        });
+      }
+    }
+    previousZoomRef.current = zoomRatio;
+
   }, [zoomRatio])
 
   const handleChange = (type: string, value: any) => {
@@ -42,10 +80,17 @@ const Common = () => {
     }
   }
 
+  const handleLayersMenu = () => {
+    if (!isSidebarOpen) {
+      setIsSidebarOpen(true)
+    }
+    setActiveSubMenu("Layers");
+  }
+
   return (
     <Container>
       <div>
-        <Button kind={KIND.tertiary} size={SIZE.compact}>
+        <Button kind={KIND.tertiary} size={SIZE.compact} onClick={() => handleLayersMenu()}>
           <Icons.Layers size={20} />
         </Button>
       </div>

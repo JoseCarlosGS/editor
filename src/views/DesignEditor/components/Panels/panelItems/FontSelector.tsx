@@ -13,10 +13,11 @@ import Scrollable from "~/components/Scrollable"
 import { Block } from "baseui/block"
 import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
+import { Delete } from "baseui/icon"
 
 const FontSelector = () => {
   const [query, setQuery] = React.useState("")
-  const { setActiveSubMenu } = useAppContext()
+  const {activePanel, setActiveSubMenu } = useAppContext()
   const setIsSidebarOpen = useSetIsSidebarOpen()
 
   const [commonFonts, setCommonFonts] = React.useState<any[]>([])
@@ -51,6 +52,10 @@ const FontSelector = () => {
     }
   }
 
+  const handleClose = () => {
+    setActiveSubMenu(activePanel); // Restaurar el panel activo anterior
+  };
+
   return (
     <Block $style={{ flex: 1, display: "flex", flexDirection: "column" }}>
       <Block
@@ -63,11 +68,14 @@ const FontSelector = () => {
         }}
       >
         <Block $style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <Block onClick={() => setActiveSubMenu(activePanel)} $style={{ cursor: "pointer", display: "flex" }}>
           <ArrowBackOutline size={24} />
+          </Block>
+          
           <Block>Choose font</Block>
         </Block>
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
-          <AngleDoubleLeft size={18} />
+          <Delete size={24} />
         </Block>
       </Block>
 
@@ -96,7 +104,7 @@ const FontSelector = () => {
                 key={index}
                 onClick={() => handleFontFamilyChange(font)}
                 className={css({
-                  height: "40px",
+                  height: "80px",
                   display: "flex",
                   alignItems: "center",
                   cursor: "pointer",
@@ -107,7 +115,7 @@ const FontSelector = () => {
                 })}
                 id={font.id}
               >
-                <img src={font.preview} />
+                <img src={font.preview} style={{ height: "80px" }} alt="Preview" />
               </div>
             )
           })}

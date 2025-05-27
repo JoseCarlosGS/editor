@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from "axios"
 import { Resource } from "~/interfaces/editor"
+import { environment } from "~/constants/environment/environment"
 
 type IElement = any
 type IFontFamily = any
@@ -8,14 +9,25 @@ type Template = any
 
 class ApiService {
   base: AxiosInstance
+
   constructor() {
     this.base = axios.create({
-      // baseURL: "http://localhost:8080",
-      baseURL: "https://burly-note-production.up.railway.app",
-      headers: {
-        Authorization: "Bearer QYT8s1NavSTpTAxURji98Fpg",
-      },
+      baseURL: environment.apiBaseUrl,
     })
+
+    // Interceptor para añadir el token en cada request automáticamente
+    this.base.interceptors.request.use((config) => {
+      const token = sessionStorage.getItem("auth_token")
+      if (token) {
+        config.headers!.Authorization = `Bearer ${token}`
+      }
+      return config
+    })
+  }
+
+  setAuthToken(token: string) {
+    this.base.defaults.headers.common["Authorization"] = `Bearer ${token}`
+    sessionStorage.setItem("auth_token", token)
   }
 
   signin(props: any) {
@@ -163,6 +175,17 @@ class ApiService {
       }
     })
   }
+
+  loadTemplateByFilename(filename: string): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await this.base.get(`/templates/load/${filename}`)
+        resolve(data)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
   //CREATIONS
 
   createCreation(props: Partial<Template>): Promise<Template> {
@@ -247,6 +270,49 @@ class ApiService {
       try {
         const { data } = await this.base.get("/resources/pixabay?query=flower")
         resolve(data.data)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  getTemplateByParams(personaId: string, eventoId: string, filename: string): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        //console.log(this.base.defaults)
+        const { data } = await this.base.get(
+          `/archivos/leer?personaId=${personaId}&eventoId=${eventoId}&filename=${filename}`
+        )
+        resolve(data)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  getTokenById(id: string): Promise<any> {
+    const url = this.base.defaults.baseURL
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await axios.get(`${url}/data/get/${id}`)
+        resolve(data)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  createProject(personaId: string, eventoId: string, filename: string | null, proyecto: any): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      const request = {
+        personaId: personaId,
+        eventoId: eventoId,
+        data: proyecto,
+        filename: filename,
+      }
+      try {
+        const data = await this.base.post(`/archivos/guardar`, request)
+        resolve(data)
       } catch (err) {
         reject(err)
       }

@@ -7,12 +7,15 @@ import { getFonts } from "./store/slices/fonts/actions"
 import { getPixabayResources } from "./store/slices/resources/actions"
 import { getUploads } from "./store/slices/uploads/actions"
 import { useAppDispatch } from "./store/store"
+import api from "./services/api"
+import Error403 from "./views/Errors/403"
 
 const Container = ({ children }: { children: React.ReactNode }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const { isMobile, setIsMobile } = useAppContext()
   const [loaded, setLoaded] = useState(false)
   const dispatch = useAppDispatch()
+  const [isAutenticated, setIsAutenticated] = useState(false)
   const updateMediaQuery = (value: number) => {
     if (!isMobile && value >= 800) {
       setIsMobile(false)
@@ -22,6 +25,24 @@ const Container = ({ children }: { children: React.ReactNode }) => {
       setIsMobile(false)
     }
   }
+
+  const queryParams = new URLSearchParams(location.search);
+  const id = queryParams.get("id")
+  const sessiontoken = sessionStorage.getItem('auth_token')
+
+  useEffect(() => {
+    if (!sessiontoken) {
+      if (!id) return
+      loadAuthentication(id);
+      setTimeout(() => {
+        setLoaded(true)
+      }, 1000)
+    } else {
+      api.setAuthToken(sessiontoken);
+      setIsAutenticated(true);
+    }
+  }, [])
+
   useEffect(() => {
     const containerElement = containerRef.current!
     const containerWidth = containerElement.clientWidth
@@ -65,6 +86,22 @@ const Container = ({ children }: { children: React.ReactNode }) => {
       .catch((err) => console.log({ err }))
   }
 
+  const loadAuthentication = async (id: string) => {
+    try {
+      const response = await api.getTokenById(id);
+      if (response) {
+        sessionStorage.setItem('auth_token', response.data);
+        sessionStorage.setItem('persona_id', response.personaId);
+        //api.setAuthToken(response.data);
+        setIsAutenticated(true);
+      }
+    } catch (e) {
+      console.error('Auth failed', e);
+    } finally {
+      setLoaded(true);
+    }
+  }
+
   return (
     <div
       ref={containerRef}
@@ -75,9 +112,15 @@ const Container = ({ children }: { children: React.ReactNode }) => {
         width: "100vw",
       }}
     >
-      {loaded ? <>{children} </> : <Loading />}
+      {/* {loaded ? <>{children} </> : <Loading />} */}
+      {loaded ? (
+        isAutenticated ? <>{children}</> : <Error403 />
+      ) : (
+        <Loading />
+      )}
     </div>
   )
+
 }
 
 export default Container

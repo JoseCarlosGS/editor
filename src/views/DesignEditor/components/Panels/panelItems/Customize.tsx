@@ -15,6 +15,9 @@ import SwapHorizontal from "~/components/Icons/SwapHorizontal"
 import { Tabs, Tab } from "baseui/tabs"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
+import { useActiveObject } from "@layerhub-io/react"
+import { useTranslation } from "react-i18next"
+
 
 const colors = ["#ffffff", "#9B9B9B", "#4A4A4A", "#000000", "#A70C2C", "#DA9A15", "#F8E71D", "#47821A", "#4990E2"]
 
@@ -25,6 +28,7 @@ interface State {
 const Customize = () => {
   const editor = useEditor()
   const setIsSidebarOpen = useSetIsSidebarOpen()
+  const { t } = useTranslation("editor")
 
   const [state, setState] = React.useState<State>({
     backgroundColor: "#000000",
@@ -51,7 +55,7 @@ const Customize = () => {
           padding: "1.5rem",
         }}
       >
-        <Block>Customize</Block>
+        <Block>{t(`panels.customize.customize`)}</Block>
 
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
           <AngleDoubleLeft size={18} />
@@ -74,7 +78,7 @@ const Customize = () => {
                 fontSize: "14px",
               }}
             >
-              <div>Background color</div>
+              <div>{t(`panels.customize.backgroundColor`)}</div>
               <div
                 style={{
                   display: "grid",
@@ -164,9 +168,11 @@ const Customize = () => {
 
 const ResizeTemplate = () => {
   const [isOpen, setIsOpen] = React.useState(false)
+  const { t } = useTranslation("editor")
   const [activeKey, setActiveKey] = React.useState<string | number>("0")
   const { currentDesign, setCurrentDesign } = useDesignEditorContext()
   const editor = useEditor()
+  const active = useActiveObject()
   const [desiredFrame, setDesiredFrame] = React.useState({
     width: 0,
     height: 0,
@@ -186,6 +192,10 @@ const ResizeTemplate = () => {
       })
     }
   }, [frame])
+
+  React.useEffect(() => {
+    console.log(active)
+  }, [])
 
   const applyResize = () => {
     // @ts-ignore
@@ -214,7 +224,10 @@ const ResizeTemplate = () => {
   return (
     <>
       <Button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          editor.objects.deselect();
+          setIsOpen(true)
+        }}
         size={SIZE.compact}
         overrides={{
           Root: {
@@ -224,7 +237,7 @@ const ResizeTemplate = () => {
           },
         }}
       >
-        Resize template
+        {t(`panels.customize.modal.resizeTemplate`)}
       </Button>
       <Modal
         onClose={() => setIsOpen(false)}
@@ -237,6 +250,7 @@ const ResizeTemplate = () => {
         overrides={{
           Dialog: {
             style: {
+              zIndex: 9999,
               borderTopRightRadius: "8px",
               borderEndStartRadius: "8px",
               borderEndEndRadius: "8px",
@@ -251,10 +265,11 @@ const ResizeTemplate = () => {
             $style={{
               padding: "2rem 1rem 1rem",
               textAlign: "center",
-              fontWeight: 500,
+              fontWeight: 600,
+              fontFamily: "Roboto, sans-serif",
             }}
           >
-            Choose a format and resize your template.
+            {t(`panels.customize.modal.title`)}
           </Block>
           <Tabs
             overrides={{
@@ -278,34 +293,63 @@ const ResizeTemplate = () => {
               setActiveKey(activeKey)
             }}
           >
-            <Tab title="Preset size">
+            <Tab title={t(`panels.customize.modal.presetSize`)}>
               <Block $style={{ width: "100%", height: "400px" }}>
                 <Scrollbar>
-                  <Block $style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>
+                  <Block
+                    $style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                      gap: "1rem",
+                      justifyItems: "center",
+                    }}
+                  >
                     {sampleFrames.map((sampleFrame, index) => (
                       <Block
                         onClick={() => setSelectedFrame(sampleFrame)}
                         $style={{
+                          width: "190px",
+                          height: "250px",
                           padding: "0.5rem",
-                          backgroundColor: selectedFrame.id === sampleFrame.id ? "rgb(243,244,245)" : "#ffffff",
+                          backgroundColor:
+                            selectedFrame.id === sampleFrame.id
+                              ? "rgb(232, 232, 233)"
+                              : "rgb(247, 250, 252)",
                           ":hover": {
-                            backgroundColor: "rgb(246,247,248)",
+                            backgroundColor: "rgb(232, 232, 233)",
                             cursor: "pointer",
                           },
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
                         }}
                         key={index}
                       >
                         <Block
                           $style={{
-                            height: "120px",
+                            flex: 1,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            overflow: "hidden",
                           }}
                         >
-                          <img src={sampleFrame.preview} />
+                          <img
+                            src={sampleFrame.preview}
+                            style={{
+                              maxWidth: "100%",
+                              maxHeight: "100%",
+                              objectFit: "contain",
+                            }}
+                          />
                         </Block>
-                        <Block $style={{ fontSize: "13px", textAlign: "center" }}>
+                        <Block
+                          $style={{
+                            fontSize: "13px",
+                            textAlign: "center",
+                            paddingTop: "0.5rem",
+                          }}
+                        >
                           <Block $style={{ fontWeight: 500 }}>{sampleFrame.name}</Block>
                           <Block $style={{ color: "rgb(119,119,119)" }}>
                             {sampleFrame.width} x {sampleFrame.height}px
@@ -317,10 +361,15 @@ const ResizeTemplate = () => {
                 </Scrollbar>
               </Block>
             </Tab>
-            <Tab title="Custom size">
+            <Tab title={t(`panels.customize.modal.customSize`)}>
               <Block $style={{ padding: "2rem 2rem" }}>
                 <Block
-                  $style={{ display: "grid", gridTemplateColumns: "1fr 50px 1fr", alignItems: "end", fontSize: "14px" }}
+                  $style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 50px 1fr",
+                    alignItems: "end",
+                    fontSize: "14px"
+                  }}
                 >
                   <Input
                     onChange={(e: any) => setDesiredFrame({ ...desiredFrame, width: e.target.value })}
@@ -352,9 +401,14 @@ const ResizeTemplate = () => {
             </Tab>
           </Tabs>
         </Block>
-        <Block $style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "2rem" }}>
+        <Block $style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingBottom: "2rem"
+        }}>
           <Button disabled={!isEnabled} onClick={applyResize} style={{ width: "190px" }}>
-            Resize template
+            {t(`panels.customize.modal.resizeTemplate`)}
           </Button>
         </Block>
       </Modal>

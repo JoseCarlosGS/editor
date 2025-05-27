@@ -40,3 +40,36 @@ input[type="number"] {
 .react-player video {
     max-height: 740px;
 }
+
+/* Estilos para las barras de desplazamiento */
+.layerhub-canvas-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+  }
+  
+  .layerhub-canvas-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .layerhub-canvas-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .layerhub-canvas-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+  }
+
+  /* Estilos para el cursor */
+.line-tool-active {
+  cursor: crosshair !important;
+}
+
+.line-tool-drawing {
+  cursor: grabbing !important;
+}
+
+.line-tool-container * {
+  cursor: inherit !important;
+}
