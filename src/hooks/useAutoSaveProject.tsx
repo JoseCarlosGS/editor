@@ -25,7 +25,7 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
             console.warn("Guardado forzado cancelado: escena vacía");
             return;
         }
-
+        const frame = currentScene.frame
         const updatedScenes = latestScenesRef.current.map((scn) => {
             return scn.id === currentScene.id
                 ? { id: currentScene.id, layers: currentScene.layers, name: currentScene.name }
@@ -34,6 +34,7 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
 
         const project = {
             ...latestDesignRef.current,
+            frame: frame,
             scenes: updatedScenes,
         };
 

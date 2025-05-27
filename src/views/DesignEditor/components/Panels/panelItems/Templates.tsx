@@ -9,6 +9,7 @@ import { SAMPLE_TEMPLATES } from "~/constants/editor"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
 import { useTranslation } from "react-i18next"
+import { BASIC_TEMPLATES } from "~/constants/templates/certificates/basic_certificates"
 
 const Templates = () => {
   const editor = useEditor()
@@ -58,13 +59,24 @@ const Templates = () => {
         </Block>
       </Block>
       <Scrollable>
-        <div style={{ padding: "0 1.5rem" }}>
-          <div style={{ display: "grid", gap: "0.5rem", gridTemplateColumns: "1fr 1fr" }}>
-            {SAMPLE_TEMPLATES.map((item, index) => {
-              return <ImageItem onClick={() => loadTemplate(item)} key={index} preview={`${item.preview}?tr=w-320`} />
-            })}
+        <Block>
+          <div style={{ padding: "0 1.5rem" }}>
+            <Block $style={{ marginBottom: "10px", marginTop: "10px" }}>{t(`panels.templates.basicTemplates`)}</Block>
+            <div style={{ display: "grid", gap: "0.5rem", gridTemplateColumns: "1fr 1fr" }}>
+              {SAMPLE_TEMPLATES.map((item, index) => {
+                return <ImageItem onClick={() => loadTemplate(item)} key={index} preview={`${item.preview}?tr=w-320`} />
+              })}
+            </div>
           </div>
-        </div>
+          <div style={{ padding: "0 1.5rem" }}>
+            <Block $style={{ marginBottom: "10px", marginTop: "10px" }}>{t(`panels.templates.certificates`)}</Block>
+            <div style={{ display: "grid", gap: "0.5rem", gridTemplateColumns: "1fr 1fr" }}>
+              {BASIC_TEMPLATES.map((item, index) => {
+                return <ImageItem onClick={() => loadTemplate(item)} key={index} preview={`${item.preview}?tr=w-320`} />
+              })}
+            </div>
+          </div>
+        </Block>
       </Scrollable>
     </Block>
   )
