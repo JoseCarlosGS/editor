@@ -17,9 +17,13 @@ import Github from "~/components/Icons/Github"
 import api from "~/services/api"
 import CustomAlert from "~/components/Errors"
 import { ErrorType } from "~/components/Errors/CustomAlert"
+import CustomAlertWithButtons from "~/components/Errors/CustomAlertWithButtons"
 import { useRestoreImageFilters } from "~/hooks/useRestoreImageFilters"
 import { Languages } from "lucide-react"
 import { useTranslation } from 'react-i18next';
+import { AlertCircle } from "lucide-react"
+import { useAutosaveProject } from "~/hooks/useAutoSaveProject"
+
 
 const Container = styled<"div", {}, Theme>("div", ({ $theme }) => ({
   height: "50px",
@@ -41,6 +45,8 @@ const Navbar = () => {
   const filename = sessionStorage.getItem('f_nm') || queryParams.get("filename");
   const [changesSaved, setChangesSaved] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [showNewProjectModal, setShowNewProjectModal] = useState(false)
+  const { forceSaveProject } = useAutosaveProject(sessionStorage.getItem('project_key')!)
   const [alert, setAlert] = useState<{
     open: boolean;
     message: string;
@@ -198,6 +204,22 @@ const Navbar = () => {
       } else {
         return parseVideoJSON()
       }
+    }
+  }
+
+  const newProject = async () => {
+    try {
+      const key = sessionStorage.getItem('project_key')
+      sessionStorage.removeItem(key!)
+      sessionStorage.removeItem('project_key')
+      if (sessionStorage.getItem('f_nm'))
+        sessionStorage.removeItem('f_nm')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      forceSaveProject()
+      window.location.reload()
+      setShowNewProjectModal(false)
     }
   }
 
@@ -371,11 +393,12 @@ const Navbar = () => {
         id: currentDesign.id,
         type: "GRAPHIC",
         name: currentDesign.name,
-        frame: currentDesign.frame,
+        frame: currentScene.frame,
         scenes: updatedScenes,
         metadata: {},
         preview: previewBase64 as string
       }
+      //console.log(graphicTemplate)
       try {
         setLoading(true)
         const response = await api.createProject(sessionStorage.getItem('persona_id')!, sessionStorage.getItem('evento_id')!, filename, graphicTemplate)
@@ -419,6 +442,14 @@ const Navbar = () => {
           onClose={() => setAlert({ ...alert, open: false })}
           duration={4000}
         />
+        {showNewProjectModal && (<CustomAlertWithButtons
+          icon={<AlertCircle color="orange" size={60} />}
+          message={t(`navbar.newProjectModal.message`)}
+          onAccept={newProject}
+          onCancel={() => setShowNewProjectModal(false)}
+          acceptText={t(`navbar.newProjectModal.acceptText`)}
+          cancelText={t(`navbar.newProjectModal.cancelText`)}
+        />)}
         <DesignTitle changesSaved={changesSaved} />
         <Block $style={{
           display: "flex",
@@ -433,7 +464,7 @@ const Navbar = () => {
             ref={inputFileRef}
             style={{ display: "none" }}
           />
-          <Button
+          {/* <Button
             size="compact"
             onClick={handleInputFileRefClick}
             kind={KIND.tertiary}
@@ -446,9 +477,9 @@ const Navbar = () => {
             }}
           >
             {t(`navbar.import`)}
-          </Button>
+          </Button> */}
 
-          <Button
+          {/* <Button
             size="compact"
             onClick={makeDownloadTemplate}
             kind={KIND.tertiary}
@@ -461,6 +492,20 @@ const Navbar = () => {
             }}
           >
             {t(`navbar.export`)}
+          </Button> */}
+          <Button
+            size="compact"
+            onClick={() => setShowNewProjectModal(true)}
+            kind={KIND.tertiary}
+            overrides={{
+              StartEnhancer: {
+                style: {
+                  marginRight: "4px",
+                },
+              },
+            }}
+          >
+            {t(`navbar.new`)}
           </Button>
           <Button
             size="compact"

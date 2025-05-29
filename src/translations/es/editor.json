@@ -74,9 +74,18 @@
         }
     },
     "navbar": {
+        "tittle": {
+            "default": "Nuevo proyecto"
+        },
         "import": "Importar",
         "export": "Exportar",
-        "save": "Guardar"
+        "save": "Guardar",
+        "new": "Nuevo",
+        "newProjectModal": {
+            "message": "¿Esta seguro que desea iniciar un nuevo proyecto? Podrian perderse los cambios que no han sido guardados.",
+            "acceptText": "Aceptar",
+            "cancelText": "Cancelar"
+        }
     },
     "common": {
         "buttonLabels": {
