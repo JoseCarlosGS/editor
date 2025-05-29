@@ -74,9 +74,18 @@
         }
     },
     "navbar": {
+        "tittle": {
+            "default": "New project"
+        },
         "import": "Import",
         "export": "Export",
-        "save": "Save"
+        "save": "Save",
+        "new": "New",
+        "newProjectModal": {
+            "message": "Are you sure you want to start a new project? Unsaved changes may be lost.",
+            "acceptText": "Accept",
+            "cancelText": "Cancel"
+        }
     },
     "common": {
         "buttonLabels": {
