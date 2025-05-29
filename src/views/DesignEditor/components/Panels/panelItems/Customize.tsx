@@ -17,7 +17,7 @@ import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
 import { useActiveObject } from "@layerhub-io/react"
 import { useTranslation } from "react-i18next"
-
+import { useAutosaveProject } from "~/hooks/useAutoSaveProject"
 
 const colors = ["#ffffff", "#9B9B9B", "#4A4A4A", "#000000", "#A70C2C", "#DA9A15", "#F8E71D", "#47821A", "#4990E2"]
 
@@ -169,6 +169,7 @@ const Customize = () => {
 const ResizeTemplate = () => {
   const [isOpen, setIsOpen] = React.useState(false)
   const { t } = useTranslation("editor")
+  const { forceSaveProject } = useAutosaveProject(sessionStorage.getItem('project_key')!)
   const [activeKey, setActiveKey] = React.useState<string | number>("0")
   const { currentDesign, setCurrentDesign } = useDesignEditorContext()
   const editor = useEditor()
@@ -213,6 +214,7 @@ const ResizeTemplate = () => {
         },
       })
     }
+    forceSaveProject()
     setIsOpen(false)
   }
   const isEnabled =
