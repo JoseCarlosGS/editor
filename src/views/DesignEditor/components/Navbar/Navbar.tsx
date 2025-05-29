@@ -371,11 +371,12 @@ const Navbar = () => {
         id: currentDesign.id,
         type: "GRAPHIC",
         name: currentDesign.name,
-        frame: currentDesign.frame,
+        frame: currentScene.frame,
         scenes: updatedScenes,
         metadata: {},
         preview: previewBase64 as string
       }
+      //console.log(graphicTemplate)
       try {
         setLoading(true)
         const response = await api.createProject(sessionStorage.getItem('persona_id')!, sessionStorage.getItem('evento_id')!, filename, graphicTemplate)
