@@ -3373,6 +3373,16 @@ export const SAMPLE_FONTS = [
     url: "https://fonts.gstatic.com/s/labelleaurore/v11/RrQIbot8-mNYKnGNDkWlocovHeIIG-eFNVmULg.ttf",
     category: "handwriting",
   },
+  {
+    id: "font_U75vuTcE1tlIGGt5g50fz" + Date.now().toString(),
+    family: "Kapakana",
+    full_name: "Kapakana Regular",
+    postscript_name: "Kapakana-Regular",
+    preview: "https://ik.imagekit.io/cezllypgi/fonts/La%20Belle%20Aurore.png?updatedAt=1744300089851",
+    style: "Kapakana-Regular",
+    url: "https://fonts.gstatic.com/s/kapakana/v17/sykw-yN0m6InS7OD9DqQ3tc.woff2",
+    category: "handwriting",
+  },
 ]
 const textComponent1 = {
   id: "8_rxQGqFj-sJWchXvBM49",

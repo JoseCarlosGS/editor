@@ -7,7 +7,9 @@ import editor_es from "./es/editor.json"
 
 i18next.init({
   interpolation: { escapeValue: false },
-  lng: "en",
+  lng: navigator.language, // establece el idioma detectado al iniciar
+  fallbackLng: "en",
+  //lng: "en",
   resources: {
     en: {
       common: common_en,
