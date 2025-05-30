@@ -39,7 +39,7 @@
         },
         "elements": {
             "elements": "Elements",
-            "lines": "Lines (Comming soon)",
+            "lines": "Lines",
             "forms": "Forms",
             "custom": "Figures"
         },
@@ -71,6 +71,10 @@
             "businessCards": "Business cards",
             "flyers": "Flyers",
             "credentials": "Credentials"
+        },
+        "textFill": {
+            "textFill": "Text fill",
+            "presetColors": "Preset colors"
         }
     },
     "navbar": {

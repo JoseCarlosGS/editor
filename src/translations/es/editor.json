@@ -39,7 +39,7 @@
         },
         "elements": {
             "elements": "Elementos",
-            "lines": "Lineas (Proximamente)",
+            "lines": "Lineas",
             "forms": "Formas",
             "custom": "Figuras"
         },
@@ -71,6 +71,10 @@
             "businessCards": "Tarjetas de visita",
             "flyers": "Volantes",
             "credentials": "Credenciales"
+        },
+        "textFill": {
+            "textFill": "Color de texto",
+            "presetColors": "Colores preestablecidos"
         }
     },
     "navbar": {
