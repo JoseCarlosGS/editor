@@ -11,14 +11,15 @@ import { SAMPLE_FONTS } from "~/constants/editor"
 import { groupBy } from "lodash"
 import Scrollable from "~/components/Scrollable"
 import { Block } from "baseui/block"
-import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 import { Delete } from "baseui/icon"
+import { useTranslation } from "react-i18next"
 
 const FontSelector = () => {
   const [query, setQuery] = React.useState("")
-  const {activePanel, setActiveSubMenu } = useAppContext()
+  const { activePanel, setActiveSubMenu } = useAppContext()
   const setIsSidebarOpen = useSetIsSidebarOpen()
+  const { t } = useTranslation("editor")
 
   const [commonFonts, setCommonFonts] = React.useState<any[]>([])
   const [css] = useStyletron()
@@ -69,10 +70,10 @@ const FontSelector = () => {
       >
         <Block $style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <Block onClick={() => setActiveSubMenu(activePanel)} $style={{ cursor: "pointer", display: "flex" }}>
-          <ArrowBackOutline size={24} />
+            <ArrowBackOutline size={24} />
           </Block>
-          
-          <Block>Choose font</Block>
+
+          <Block>{t(`panels.fontSelector.chooseFont`)}</Block>
         </Block>
         <Block onClick={() => setIsSidebarOpen(false)} $style={{ cursor: "pointer", display: "flex" }}>
           <Delete size={24} />
@@ -90,7 +91,7 @@ const FontSelector = () => {
           }}
           clearable
           onChange={(e) => setQuery((e.target as any).value)}
-          placeholder="Search font"
+          placeholder={t(`panels.fontSelector.searchFont`)}
           size={SIZE.compact}
           startEnhancer={<Search size={16} />}
         />
@@ -104,7 +105,7 @@ const FontSelector = () => {
                 key={index}
                 onClick={() => handleFontFamilyChange(font)}
                 className={css({
-                  height: "80px",
+                  height: "55px",
                   display: "flex",
                   alignItems: "center",
                   cursor: "pointer",
@@ -115,7 +116,7 @@ const FontSelector = () => {
                 })}
                 id={font.id}
               >
-                <img src={font.preview} style={{ height: "80px" }} alt="Preview" />
+                <img src={font.preview} style={{ height: "35px" }} alt="Preview" />
               </div>
             )
           })}

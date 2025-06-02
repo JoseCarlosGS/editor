@@ -75,6 +75,10 @@
         "textFill": {
             "textFill": "Color de texto",
             "presetColors": "Colores preestablecidos"
+        },
+        "fontSelector": {
+            "chooseFont": "Elegir fuente",
+            "searchFont": "Buscar fuente"
         }
     },
     "navbar": {
