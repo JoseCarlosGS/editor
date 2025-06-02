@@ -66,7 +66,7 @@ const Text = () => {
   const handleOnClick = (submenu: string) => {
     console.log("submenu", submenu)
     setIsSidebarOpen(true)
-    setActiveSubMenu(submenu)  
+    setActiveSubMenu(submenu)
   }
 
   React.useEffect(() => {
@@ -93,7 +93,7 @@ const Text = () => {
     }
   }, [editor, activeObject])
 
- 
+
 
   const makeBold = React.useCallback(async () => {
     if (state.bold) {
@@ -239,7 +239,17 @@ const Text = () => {
           display="flex"
           alignItems="center"
         >
-          <Block>{state.family}</Block>
+          <Block
+            $style={{
+              maxWidth: "100px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+          >
+            {state.family}
+          </Block>
           <Block display="flex">
             <ChevronDown size={22} />
           </Block>
@@ -282,10 +292,10 @@ const Text = () => {
             </Button>
           </StatefulTooltip>
 
-          <StatefulTooltip 
-            placement={PLACEMENT.bottom} 
-            showArrow={true} 
-            accessibilityType="tooltip" 
+          <StatefulTooltip
+            placement={PLACEMENT.bottom}
+            showArrow={true}
+            accessibilityType="tooltip"
             content="Underline"
           >
             <Button
@@ -513,7 +523,7 @@ const TextSpacing = () => {
                     InputContainer: {},
                   }}
                   size={SIZE.mini}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   value={Math.round(state.lineHeight)}
                 />
               </Block>
@@ -575,7 +585,7 @@ const TextSpacing = () => {
                     InputContainer: {},
                   }}
                   size={SIZE.mini}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   value={Math.round(state.charSpacing)}
                 />
               </Block>
