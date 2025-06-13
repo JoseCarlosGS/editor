@@ -23,6 +23,7 @@ import { toBase64 } from "~/utils/data"
 import ImagePreview from "~/views/DesignEditor/utils/common/ImagePreview"
 import { Type, Image, QrCode } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { set } from "lodash"
 
 const DocumentFields = () => {
   const editor = useEditor()
@@ -41,6 +42,7 @@ const DocumentFields = () => {
   const [newFieldName, setNewFieldName] = useState("");
   const [newFieldContent, setNewFieldContent] = useState("");
   const [fieldType, setFieldType] = useState([{ id: "text", label: "Texto" }]);
+  const [fieldNameError, setFieldNameError] = useState(false);
 
   useEffect(() => {
     setLocalObjects(objects)
@@ -69,6 +71,10 @@ const DocumentFields = () => {
   ];
 
   const handleAddNewField = async () => {
+    if (!newFieldName.trim()) {
+      setFieldNameError(true);
+      return;
+    }
 
     if (newFieldName.trim()) {
       if (fieldType[0].id !== "image") {
@@ -155,7 +161,7 @@ const DocumentFields = () => {
           editor.objects.add(firma)
         }
         if (fieldType[0].id === "qr-code") {
-          const response = await fetch("https://cdn-icons-png.flaticon.com/512/714/714390.png")
+          const response = await fetch("https://ik.imagekit.io/kz4jyfhac/assets/resources/qr-code.png?updatedAt=1749827556025")
           const blob = await response.blob()
           const file = new File([blob], "image.jpg", { type: blob.type });
           const base64 = await toBase64(file) as unknown as string
@@ -165,8 +171,8 @@ const DocumentFields = () => {
             name: newFieldName,
             src: base64,
             preview: base64,
-            scaleX: 0.4,
-            scaleY: 0.4,
+            // scaleX: 0.4,
+            // scaleY: 0.4,
             metadata: {
               type: "field",
               contentType: "qr"
@@ -187,8 +193,8 @@ const DocumentFields = () => {
           name: newFieldName,
           src: base64,
           preview: base64,
-          scaleX: 0.5,
-          scaleY: 0.5,
+          //scaleX: 0.5,
+          //scaleY: 0.5,
           metadata: {
             type: "field",
             contentType: "image"
@@ -205,6 +211,7 @@ const DocumentFields = () => {
     setNewFieldName("");
     setNewFieldContent("");
     setFieldType([typeOptions[0]]);
+    setFieldNameError(false);
   };
 
   const handleEdit = (textObj: any) => {
@@ -394,14 +401,15 @@ const DocumentFields = () => {
           ))}
         </Block>
       </Scrollable>
-    </Block><Modal
-      onClose={() => setIsModalOpen(false)}
-      isOpen={isModalOpen}
-      animate
-      autoFocus
-      size={SIZE.default}
-      role={ROLE.dialog}
-    >
+    </Block>
+      <Modal
+        onClose={() => { setIsModalOpen(false); setFieldNameError(false) }}
+        isOpen={isModalOpen}
+        animate
+        autoFocus
+        size={SIZE.default}
+        role={ROLE.dialog}
+      >
         <ModalHeader>{t(`panels.fields.modal.newField`)}</ModalHeader>
         <ModalBody>
           <FormControl label={t(`panels.fields.modal.fieldType`)}>
@@ -440,12 +448,74 @@ const DocumentFields = () => {
             </Block>
           </FormControl>
 
-          <FormControl label={t(`panels.fields.modal.fieldName`)}>
+          {/* Advertencia para QR Code */}
+          {fieldType[0].id === "qr-code" && (
+            <Block
+              marginBottom="1rem"
+              padding="1rem"
+              backgroundColor="#fff8e1"
+              $style={{
+                borderRadius: "8px",
+                border: "1px solid #ffd54f",
+                borderLeft: "4px solid #ff9800",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+              }}
+            >
+              <Block display="flex" alignItems="flex-start">
+                <Block
+                  marginRight="0.75rem"
+                  marginTop="0.125rem"
+                  $style={{
+                    color: "#ff8f00",
+                    fontSize: "16px",
+                    flexShrink: 0
+                  }}
+                >
+                  ⚠️
+                </Block>
+                <Block $style={{ flex: 1 }}>
+                  <Block
+                    marginBottom="0.25rem"
+                    $style={{
+                      fontSize: "13px",
+                      color: "#e65100",
+                      fontWeight: "600",
+                      lineHeight: "1.2"
+                    }}
+                  >
+                    {t(`panels.fields.modal.qrWarningTitle`)}
+                  </Block>
+                  <Block
+                    $style={{
+                      fontSize: "12px",
+                      color: "#bf360c",
+                      lineHeight: "1.4",
+                      letterSpacing: "0.02em"
+                    }}
+                  >
+                    {t(`panels.fields.modal.qrWarning`)}
+                  </Block>
+                </Block>
+              </Block>
+            </Block>
+          )}
+
+          <FormControl
+            label={t(`panels.fields.modal.fieldName`)}
+            error={fieldNameError ? t(`panels.fields.modal.emptyNameError`) : ""}
+          >
             <Input
               value={newFieldName}
-              onChange={e => setNewFieldName(e.target.value)}
+              onChange={e => {
+                setNewFieldName(e.target.value);
+                if (fieldNameError && e.target.value.trim()) {
+                  setFieldNameError(false);
+                }
+              }}
               placeholder={t(`panels.fields.modal.example`)}
-              clearOnEscape />
+              clearOnEscape
+              error={fieldNameError}
+            />
           </FormControl>
 
           {fieldType[0].id === "image" && (
@@ -454,10 +524,10 @@ const DocumentFields = () => {
           )}
         </ModalBody>
         <ModalFooter>
-          <ModalButton kind="tertiary" onClick={() => setIsModalOpen(false)}>
+          <ModalButton kind="tertiary" onClick={() => { setIsModalOpen(false); setFieldNameError(false) }}>
             {t(`common.buttonLabels.cancel`)}
           </ModalButton>
-          <ModalButton onClick={handleAddNewField} >
+          <ModalButton onClick={handleAddNewField}>
             {t(`panels.fields.modal.createField`)}
           </ModalButton>
         </ModalFooter>

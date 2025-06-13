@@ -88,7 +88,27 @@ const GraphicEditor = () => {
         for (const obj of fieldObjects) {
           const field = data.find((item: any) => item.name === obj.name);
           if (field) {
-            await window.editor.objects.update({ text: field.value }, obj.id);
+            if (obj.type === 'StaticText') {
+              await window.editor.objects.update({ text: field.value }, obj.id);
+            } else if (obj.type === 'StaticImage') {
+              //await window.editor.objects.update({ src: field.value }, obj.id);
+              const prevWidth = obj.width;
+              const prevHeight = obj.height;
+              const prevScaleX = obj.scaleX;
+              const prevScaleY = obj.scaleY;
+
+              await obj.setSrc(field.value, () => {
+                const imgElement = obj.getElement();
+                obj.set({
+                  width: prevWidth,
+                  height: prevHeight,
+                  scaleX: prevScaleX,
+                  scaleY: prevScaleY,
+                });
+                window.editor.canvas.requestRenderAll(); // Asegura que se dibuje después del cambio de imagen
+              });
+              // Reset scale to 1
+            }
           }
         }
       }
