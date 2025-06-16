@@ -91,23 +91,28 @@ const GraphicEditor = () => {
             if (obj.type === 'StaticText') {
               await window.editor.objects.update({ text: field.value }, obj.id);
             } else if (obj.type === 'StaticImage') {
-              //await window.editor.objects.update({ src: field.value }, obj.id);
-              const prevWidth = obj.width;
-              const prevHeight = obj.height;
-              const prevScaleX = obj.scaleX;
-              const prevScaleY = obj.scaleY;
+              // Guardar las dimensiones RENDERIZADAS reales
+              const prevRenderedWidth = obj.width * obj.scaleX;
+              const prevRenderedHeight = obj.height * obj.scaleY;
+              const prevLeft = obj.left;
+              const prevTop = obj.top;
 
               await obj.setSrc(field.value, () => {
                 const imgElement = obj.getElement();
+                // Calcular la escala necesaria basada en las dimensiones naturales de la nueva imagen
+                const newScaleX = prevRenderedWidth / imgElement.naturalWidth;
+                const newScaleY = prevRenderedHeight / imgElement.naturalHeight;
+
                 obj.set({
-                  width: prevWidth,
-                  height: prevHeight,
-                  scaleX: prevScaleX,
-                  scaleY: prevScaleY,
+                  width: imgElement.naturalWidth,
+                  height: imgElement.naturalHeight,
+                  scaleX: newScaleX,
+                  scaleY: newScaleY,
+                  left: prevLeft,
+                  top: prevTop
                 });
-                window.editor.canvas.requestRenderAll(); // Asegura que se dibuje después del cambio de imagen
+                window.editor.canvas.requestRenderAll();
               });
-              // Reset scale to 1
             }
           }
         }
