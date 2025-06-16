@@ -88,7 +88,32 @@ const GraphicEditor = () => {
         for (const obj of fieldObjects) {
           const field = data.find((item: any) => item.name === obj.name);
           if (field) {
-            await window.editor.objects.update({ text: field.value }, obj.id);
+            if (obj.type === 'StaticText') {
+              await window.editor.objects.update({ text: field.value }, obj.id);
+            } else if (obj.type === 'StaticImage') {
+              // Guardar las dimensiones RENDERIZADAS reales
+              const prevRenderedWidth = obj.width * obj.scaleX;
+              const prevRenderedHeight = obj.height * obj.scaleY;
+              const prevLeft = obj.left;
+              const prevTop = obj.top;
+
+              await obj.setSrc(field.value, () => {
+                const imgElement = obj.getElement();
+                // Calcular la escala necesaria basada en las dimensiones naturales de la nueva imagen
+                const newScaleX = prevRenderedWidth / imgElement.naturalWidth;
+                const newScaleY = prevRenderedHeight / imgElement.naturalHeight;
+
+                obj.set({
+                  width: imgElement.naturalWidth,
+                  height: imgElement.naturalHeight,
+                  scaleX: newScaleX,
+                  scaleY: newScaleY,
+                  left: prevLeft,
+                  top: prevTop
+                });
+                window.editor.canvas.requestRenderAll();
+              });
+            }
           }
         }
       }

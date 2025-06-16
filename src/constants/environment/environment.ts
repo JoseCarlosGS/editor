@@ -3,6 +3,7 @@
 export const environment = {
   production: false,
   //apiBaseUrl: "https://66sqhsvx-8080.brs.devtunnels.ms/api",
+  //apiBaseUrl: "http://localhost:8088/api",
   apiBaseUrl: "https://www.mireserva.miclases.com/api",
   authServiceUrl: "https://auth.example.com",
   analyticsServiceUrl: "https://analytics.example.com",

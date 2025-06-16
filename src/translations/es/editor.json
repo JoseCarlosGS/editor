@@ -24,7 +24,10 @@
                 "qrCode": "Codigo QR",
                 "fieldName": "Nombre del campo",
                 "createField": "Crear campo",
-                "example": "Ej: Titulo, Fecha, Nombre..."
+                "example": "Ej: Titulo, Fecha, Nombre...",
+                "qrWarningTitle": "Importante",
+                "qrWarning": "El campo QR indica dónde aparecerá el código QR que será generado por el sistema. Si requiere incluir un código QR personalizado (por ejemplo, con diseño o información adicional), puede agregarlo manualmente como imagen independiente en el documento.",
+                "emptyNameError": "El nombre del campo no puede estar vacío."
             }
         },
         "customize": {
