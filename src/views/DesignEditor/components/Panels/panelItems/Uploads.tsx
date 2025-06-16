@@ -11,6 +11,8 @@ import { captureFrame, loadVideoResource } from "~/utils/video"
 import { ILayer } from "@layerhub-io/types"
 import { toBase64 } from "~/utils/data"
 import { useTranslation } from "react-i18next"
+import { Upload } from "lucide-react"
+import { Padding } from "baseui/popover/styled-components"
 
 export default function () {
   const inputFileRef = React.useRef<HTMLInputElement>(null)
@@ -79,11 +81,12 @@ export default function () {
               overrides={{
                 Root: {
                   style: {
-                    width: "100%",
+                    width: "100%"
                   },
                 },
               }}
             >
+              <Upload size={20} style={{ marginRight: "8px" }} />
               {t(`panels.common.computer`)}
             </Button>
             <input onChange={handleFileInput} type="file" id="file" ref={inputFileRef} style={{ display: "none" }} />

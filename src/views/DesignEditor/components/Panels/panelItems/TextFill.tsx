@@ -5,6 +5,10 @@ import { HexColorPicker } from "react-colorful"
 import { Delete } from "baseui/icon"
 import { throttle } from "lodash"
 import { useActiveObject, useEditor } from "@layerhub-io/react"
+import useAppContext from "~/hooks/useAppContext"
+import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
+import { useTranslation } from "react-i18next"
+import ArrowBackOutline from "~/components/Icons/ArrowBackOutline"
 
 const PRESET_COLORS = [
   "#f44336",
@@ -25,6 +29,9 @@ const TextFill = () => {
   const [color, setColor] = React.useState("#b32aa9")
   const activeObject = useActiveObject()
   const editor = useEditor()
+  const { activePanel, setActiveSubMenu } = useAppContext();
+  const setIsSidebarOpen = useSetIsSidebarOpen()
+  const { t } = useTranslation("editor")
 
   const updateObjectFill = throttle((color: string) => {
     if (activeObject) {
@@ -45,9 +52,14 @@ const TextFill = () => {
           padding: "1.5rem",
         }}
       >
-        <Block>Text Fill</Block>
+        <Block onClick={() => setActiveSubMenu(activePanel)} $style={{ cursor: "pointer", display: "flex" }}>
+          <ArrowBackOutline size={24} />
+        </Block>
+        <Block>{t(`panels.textFill.textFill`)}</Block>
 
-        <Block $style={{ cursor: "pointer", display: "flex" }}>
+        <Block
+          onClick={() => setIsSidebarOpen(false)}
+          $style={{ cursor: "pointer", display: "flex" }}>
           <Delete size={24} />
         </Block>
       </Block>
@@ -55,7 +67,7 @@ const TextFill = () => {
         <Block padding="0 1.5rem">
           <HexColorPicker onChange={updateObjectFill} style={{ width: "100%" }} />
           <Block>
-            <Block $style={{ padding: "0.75rem 0", fontWeight: 500, fontSize: "14px" }}>Preset colors</Block>
+            <Block $style={{ padding: "0.75rem 0", fontWeight: 500, fontSize: "14px" }}>{t(`panels.textFill.presetColors`)}</Block>
             <Block $style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr", gap: "0.25rem" }}>
               {PRESET_COLORS.map((color, index) => (
                 <Block

@@ -24,7 +24,10 @@
                 "qrCode": "Codigo QR",
                 "fieldName": "Nombre del campo",
                 "createField": "Crear campo",
-                "example": "Ej: Titulo, Fecha, Nombre..."
+                "example": "Ej: Titulo, Fecha, Nombre...",
+                "qrWarningTitle": "Importante",
+                "qrWarning": "El campo QR indica dónde aparecerá el código QR que será generado por el sistema. Si requiere incluir un código QR personalizado (por ejemplo, con diseño o información adicional), puede agregarlo manualmente como imagen independiente en el documento.",
+                "emptyNameError": "El nombre del campo no puede estar vacío."
             }
         },
         "customize": {
@@ -39,7 +42,7 @@
         },
         "elements": {
             "elements": "Elementos",
-            "lines": "Lineas (Proximamente)",
+            "lines": "Lineas",
             "forms": "Formas",
             "custom": "Figuras"
         },
@@ -71,12 +74,29 @@
             "businessCards": "Tarjetas de visita",
             "flyers": "Volantes",
             "credentials": "Credenciales"
+        },
+        "textFill": {
+            "textFill": "Color de texto",
+            "presetColors": "Colores preestablecidos"
+        },
+        "fontSelector": {
+            "chooseFont": "Elegir fuente",
+            "searchFont": "Buscar fuente"
         }
     },
     "navbar": {
+        "tittle": {
+            "default": "Nuevo proyecto"
+        },
         "import": "Importar",
         "export": "Exportar",
-        "save": "Guardar"
+        "save": "Guardar",
+        "new": "Nuevo",
+        "newProjectModal": {
+            "message": "¿Esta seguro que desea iniciar un nuevo proyecto? Podrian perderse los cambios que no han sido guardados.",
+            "acceptText": "Aceptar",
+            "cancelText": "Cancelar"
+        }
     },
     "common": {
         "buttonLabels": {

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useEditor } from "@layerhub-io/react";
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
+import { current } from "@reduxjs/toolkit";
 
 export function useAutosaveProject(key: string, delay = 1000, enabled: boolean = true) {
     const { scenes, currentDesign } = useDesignEditorContext();
@@ -17,10 +18,12 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
         latestScenesRef.current = scenes;
     }, [scenes]);
 
-    const forceSaveProject = useCallback(async () => {
+    const forceSaveProject = useCallback(async (nameOverride?: string) => {
         if (!editor) return;
 
         const currentScene = editor.scene.exportToJSON();
+        //console.log(latestDesignRef.current.name)
+        //console.log(latestDesignRef)
         if (!currentScene?.layers?.length) {
             console.warn("Guardado forzado cancelado: escena vacía");
             return;
@@ -34,6 +37,7 @@ export function useAutosaveProject(key: string, delay = 1000, enabled: boolean =
 
         const project = {
             ...latestDesignRef.current,
+            name: nameOverride ?? latestDesignRef.current.name,
             frame: frame,
             scenes: updatedScenes,
         };
